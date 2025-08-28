@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gap Inversion Sieve: Complete ζ(s) Calculator</title>
+    <title>Gap Decomposition Theorem: Complete ζ(s) Calculator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -315,7 +315,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔬 Gap Inversion Sieve</h1>
+        <h1>🔬 Gap Decompositon Theorem </h1>
         <div class="subtitle">Prime Gap Factorization of ζ(s) and π Reconstruction</div>
         
         <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
