@@ -16,7 +16,7 @@
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.0);
             backdrop-filter: blur(20px);
             border-radius: 25px;
             padding: 40px;
