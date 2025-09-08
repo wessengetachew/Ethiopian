@@ -1,900 +1,1166 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gap Decomposition Theorem: Complete ζ(s) Calculator</title>
+    <title>Prime Constellation Explorer</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1800px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+            animation: float 15s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .container {
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
-            background: linear-gradient(135deg, #0c1445 0%, #1e3c72 50%, #2a5298 100%);
-            color: white;
-            min-height: 100vh;
         }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.0);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 40px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        h1 {
+
+        .header {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            padding: 50px 30px;
             text-align: center;
-            margin-bottom: 15px;
-            font-size: 3em;
-            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.6);
-            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 15px;
         }
-        
-        .subtitle {
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 1.4em;
-            opacity: 0.9;
-            font-style: italic;
-            color: #a8e6cf;
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
         }
-        
-        .theorem-section {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(254, 202, 87, 0.15));
-            border: 3px solid rgba(255, 107, 107, 0.3);
-            padding: 35px;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.2);
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
         }
-        
-        .theorem-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #ff6b6b;
-            margin-bottom: 25px;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .main-formula {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 30px;
-            border-radius: 15px;
-            margin: 25px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.4em;
-            text-align: center;
-            border: 3px solid rgba(72, 219, 251, 0.4);
-            box-shadow: inset 0 0 20px rgba(72, 219, 251, 0.1);
-        }
-        
-        .gap-explanation {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 25px 0;
-            border-left: 6px solid #48dbfb;
-        }
-        
-        .controls {
+
+        .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
             padding: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
         }
-        
+
         .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 12px;
+            margin-bottom: 25px;
         }
-        
-        label {
-            font-weight: bold;
-            color: #a8e6cf;
-            font-size: 1.1em;
+
+        .control-group:last-child {
+            margin-bottom: 0;
         }
-        
-        input, select, button {
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-        
-        input, select {
-            background: rgba(255, 255, 255, 0.15);
+
+        .control-title {
+            font-size: 1.3rem;
+            font-weight: 700;
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
+        .control-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 2px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
         input::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
-        
-        button {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .pattern-display {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
             color: white;
+            padding: 16px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .preset-btn {
+            padding: 10px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
-        }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.6);
-        }
-        
-        .results {
-            display: grid;
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .result-card {
-            background: rgba(255, 255, 255, 0.12);
-            padding: 35px;
-            border-radius: 20px;
-            border-left: 8px solid #ff6b6b;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-        
-        .result-header {
-            font-size: 1.6em;
-            font-weight: bold;
-            margin-bottom: 30px;
-            color: #ff6b6b;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .zeta-calculation {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1em;
-            line-height: 1.8;
-            border: 2px solid rgba(72, 219, 251, 0.3);
-        }
-        
-        .zeta-comparison {
-            background: linear-gradient(135deg, rgba(168, 230, 207, 0.2), rgba(72, 219, 251, 0.2));
-            border: 3px solid #48dbfb;
-            padding: 30px;
-            border-radius: 15px;
-            margin: 25px 0;
             text-align: center;
         }
-        
-        .gap-breakdown {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
+
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
-        
-        .gap-class {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 4px solid #feca57;
-        }
-        
-        .gap-table {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 25px 0;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        table {
+
+        .calculate-btn {
             width: 100%;
-            border-collapse: collapse;
+            padding: 16px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
         }
-        
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 1em;
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
-        
-        th {
-            background: rgba(255, 107, 107, 0.3);
-            font-weight: bold;
-            color: #fff;
-            font-size: 1.1em;
+
+        .calculate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
-        
-        .highlight {
-            background: rgba(254, 202, 87, 0.4);
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            color: #feca57;
+
+        .results-panel {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            overflow: hidden;
         }
-        
-        .special-gap {
-            background: rgba(255, 159, 243, 0.3);
-            border-left-color: #ff9ff3;
-        }
-        
+
         .loading {
+            display: none;
+            padding: 60px;
             text-align: center;
-            padding: 40px;
-            font-size: 1.4em;
-            color: #48dbfb;
+            color: white;
         }
-        
-        .error-display {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin: 15px 0;
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
-        
-        .pi-extraction {
-            background: linear-gradient(135deg, rgba(255, 159, 243, 0.2), rgba(255, 107, 107, 0.2));
-            border: 3px solid #ff9ff3;
-            padding: 30px;
-            border-radius: 15px;
-            margin: 25px 0;
-            text-align: center;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        .graph-container {
-            background: rgba(255, 255, 255, 0.12);
-            padding: 35px;
-            border-radius: 20px;
-            border-left: 8px solid #48dbfb;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            margin: 30px 0;
-        }
-        
-        .graph-canvas {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            border: 2px solid rgba(72, 219, 251, 0.3);
-            margin: 20px 0;
-        }
-        
-        .graph-legend {
+
+        .tabs {
             display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 20px 0;
-            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.1);
         }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+
+        .tab {
+            flex: 1;
+            padding: 20px 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: white;
             background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
+            border-bottom-color: #4facfe;
         }
-        
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            color: white;
         }
-        
-        a:hover {
-            color: #feca57;
-            text-shadow: 0 0 10px rgba(72, 219, 251, 0.5);
+
+        .tab-content.active {
+            display: block;
         }
-        
-        .author-credit {
-            text-align: center;
-            margin-top: 40px;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            border-left: 4px solid #4facfe;
+        }
+
+        .info-box.success { border-left-color: #43e97b; }
+        .info-box.warning { border-left-color: #f093fb; }
+        .info-box.error { border-left-color: #f5576c; }
+
+        .info-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .info-content {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .formula {
+            background: linear-gradient(135deg, #434343, #000000);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        .welcome {
+            text-align: center;
+            padding: 60px 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .welcome h3 {
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .welcome p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                position: static;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔬 Gap Decompositon Theorem </h1>
-        <div class="subtitle">Prime Gap Factorization of ζ(s) and π Reconstruction</div>
-        
-        <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
-            <div style="font-size: 1.2em; color: #a8e6cf; margin-bottom: 10px;">
-                <strong>Research by Wessen Getachew</strong>
-            </div>
-            <div style="font-size: 1em; opacity: 0.9;">
-                Follow research updates: <a href="https://twitter.com/7DView" target="_blank" style="color: #48dbfb; text-decoration: none; font-weight: bold;">@7DView</a> on Twitter
+        <div class="header">
+            <h1>K-Tuple Constellation Explorer</h1>
+            <p>Universal Identity Calculator</p>
+            <div class="subtitle">
+                Discover and analyze prime constellations using the revolutionary Wessen Master Identity
             </div>
         </div>
-        
-        <div class="theorem-section">
-            <div class="theorem-title">📐 Wessen Getachew Gap Decomposition Theorem (2025)</div>
-            
-            <div class="main-formula">
-                ζ(s) = ∏<sub>g∈{1,2,4,6,...}</sub> ( ∏<sub>p: gap(p)=g</sub> (1 - p<sup>-s</sup>)<sup>-1</sup> )
-            </div>
-            
-            <div class="gap-explanation">
-                <strong>🔥 Revolutionary Discovery:</strong><br><br>
-                
-                <strong>1. Unique Prime Usage:</strong><br>
-                Each prime p appears exactly once in the product - classified by gap(p) = next_prime(p) - p<br>
-                For example: 2 has gap(2)=1, 3 has gap(3)=2, 5 has gap(5)=2, 7 has gap(7)=4, etc.<br><br>
-                
-                <strong>2. Direct Factorization Method:</strong><br>
-                Instead of traditional analytic continuation approaches, this theorem provides<br>
-                <em>direct factorization of ζ(s) through prime gap structure!</em><br><br>
-                
-                <strong>3. Gap Classification Principle:</strong><br>
-                Prime gaps encode fundamental arithmetic information that directly reconstructs zeta functions<br>
-                through discrete spacing structure rather than continuous analysis.<br><br>
-                
-                <strong>Gap Classes & Their Role:</strong><br>
-                • <strong>Gap 1:</strong> Only prime 2 (since gap(2) = 3-2 = 1)<br>
-                • <strong>Gap 2:</strong> Primes 3, 5 (since gap(3) = 5-3 = 2, gap(5) = 7-5 = 2)<br>
-                • <strong>Gap 4:</strong> Primes 7, 13 (since gap(7) = 11-7 = 4, gap(13) = 17-13 = 4)<br>
-                • <strong>Gap 6:</strong> Primes 11, 23 (since gap(11) = 17-11 = 6, gap(23) = 29-23 = 6)<br>
-                • <strong>Larger gaps:</strong> Each prime p classified by gap(p) = next_prime(p) - p<br><br>
-                
-                <strong>π Reconstruction:</strong> π ≈ √(6 × ζ(2)) where ζ(2) is built from gap products!<br>
-                This shows how prime gaps directly encode geometric constants!<br><br>
-                
-                <strong>⚡ Key Insight:</strong> Each prime contributes exactly once to the product, ensuring proper factorization!
-            </div>
-            
-            <div class="main-formula">
-                <strong>Special Cases:</strong><br>
-                ζ(2) = π²/6 &nbsp;|&nbsp; ζ(4) = π⁴/90 &nbsp;|&nbsp; ζ(6) = π⁶/945
-                <br><br>
-                <strong>Innovation:</strong><br>
-                Direct gap-based computation of these exact values!
-            </div>
-        </div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <label for="maxPrime">Maximum Prime N:</label>
-                <input type="number" id="maxPrime" value="1000" min="100" max="100000" 
-                       title="Calculate using primes up to this value">
-            </div>
-            
-            <div class="control-group">
-                <label for="zetaS">ζ(s) Value:</label>
-                <select id="zetaS" title="Choose which zeta function to calculate">
-                    <option value="2">ζ(2) = π²/6</option>
-                    <option value="4">ζ(4) = π⁴/90</option>
-                    <option value="6">ζ(6) = π⁶/945</option>
-                    <option value="8">ζ(8) = π⁸/9450</option>
-                    <option value="10">ζ(10) = π¹⁰/93555</option>
-                    <option value="custom">Custom s</option>
-                </select>
-            </div>
-            
-            <div class="control-group" id="customSGroup">
-                <label for="customS">Custom s (if selected):</label>
-                <input type="number" id="customS" value="3" min="1" max="20" step="0.1" 
-                       title="Enter custom s value for ζ(s)">
-            </div>
-            
-            <div class="control-group">
-                <label for="maxGap">Maximum Gap Size:</label>
-                <input type="number" id="maxGap" value="30" min="10" max="100" 
-                       title="Include gaps up to this size">
-            </div>
-            
-            <div class="control-group">
-                <label for="showGraph">Show Gap Distribution Graph:</label>
-                <select id="showGraph" title="Display visual graph of gap distribution">
-                    <option value="false">No Graph</option>
-                    <option value="true">Show Distribution</option>
-                </select>
-            </div>
-            
-            <div class="control-group" style="grid-column: span 2;">
-                <button onclick="calculateZeta()" title="Calculate ζ(s) using gap decomposition">
-                    🚀 Calculate ζ(s) via Gap Decomposition
+
+        <div class="main-grid">
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-title">🎯 Pattern Setup</div>
+                    
+                    <label>K-Tuple Pattern</label>
+                    <input type="text" id="pattern" placeholder="0, 2, 6, 8" value="0, 2">
+                    <div class="hint">Enter comma-separated offsets starting with 0</div>
+                    
+                    <div class="presets">
+                        <button class="preset-btn" onclick="setPattern('0, 2')">Twins</button>
+                        <button class="preset-btn" onclick="setPattern('0, 4')">Cousins</button>
+                        <button class="preset-btn" onclick="setPattern('0, 6')">Sexy</button>
+                        <button class="preset-btn" onclick="setPattern('0, 2, 6')">Triplet</button>
+                        <button class="preset-btn" onclick="setPattern('0, 2, 6, 8')">Quad</button>
+                        <button class="preset-btn" onclick="setPattern('0, 4, 6, 10, 12, 16')">Sextuple</button>
+                    </div>
+
+                    <div class="pattern-display" id="pattern-display">ℋ = {0, 2}</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-title">🔢 Parameters</div>
+                    
+                    <label>Upper Bound (x)</label>
+                    <input type="text" id="bound" placeholder="100000 or 1e6" value="100000">
+                    
+                    <label>Prime Cutoff</label>
+                    <select id="cutoff-mode">
+                        <option value="auto">Auto (largest prime ≤ x)</option>
+                        <option value="custom">Custom p_max</option>
+                    </select>
+                    <input type="number" id="custom-cutoff" class="hidden" placeholder="Custom p_max" style="margin-top: 10px;">
+                    
+                    <label>Precision</label>
+                    <input type="number" id="precision" value="6" min="2" max="12">
+                </div>
+
+                <button class="calculate-btn" onclick="calculate()" id="calc-btn">
+                    🚀 Calculate
                 </button>
             </div>
-        </div>
-        
-        <div id="results" class="results"></div>
-        
-        <div class="author-credit">
-            <div style="font-size: 1.4em; color: #ff6b6b; font-weight: bold; margin-bottom: 15px;">
-                🧮 Gap Inversion Sieve Theory
-            </div>
-            <div style="font-size: 1.2em; color: #a8e6cf; margin-bottom: 10px;">
-                Original Research by <strong>Wessen Getachew</strong>
-            </div>
-            <div style="font-size: 1em; opacity: 0.9;">
-                Follow mathematical discoveries: <a href="https://twitter.com/7DView" target="_blank" style="color: #48dbfb; text-decoration: none; font-weight: bold; transition: all 0.3s ease;">@7DView</a> on Twitter
-            </div>
-            <div style="font-size: 0.9em; margin-top: 15px; opacity: 0.8; color: #feca57;">
-                "Bridging discrete prime gaps with continuous zeta functions through modular arithmetic"
+
+            <div class="results-panel">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Computing constellation density...</div>
+                </div>
+
+                <div id="results" class="hidden">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+                        <button class="tab" onclick="showTab('list')">🌟 K-Tuples</button>
+                        <button class="tab" onclick="showTab('identity')">🔧 Identity</button>
+                        <button class="tab" onclick="showTab('analysis')">📐 Analysis</button>
+                    </div>
+
+                    <div class="tab-content active" id="overview">
+                        <div class="info-box success">
+                            <div class="info-title">🎯 Results for <span id="pattern-name"></span></div>
+                            <div class="info-content" id="summary"></div>
+                        </div>
+
+                        <div class="result-grid" id="result-cards"></div>
+
+                        <div class="info-box" id="admissible"></div>
+                    </div>
+
+                    <div class="tab-content" id="list">
+                        <div id="constellation-list"></div>
+                    </div>
+
+                    <div class="tab-content" id="identity">
+                        <div class="formula">
+                            R<sub>ℋ</sub>(p<sub>max</sub>) = A<sub>ℋ</sub> × C<sub>ℋ</sub>(p<sub>max</sub>) × [M<sub>no-two</sub>(p<sub>max</sub>)]<sup>k</sup>
+                        </div>
+                        <div id="verification"></div>
+                    </div>
+
+                    <div class="tab-content" id="analysis">
+                        <div id="math-analysis"></div>
+                    </div>
+                </div>
+
+                <div id="welcome" class="welcome">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">🔮</div>
+                    <h3>Ready to Explore</h3>
+                    <p>Configure your k-tuple pattern and parameters, then calculate to discover the universal structure of prime constellations.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function isPrime(n) {
-            if (n < 2) return false;
-            if (n === 2) return true;
-            if (n % 2 === 0) return false;
-            for (let i = 3; i * i <= n; i += 2) {
-                if (n % i === 0) return false;
-            }
-            return true;
+        const GAMMA = 0.5772156649015328606;
+        let currentPattern = [0, 2];
+        let results = null;
+
+        function setPattern(str) {
+            document.getElementById('pattern').value = str;
+            updatePattern();
         }
-        
-        function getPrimesUpTo(n) {
-            const primes = [];
-            for (let i = 2; i <= n; i++) {
-                if (isPrime(i)) primes.push(i);
+
+        function updatePattern() {
+            const input = document.getElementById('pattern').value;
+            const display = document.getElementById('pattern-display');
+            
+            try {
+                const pattern = parsePattern(input);
+                currentPattern = pattern;
+                display.textContent = `ℋ = {${pattern.join(', ')}}`;
+                display.style.background = 'linear-gradient(135deg, #43e97b, #38f9d7)';
+            } catch (e) {
+                display.textContent = `Invalid: ${e.message}`;
+                display.style.background = 'linear-gradient(135deg, #f093fb, #f5576c)';
             }
-            return primes;
         }
-        
-        function calculatePrimeGaps(primes) {
-            const gapData = [];
+
+        function parsePattern(input) {
+            const parts = input.split(',').map(x => {
+                const num = parseInt(x.trim());
+                if (isNaN(num)) throw new Error(`"${x.trim()}" not a number`);
+                return num;
+            });
             
-            // Calculate forward gaps between consecutive primes
-            // Each prime p is used exactly once: when calculating gap from p to next prime
-            for (let i = 0; i < primes.length - 1; i++) {
-                const gap = primes[i + 1] - primes[i];
-                gapData.push({
-                    prime: primes[i],           // The prime p that has this gap
-                    gap: gap,                   // gap(p) = next_prime - p
-                    nextPrime: primes[i + 1]    // p + gap(p)
-                });
-            }
+            if (parts.length < 2) throw new Error('Need at least 2 elements');
+            if (parts[0] !== 0) throw new Error('Must start with 0');
             
-            return gapData;
+            const unique = [...new Set(parts)];
+            if (unique.length !== parts.length) throw new Error('No duplicates');
+            
+            parts.sort((a, b) => a - b);
+            return parts;
         }
-        
-        function groupByGapClasses(gapData, maxGap) {
-            const gapClasses = {};
+
+        function sieve(n) {
+            const isPrime = new Array(n + 1).fill(true);
+            isPrime[0] = isPrime[1] = false;
             
-            gapData.forEach(data => {
-                const gap = data.gap;
-                if (gap <= maxGap) {
-                    if (!gapClasses[gap]) {
-                        gapClasses[gap] = [];
+            for (let i = 2; i * i <= n; i++) {
+                if (isPrime[i]) {
+                    for (let j = i * i; j <= n; j += i) {
+                        isPrime[j] = false;
                     }
-                    gapClasses[gap].push(data);
                 }
-            });
-            
-            return gapClasses;
-        }
-        
-        function calculateZetaFromGaps(gapClasses, s) {
-            let totalProduct = 1.0;
-            const gapProducts = {};
-            
-            // Calculate product for each gap class
-            // Each prime p contributes exactly once: (1 - p^(-s))^(-1) where gap(p) = g
-            Object.keys(gapClasses).forEach(gap => {
-                const gapNum = parseInt(gap);
-                const primesInGap = gapClasses[gap];
-                
-                let gapProduct = 1.0;
-                primesInGap.forEach(data => {
-                    const p = data.prime;  // Prime p with gap(p) = gapNum
-                    const factor = 1 / (1 - Math.pow(p, -s)); // (1 - p^(-s))^(-1)
-                    gapProduct *= factor;
-                });
-                
-                gapProducts[gapNum] = {
-                    primes: primesInGap.map(d => d.prime),
-                    count: primesInGap.length,
-                    product: gapProduct,
-                    examples: primesInGap.slice(0, 6).map(d => {
-                        return `${d.prime}→${d.nextPrime} (gap ${d.gap})`;
-                    }).join(', ')
-                };
-                
-                totalProduct *= gapProduct;
-            });
-            
-            return { totalProduct, gapProducts };
-        }
-        
-        function getZetaTarget(s) {
-            const targets = {
-                2: Math.PI * Math.PI / 6,
-                4: Math.pow(Math.PI, 4) / 90,
-                6: Math.pow(Math.PI, 6) / 945,
-                8: Math.pow(Math.PI, 8) / 9450,
-                10: Math.pow(Math.PI, 10) / 93555
-            };
-            
-            if (targets[s]) {
-                return {
-                    value: targets[s],
-                    formula: s === 2 ? 'π²/6' :
-                           s === 4 ? 'π⁴/90' :
-                           s === 6 ? 'π⁶/945' :
-                           s === 8 ? 'π⁸/9450' :
-                           s === 10 ? 'π¹⁰/93555' : `π^${s}/unknown`
-                };
             }
             
-            // For other values, calculate numerically
-            let sum = 0;
-            for (let n = 1; n <= 100000; n++) {
-                sum += 1 / Math.pow(n, s);
+            return Array.from({length: n + 1}, (_, i) => isPrime[i] ? i : null).filter(x => x !== null);
+        }
+
+        function countResidues(pattern, p) {
+            const residues = new Set();
+            for (const h of pattern) {
+                residues.add(((h % p) + p) % p);
+            }
+            return residues.size;
+        }
+
+        function isAdmissible(pattern) {
+            const checks = [];
+            const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
+            
+            for (const p of primes) {
+                const nu = countResidues(pattern, p);
+                const ok = nu < p;
+                checks.push({ prime: p, nu: nu, total: p, ok: ok });
+                if (!ok) return { ok: false, checks: checks };
+            }
+            
+            return { ok: true, checks: checks };
+        }
+
+        function findConstellations(primes, pattern, bound) {
+            const found = [];
+            const maxOffset = Math.max(...pattern);
+            const primeSet = new Set(primes);
+            
+            for (const p of primes) {
+                if (p + maxOffset > bound) break;
+                
+                let valid = true;
+                const constellation = [];
+                
+                for (const offset of pattern) {
+                    const candidate = p + offset;
+                    constellation.push(candidate);
+                    if (!primeSet.has(candidate)) {
+                        valid = false;
+                        break;
+                    }
+                }
+                
+                if (valid) {
+                    found.push({
+                        start: p,
+                        values: [...constellation],
+                        span: maxOffset
+                    });
+                }
+            }
+            
+            return found;
+        }
+
+        function analyzeGaps(constellations) {
+            if (constellations.length === 0) {
+                return { count: 0, density: 0, avgGap: 0, maxGap: 0, minGap: 0, gaps: [] };
+            }
+            
+            const starts = constellations.map(c => c.start);
+            const gaps = [];
+            
+            for (let i = 1; i < starts.length; i++) {
+                gaps.push(starts[i] - starts[i-1]);
             }
             
             return {
-                value: sum,
-                formula: `ζ(${s}) ≈ numerical`
+                count: constellations.length,
+                avgGap: gaps.length > 0 ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 0,
+                maxGap: gaps.length > 0 ? Math.max(...gaps) : 0,
+                minGap: gaps.length > 0 ? Math.min(...gaps) : 0,
+                gaps: gaps,
+                first: constellations.slice(0, 10),
+                last: constellations.slice(-5)
             };
         }
-        
-        function drawGapDistributionGraph(gapProducts, canvasId) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
+
+        function calcR(primes, pattern, pMax) {
+            let product = 0.25;
             
-            // Set canvas size
-            canvas.width = 800;
-            canvas.height = 400;
-            
-            // Clear canvas with dark background
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Prepare data
-            const gaps = Object.keys(gapProducts).map(Number).sort((a, b) => a - b);
-            const counts = gaps.map(gap => gapProducts[gap].count);
-            const products = gaps.map(gap => gapProducts[gap].product);
-            
-            if (gaps.length === 0) return;
-            
-            // Graph dimensions
-            const margin = { top: 40, right: 60, bottom: 60, left: 80 };
-            const graphWidth = canvas.width - margin.left - margin.right;
-            const graphHeight = canvas.height - margin.top - margin.bottom;
-            
-            // Scale functions
-            const maxCount = Math.max(...counts);
-            const maxProduct = Math.max(...products);
-            const xScale = (gap) => margin.left + (gaps.indexOf(gap) / (gaps.length - 1)) * graphWidth;
-            const yScale = (value, max) => margin.top + graphHeight - (value / max) * graphHeight;
-            
-            // Draw grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 1;
-            
-            // Vertical grid lines
-            for (let i = 0; i < gaps.length; i += Math.max(1, Math.floor(gaps.length / 8))) {
-                const x = xScale(gaps[i]);
-                ctx.beginPath();
-                ctx.moveTo(x, margin.top);
-                ctx.lineTo(x, margin.top + graphHeight);
-                ctx.stroke();
-            }
-            
-            // Horizontal grid lines
-            for (let i = 0; i <= 5; i++) {
-                const y = margin.top + (i / 5) * graphHeight;
-                ctx.beginPath();
-                ctx.moveTo(margin.left, y);
-                ctx.lineTo(margin.left + graphWidth, y);
-                ctx.stroke();
-            }
-            
-            // Draw axes
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            
-            // X-axis
-            ctx.beginPath();
-            ctx.moveTo(margin.left, margin.top + graphHeight);
-            ctx.lineTo(margin.left + graphWidth, margin.top + graphHeight);
-            ctx.stroke();
-            
-            // Y-axis
-            ctx.beginPath();
-            ctx.moveTo(margin.left, margin.top);
-            ctx.lineTo(margin.left, margin.top + graphHeight);
-            ctx.stroke();
-            
-            // Draw bars for prime counts
-            ctx.fillStyle = 'rgba(255, 107, 107, 0.7)';
-            const barWidth = Math.min(20, graphWidth / gaps.length * 0.8);
-            
-            gaps.forEach((gap, i) => {
-                const x = xScale(gap) - barWidth / 2;
-                const y = yScale(counts[i], maxCount);
-                const height = margin.top + graphHeight - y;
-                
-                ctx.fillRect(x, y, barWidth, height);
-            });
-            
-            // Draw line for gap products (scaled)
-            ctx.strokeStyle = '#48dbfb';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            
-            gaps.forEach((gap, i) => {
-                const x = xScale(gap);
-                const y = yScale(products[i], maxProduct);
-                
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
+            for (const p of primes) {
+                if (p >= 3 && p <= pMax) {
+                    const nu = countResidues(pattern, p);
+                    product *= (1 - nu / p);
                 }
-            });
-            ctx.stroke();
-            
-            // Draw points on the line
-            ctx.fillStyle = '#48dbfb';
-            gaps.forEach((gap, i) => {
-                const x = xScale(gap);
-                const y = yScale(products[i], maxProduct);
-                
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                ctx.fill();
-            });
-            
-            // Add labels
-            ctx.font = '12px Arial';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            
-            // X-axis labels (gap sizes)
-            gaps.forEach((gap, i) => {
-                if (i % Math.max(1, Math.floor(gaps.length / 10)) === 0) {
-                    const x = xScale(gap);
-                    ctx.fillText(gap.toString(), x, margin.top + graphHeight + 20);
-                }
-            });
-            
-            // Y-axis labels
-            ctx.textAlign = 'right';
-            for (let i = 0; i <= 5; i++) {
-                const y = margin.top + (i / 5) * graphHeight + 4;
-                const value = (maxCount * (5 - i) / 5).toFixed(0);
-                ctx.fillText(value, margin.left - 10, y);
             }
             
-            // Axis titles
-            ctx.textAlign = 'center';
-            ctx.font = '14px Arial';
-            ctx.fillStyle = '#a8e6cf';
-            
-            // X-axis title
-            ctx.fillText('Gap Size', canvas.width / 2, canvas.height - 15);
-            
-            // Y-axis title (rotated)
-            ctx.save();
-            ctx.translate(20, canvas.height / 2);
-            ctx.rotate(-Math.PI / 2);
-            ctx.fillText('Prime Count', 0, 0);
-            ctx.restore();
-            
-            // Graph title
-            ctx.font = 'bold 16px Arial';
-            ctx.fillStyle = '#ff6b6b';
-            ctx.fillText('Prime Gap Distribution & Product Contributions', canvas.width / 2, 25);
+            return product;
         }
-        
-        function calculateZeta() {
-            const maxPrime = parseInt(document.getElementById('maxPrime').value);
-            const zetaSSelect = document.getElementById('zetaS').value;
-            const customS = parseFloat(document.getElementById('customS').value);
-            const maxGap = parseInt(document.getElementById('maxGap').value);
-            const showGraph = document.getElementById('showGraph').value === 'true';
+
+        function calcC(primes, pattern, pMax) {
+            const k = pattern.length;
+            let product = 1;
+            
+            for (const p of primes) {
+                if (p >= 3 && p <= pMax) {
+                    const nu = countResidues(pattern, p);
+                    const num = 1 - nu / p;
+                    const den = Math.pow(1 - 1/p, k);
+                    product *= num / den;
+                }
+            }
+            
+            return product;
+        }
+
+        function calcM(primes, pMax) {
+            let product = 1;
+            
+            for (const p of primes) {
+                if (p >= 3 && p <= pMax) {
+                    product *= (1 - 1/p);
+                }
+            }
+            
+            return product;
+        }
+
+        function format(num, precision) {
+            if (Math.abs(num) >= 1e15) {
+                return num.toExponential(precision);
+            } else if (Math.abs(num) >= 1e6) {
+                const exp = Math.floor(Math.log10(Math.abs(num)));
+                const mantissa = num / Math.pow(10, exp);
+                return mantissa.toFixed(precision) + ' × 10^' + exp;
+            } else if (Math.abs(num) >= 1000) {
+                return num.toLocaleString();
+            } else {
+                return num.toFixed(precision);
+            }
+        }
+
+        function showTab(name) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[onclick="showTab('${name}')"]`).classList.add('active');
+            document.getElementById(name).classList.add('active');
+        }
+
+        function calculate() {
+            const btn = document.getElementById('calc-btn');
+            const loading = document.getElementById('loading');
             const resultsDiv = document.getElementById('results');
+            const welcome = document.getElementById('welcome');
             
-            const s = zetaSSelect === 'custom' ? customS : parseInt(zetaSSelect);
-            
-            resultsDiv.innerHTML = '<div class="loading">🔄 Computing gap decomposition...</div>';
-            
-            setTimeout(() => {
-                try {
-                    const primes = getPrimesUpTo(maxPrime);
-                    const gapData = calculatePrimeGaps(primes);
-                    const gapClasses = groupByGapClasses(gapData, maxGap);
-                    const { totalProduct, gapProducts } = calculateZetaFromGaps(gapClasses, s);
-                    const target = getZetaTarget(s);
-                    
-                    resultsDiv.innerHTML = '';
-                    
-                    // Main calculation display
-                    const mainDiv = document.createElement('div');
-                    mainDiv.className = 'result-card';
-                    
-                    const error = Math.abs(totalProduct - target.value);
-                    const errorPercent = (error / target.value * 100);
-                    
-                    mainDiv.innerHTML = `
-                        <div class="result-header">🧮 ζ(${s}) Gap Decomposition (N ≤ ${maxPrime})</div>
-                        
-                        <div class="zeta-comparison">
-                            <div class="error-display">
-                                <strong>Gap Product Result:</strong> ζ(${s}) ≈ <span class="highlight">${totalProduct.toFixed(12)}</span><br>
-                                <strong>Theoretical Value:</strong> ${target.formula} = ${target.value.toFixed(12)}<br><br>
-                                
-                                <strong>Error Analysis:</strong><br>
-                                Absolute Error: ${error.toExponential(6)}<br>
-                                Relative Error: ${errorPercent.toFixed(6)}%<br><br>
-                                
-                                ${errorPercent < 0.001 ? '🎯 <strong>Exceptional precision!</strong>' :
-                                  errorPercent < 0.01 ? '✅ <strong>Excellent approximation!</strong>' :
-                                  errorPercent < 0.1 ? '📈 <strong>Very good convergence!</strong>' :
-                                  errorPercent < 1 ? '🔬 <strong>Good approximation - try larger N</strong>' :
-                                  '📊 <strong>Interesting pattern emerging</strong>'}
-                            </div>
-                        </div>
-                        
-                        <div class="zeta-calculation">
-                            <strong>Gap Inversion Formula:</strong><br>
-                            ζ(${s}) = ∏_{g∈{1,2,4,6,...}} ∏_{p: gap(p)=g} (1 - p^{-${s}})^{-1}<br><br>
-                            
-                            <strong>Individual Gap Contributions:</strong><br>
-                            ${Object.keys(gapProducts).sort((a,b) => parseInt(a) - parseInt(b)).map(gap => {
-                                const gp = gapProducts[gap];
-                                return `Gap ${gap}: ${gp.count} prime${gp.count > 1 ? 's' : ''} → Product = ${gp.product.toFixed(8)}`;
-                            }).join('<br>')}
-                            <br><br>
-                            Total Product: ${totalProduct.toFixed(12)}
-                        </div>
-                    `;
-                    
-                    resultsDiv.appendChild(mainDiv);
-                    
-                    // π extraction if s = 2
-                    if (s === 2) {
-                        const piExtracted = Math.sqrt(6 * totalProduct);
-                        const actualPi = Math.PI;
-                        const piError = Math.abs(piExtracted - actualPi);
-                        const piErrorPercent = (piError / actualPi * 100);
-                        
-                        const piDiv = document.createElement('div');
-                        piDiv.className = 'result-card';
-                        piDiv.innerHTML = `
-                            <div class="result-header">🥧 π Extraction from ζ(2)</div>
-                            
-                            <div class="pi-extraction">
-                                <div class="error-display">
-                                    <strong>π Reconstruction:</strong> π = √(6 × ζ(2))<br>
-                                    π = √(6 × ${totalProduct.toFixed(10)}) = <span class="highlight">${piExtracted.toFixed(10)}</span><br>
-                                    π<sub>actual</sub> = ${actualPi.toFixed(10)}<br><br>
-                                    
-                                    <strong>π Error Analysis:</strong><br>
-                                    Absolute Error: ${piError.toFixed(10)}<br>
-                                    Relative Error: ${piErrorPercent.toFixed(6)}%<br><br>
-                                    
-                                    ${piErrorPercent < 0.001 ? '🎯 <strong>Exceptional π precision!</strong>' :
-                                      piErrorPercent < 0.01 ? '✅ <strong>Excellent π approximation!</strong>' :
-                                      piErrorPercent < 0.1 ? '📈 <strong>Very good π convergence!</strong>' :
-                                      '🔬 <strong>Good π approximation!</strong>'}
-                                </div>
-                                
-                                This demonstrates how prime gaps directly encode the geometric constant π!
-                            </div>
-                        `;
-                        resultsDiv.appendChild(piDiv);
+            try {
+                const pattern = parsePattern(document.getElementById('pattern').value);
+                const bound = parseFloat(document.getElementById('bound').value);
+                const precision = parseInt(document.getElementById('precision').value);
+                
+                if (bound < 100) throw new Error('Bound must be ≥ 100');
+                
+                btn.disabled = true;
+                loading.style.display = 'block';
+                resultsDiv.classList.add('hidden');
+                welcome.style.display = 'none';
+                
+                setTimeout(() => {
+                    try {
+                        compute(pattern, bound, precision);
+                    } catch (error) {
+                        showError(error.message);
+                    } finally {
+                        btn.disabled = false;
+                        loading.style.display = 'none';
                     }
-                    
-                    // Add graph if requested
-                    if (showGraph) {
-                        const graphDiv = document.createElement('div');
-                        graphDiv.className = 'graph-container';
-                        graphDiv.innerHTML = `
-                            <div class="result-header">📈 Prime Gap Distribution Visualization</div>
-                            <canvas id="gapDistributionCanvas" class="graph-canvas"></canvas>
-                            <div class="graph-legend">
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: rgba(255, 107, 107, 0.7);"></div>
-                                    <span>Prime Count per Gap</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #48dbfb;"></div>
-                                    <span>Gap Product Contribution</span>
-                                </div>
-                            </div>
-                            <div style="text-align: center; margin-top: 15px; color: #a8e6cf; font-size: 0.9em;">
-                                Red bars show how many primes have each gap size.<br>
-                                Blue line shows each gap class's contribution to ζ(${s}).
-                            </div>
-                        `;
-                        resultsDiv.appendChild(graphDiv);
-                        
-                        // Draw the graph after DOM is updated
-                        setTimeout(() => {
-                            drawGapDistributionGraph(gapProducts, 'gapDistributionCanvas');
-                        }, 100);
-                    }
-                    
-                    // Gap class breakdown table
-                    const tableDiv = document.createElement('div');
-                    tableDiv.className = 'result-card';
-                    
-                    let tableHTML = `
-                        <div class="result-header">📊 Gap Class Breakdown</div>
-                        
-                        <div class="gap-table">
-                            <table>
-                                <tr>
-                                    <th>Gap Size</th>
-                                    <th>Prime Count</th>
-                                    <th>Gap Product</th>
-                                    <th>Log Contribution</th>
-                                    <th>Examples</th>
-                                </tr>
-                    `;
-                    
-                    Object.keys(gapProducts).sort((a,b) => parseInt(a) - parseInt(b)).forEach(gap => {
-                        const gp = gapProducts[gap];
-                        const logContrib = Math.log(gp.product);
-                        const moreText = gp.count > 6 ? ` +${gp.count - 6} more` : '';
-                        
-                        tableHTML += `
-                            <tr>
-                                <td><span class="highlight">${gap}</span></td>
-                                <td>${gp.count}</td>
-                                <td>${gp.product.toFixed(8)}</td>
-                                <td>${logContrib.toFixed(6)}</td>
-                                <td>${gp.examples}${moreText}</td>
-                            </tr>
-                        `;
-                    });
-                    
-                    tableHTML += '</table></div>';
-                    tableDiv.innerHTML = tableHTML;
-                    resultsDiv.appendChild(tableDiv);
-                    
-                } catch (error) {
-                    resultsDiv.innerHTML = `<div class="result-card zeta-comparison">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
-                }
-            }, 150);
+                }, 100);
+                
+            } catch (error) {
+                showError(error.message);
+            }
         }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle custom s visibility
-            const zetaSSelect = document.getElementById('zetaS');
-            const customSGroup = document.getElementById('customSGroup');
+
+        function compute(pattern, bound, precision) {
+            const k = pattern.length;
+            const admCheck = isAdmissible(pattern);
             
-            function updateCustomSVisibility() {
-                if (zetaSSelect.value === 'custom') {
-                    customSGroup.style.display = 'flex';
-                } else {
-                    customSGroup.style.display = 'none';
-                }
+            if (!admCheck.ok) {
+                throw new Error(`Pattern {${pattern.join(', ')}} not admissible`);
             }
             
-            // Initial state
-            updateCustomSVisibility();
+            let pMax;
+            const cutoffMode = document.getElementById('cutoff-mode').value;
+            if (cutoffMode === 'custom') {
+                pMax = parseInt(document.getElementById('custom-cutoff').value);
+                if (isNaN(pMax) || pMax < 3) throw new Error('Custom p_max must be ≥ 3');
+            } else {
+                const primes = sieve(Math.floor(bound));
+                pMax = primes[primes.length - 1];
+            }
             
-            zetaSSelect.addEventListener('change', updateCustomSVisibility);
+            const primes = sieve(Math.max(pMax, bound));
+            const constellations = findConstellations(primes, pattern, bound);
+            const gapAnalysis = analyzeGaps(constellations);
+            const count = constellations.length;
             
-            calculateZeta();
+            const rMod = calcR(primes, pattern, pMax);
+            const cH = calcC(primes, pattern, pMax);
+            const mNoTwo = calcM(primes, pMax);
+            
+            const identityCheck = 0.25 * cH * Math.pow(mNoTwo, k);
+            const identityError = Math.abs(rMod - identityCheck) / Math.abs(rMod);
+            
+            const xR = bound * rMod;
+            const wFit = xR > 0 ? count / xR : 0;
+            const wTheory = Math.exp(k * GAMMA) * Math.log(bound);
+            const ratio = wTheory > 0 ? wFit / wTheory : 0;
+            
+            results = {
+                pattern, k, bound, pMax, count,
+                constellations, gapAnalysis,
+                rMod, cH, mNoTwo, identityCheck, identityError,
+                xR, wFit, wTheory, ratio, admCheck,
+                primeCount: primes.filter(p => p <= bound).length,
+                precision
+            };
+            
+            display();
+        }
+
+        function display() {
+            const r = results;
+            
+            document.getElementById('pattern-name').textContent = `ℋ = {${r.pattern.join(', ')}}`;
+            document.getElementById('summary').innerHTML = `
+                Pattern size k = ${r.k} • Upper bound = ${format(r.bound, 0)} • Prime cutoff p<sub>max</sub> = ${r.pMax.toLocaleString()}
+            `;
+            
+            document.getElementById('result-cards').innerHTML = `
+                <div class="result-card">
+                    <div class="result-label">Pattern Size (k)</div>
+                    <div class="result-value">${r.k}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Count</div>
+                    <div class="result-value">${r.count.toLocaleString()}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Primes π(${format(r.bound, 0)})</div>
+                    <div class="result-value">${r.primeCount.toLocaleString()}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Density</div>
+                    <div class="result-value">${(r.count / r.bound * 100).toFixed(4)}%</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">R<sub>ℋ</sub></div>
+                    <div class="result-value">${r.rMod.toExponential(r.precision)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">C<sub>ℋ</sub></div>
+                    <div class="result-value">${format(r.cH, r.precision)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">M^${r.k}</div>
+                    <div class="result-value">${Math.pow(r.mNoTwo, r.k).toExponential(r.precision)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Calibration</div>
+                    <div class="result-value">${r.ratio.toFixed(r.precision)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Avg Gap</div>
+                    <div class="result-value">${r.gapAnalysis.avgGap.toFixed(1)}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Max Gap</div>
+                    <div class="result-value">${r.gapAnalysis.maxGap.toLocaleString()}</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Identity Error</div>
+                    <div class="result-value">${(r.identityError * 100).toExponential(2)}%</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Span</div>
+                    <div class="result-value">${Math.max(...r.pattern)}</div>
+                </div>
+            `;
+
+            const admissibilityHtml = r.admCheck.checks.map(check => 
+                `<span style="color: ${check.ok ? '#43e97b' : '#f5576c'}; font-family: 'JetBrains Mono', monospace;">
+                    p=${check.prime}: ${check.nu}/${check.total} ${check.ok ? '✓' : '✗'}
+                </span>`
+            ).join(' • ');
+            
+            document.getElementById('admissible').innerHTML = `
+                <div class="info-title">✅ Admissibility Check</div>
+                <div class="info-content">
+                    <p><strong>Status:</strong> Pattern ℋ = {${r.pattern.join(', ')}} is admissible</p>
+                    <p><strong>Checks:</strong> ${admissibilityHtml}</p>
+                    <p style="margin-top: 10px; font-style: italic;">Pattern avoids covering all residue classes modulo any prime.</p>
+                </div>
+            `;
+
+            displayConstellations();
+            displayIdentity();
+            displayAnalysis();
+            
+            document.getElementById('results').classList.remove('hidden');
+            showTab('overview');
+        }
+
+        function displayConstellations() {
+            const r = results;
+            const analysis = r.gapAnalysis;
+            
+            if (analysis.count === 0) {
+                document.getElementById('constellation-list').innerHTML = `
+                    <div class="info-box error">
+                        <div class="info-title">🚫 No K-Tuples Found</div>
+                        <div class="info-content">
+                            <p>No ${r.k}-tuples found in range [0, ${format(r.bound, 0)}].</p>
+                            <p>Try a larger bound or different pattern.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const stats = `
+                <div class="info-box success">
+                    <div class="info-title">📊 Distribution Statistics</div>
+                    <div class="info-content">
+                        <div class="result-grid" style="margin-top: 15px;">
+                            <div class="result-card">
+                                <div class="result-label">Total Found</div>
+                                <div class="result-value">${analysis.count.toLocaleString()}</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Density</div>
+                                <div class="result-value">${(r.count / r.bound * 100).toFixed(6)}%</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Average Gap</div>
+                                <div class="result-value">${analysis.avgGap.toFixed(2)}</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Gap Range</div>
+                                <div class="result-value">${analysis.minGap}-${analysis.maxGap}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Always show complete enumeration, but with smart formatting for large lists
+            const allConstellations = `
+                <div class="info-box warning">
+                    <div class="info-title">🌟 Complete Enumeration - All ${analysis.count.toLocaleString()} K-Tuples</div>
+                    <div class="info-content">
+                        ${analysis.count <= 100 ? 
+                            `<p><strong>Showing all ${analysis.count} constellations found:</strong></p>` :
+                            `<p><strong>Showing all ${analysis.count.toLocaleString()} constellations (scroll to see all):</strong></p>`
+                        }
+                        <div style="max-height: ${analysis.count <= 50 ? '400px' : analysis.count <= 200 ? '500px' : '600px'}; overflow-y: auto; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(0,0,0,0.2);">
+                            ${r.constellations.map((c, i) => {
+                                const rowColor = i % 2 === 0 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)';
+                                return `
+                                    <div style="
+                                        background: ${rowColor}; 
+                                        padding: 8px 16px; 
+                                        font-family: 'JetBrains Mono', monospace; 
+                                        font-size: 0.9rem;
+                                        border-bottom: 1px solid rgba(255,255,255,0.1);
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    ">
+                                        <span style="color: #4facfe; font-weight: 600;">${String(i + 1).padStart(4)}:</span>
+                                        <span style="color: white; flex: 1; margin-left: 15px;">{${c.values.join(', ')}}</span>
+                                        <span style="color: rgba(255,255,255,0.7); font-size: 0.8rem;">start: ${c.start.toLocaleString()}, span: ${c.span}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${analysis.count > 100 ? `
+                            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; font-size: 0.9rem;">
+                                <strong>💡 Navigation Tips:</strong> Use Ctrl+F to search for specific values. 
+                                Each row shows: index, constellation values, starting prime, and span.
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Gap analysis for larger datasets
+            const gapAnalysis = analysis.count > 1 ? `
+                <div class="info-box">
+                    <div class="info-title">📏 Gap Analysis</div>
+                    <div class="info-content">
+                        <p><strong>Gaps between consecutive starting primes:</strong></p>
+                        <div class="result-grid" style="margin-top: 10px;">
+                            <div class="result-card">
+                                <div class="result-label">Smallest Gap</div>
+                                <div class="result-value">${analysis.minGap}</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Largest Gap</div>
+                                <div class="result-value">${analysis.maxGap.toLocaleString()}</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Average Gap</div>
+                                <div class="result-value">${analysis.avgGap.toFixed(2)}</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Total Gaps</div>
+                                <div class="result-value">${analysis.gaps.length}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <strong>All ${analysis.gaps.length} gaps between consecutive k-tuples:</strong>
+                            <div style="
+                                font-family: 'JetBrains Mono', monospace; 
+                                background: rgba(0,0,0,0.3); 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                margin-top: 10px; 
+                                font-size: 0.9rem;
+                                max-height: ${analysis.gaps.length <= 50 ? '200px' : analysis.gaps.length <= 200 ? '300px' : '400px'};
+                                overflow-y: auto;
+                                border: 1px solid rgba(255,255,255,0.2);
+                                line-height: 1.6;
+                            ">
+                                ${analysis.gaps.map((gap, i) => {
+                                    const color = gap === analysis.minGap ? '#43e97b' : 
+                                                 gap === analysis.maxGap ? '#f5576c' : 
+                                                 'rgba(255,255,255,0.9)';
+                                    return `<span style="color: ${color}; margin-right: 8px;" title="Gap ${i+1}: ${gap}">${gap}</span>`;
+                                }).join('')}
+                            </div>
+                            ${analysis.gaps.length > 50 ? `
+                                <div style="margin-top: 10px; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; font-size: 0.85rem;">
+                                    <strong>💡 Color coding:</strong> 
+                                    <span style="color: #43e97b;">■</span> Minimum gap (${analysis.minGap}) • 
+                                    <span style="color: #f5576c;">■</span> Maximum gap (${analysis.maxGap}) • 
+                                    <span style="color: rgba(255,255,255,0.9);">■</span> Other gaps
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            ` : '';
+
+            // Summary box for large datasets
+            const summary = analysis.count > 10 ? `
+                <div class="info-box">
+                    <div class="info-title">📋 Quick Summary</div>
+                    <div class="info-content">
+                        <p><strong>First constellation:</strong> {${r.constellations[0].values.join(', ')}} (starting at ${r.constellations[0].start})</p>
+                        <p><strong>Last constellation:</strong> {${r.constellations[r.constellations.length-1].values.join(', ')}} (starting at ${r.constellations[r.constellations.length-1].start})</p>
+                        <p><strong>Range covered:</strong> ${r.constellations[0].start.toLocaleString()} to ${r.constellations[r.constellations.length-1].start.toLocaleString()}</p>
+                        <p><strong>Efficiency:</strong> ${(analysis.count / r.primeCount * 100).toFixed(4)}% of primes start a ${r.k}-tuple</p>
+                    </div>
+                </div>
+            ` : '';
+
+            document.getElementById('constellation-list').innerHTML = stats + summary + allConstellations + gapAnalysis;
+        }
+
+        function displayIdentity() {
+            const r = results;
+            
+            document.getElementById('verification').innerHTML = `
+                <div class="info-box">
+                    <div class="info-title">🔧 Verification</div>
+                    <div class="info-content">
+                        <div class="code-block">
+<strong>Direct Calculation:</strong>
+R_ℋ = ${r.rMod.toExponential(r.precision)}
+
+<strong>Identity Components:</strong>
+A_ℋ = 0.25
+C_ℋ = ${r.cH.toExponential(r.precision)}
+M^${r.k} = ${r.mNoTwo.toExponential(r.precision)}^${r.k} = ${Math.pow(r.mNoTwo, r.k).toExponential(r.precision)}
+
+<strong>Identity Result:</strong>
+A_ℋ × C_ℋ × M^${r.k} = 0.25 × ${r.cH.toExponential(r.precision)} × ${Math.pow(r.mNoTwo, r.k).toExponential(r.precision)}
+                     = ${r.identityCheck.toExponential(r.precision)}
+
+<strong>Verification:</strong>
+Error: ${(r.identityError * 100).toExponential(2)}%
+Status: ${r.identityError < 1e-10 ? 'PASSED ✓' : 'FAILED ✗'}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box ${r.identityError < 1e-10 ? 'success' : 'error'}">
+                    <div class="info-title">
+                        ${r.identityError < 1e-10 ? '✅ Identity Confirmed' : '❌ Identity Failed'}
+                    </div>
+                    <div class="info-content">
+                        <p>
+                            The Master Identity has been ${r.identityError < 1e-10 ? 'verified' : 'rejected'} 
+                            for pattern ℋ = {${r.pattern.join(', ')}} with error ${(r.identityError * 100).toExponential(2)}%.
+                        </p>
+                        ${r.identityError < 1e-10 ? 
+                            '<p>This confirms the universal structure of prime constellations.</p>' :
+                            '<p>Error suggests computational issue or identity refinement needed.</p>'
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayAnalysis() {
+            const r = results;
+            
+            document.getElementById('math-analysis').innerHTML = `
+                <div class="info-box">
+                    <div class="info-title">📊 Pattern Analysis</div>
+                    <div class="info-content">
+                        <p><strong>Properties:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>Pattern span: ${Math.max(...r.pattern)} (largest offset)</li>
+                            <li>Density: ${(r.count / r.bound * 100).toFixed(6)}% of search range</li>
+                            <li>Prime efficiency: ${(r.count / r.primeCount * 100).toFixed(4)}% of primes start constellation</li>
+                            <li>Sieve density: R_ℋ = ${(r.rMod * 100).toExponential(2)}% after sieving ≤ ${r.pMax}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-title">🔬 Universal Structure</div>
+                    <div class="info-content">
+                        <p><strong>Mertens Scaling:</strong> Power k = ${r.k} shows how complexity affects sieve requirements.</p>
+                        <p><strong>Singular Series:</strong> C_ℋ = ${r.cH.toFixed(6)} encodes pattern-specific information.</p>
+                        <p><strong>Calibration:</strong> Ratio = ${r.ratio.toFixed(3)} connects finite to asymptotic behavior.</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-title">📈 Asymptotic Behavior</div>
+                    <div class="info-content">
+                        <div class="code-block">
+<strong>Hardy-Littlewood Conjecture:</strong>
+π_ℋ(x) ~ 𝔖_ℋ × x / (log x)^${r.k}  as x → ∞
+
+<strong>Finite Density:</strong>
+R_ℋ(p_max) ~ A_ℋ × 𝔖_ℋ × e^(-${r.k}γ) / (log p_max)^${r.k}
+
+<strong>Current Calibration:</strong>
+W_fit = π_ℋ(${format(r.bound, 0)}) / (${format(r.bound, 0)} × R_ℋ) = ${r.wFit.toFixed(3)}
+W_theory = e^(${r.k}γ) × log(${format(r.bound, 0)}) = ${r.wTheory.toFixed(3)}
+Ratio = ${r.ratio.toFixed(3)} (finite-cutoff correction)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-title">🚀 Impact</div>
+                    <div class="info-content">
+                        <p><strong>Computational:</strong> Exact identity enables precise finite calculations for any k-tuple.</p>
+                        <p><strong>Theoretical:</strong> Universal k-exponent reveals deep constellation structure connections.</p>
+                        <p><strong>Algorithmic:</strong> Calibration ratios optimize probabilistic search algorithms.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            document.getElementById('results').innerHTML = `
+                <div class="info-box error" style="margin: 50px 30px;">
+                    <div class="info-title">❌ Error</div>
+                    <div class="info-content">
+                        <p style="font-size: 1.1rem;">${message}</p>
+                        <p style="margin-top: 15px; font-style: italic;">Check parameters and try again.</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('welcome').style.display = 'none';
+        }
+
+        document.getElementById('pattern').addEventListener('input', updatePattern);
+        
+        document.getElementById('cutoff-mode').addEventListener('change', function() {
+            const custom = document.getElementById('custom-cutoff');
+            if (this.value === 'custom') {
+                custom.classList.remove('hidden');
+            } else {
+                custom.classList.add('hidden');
+            }
         });
+
+        ['pattern', 'bound', 'custom-cutoff', 'precision'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') calculate();
+            });
+        });
+
+        updatePattern();
     </script>
 </body>
 </html>
