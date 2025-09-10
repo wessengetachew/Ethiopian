@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -285,7 +285,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Telescoping Identity for Twin Prime Sieving</h1>
+            <h1>A New Telescoping Identity for Twin Prime Sieving</h1>
             <div class="author-info">
                 <strong>Wessen Getachew</strong><br>
                 Independent Researcher<br>
@@ -515,10 +515,6 @@
         </div>
 
         <div class="citation-info" style="margin-top: 40px;">
-            <strong>Manuscript Information:</strong><br>
-            Submitted: [Date]<br>
-            Accepted: [Date]<br>
-            Published: [Date]<br><br>
             <strong>Correspondence:</strong> Wessen Getachew, Independent Researcher. Email: Getachewwessen@gmail.com
         </div>
     </div>
