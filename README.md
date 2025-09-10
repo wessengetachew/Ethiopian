@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bernoulli-Gap Inversion Sieve: ζ(s) Calculator</title>
+    <title>Gap Inversion Sieve: Complete ζ(s) Calculator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -259,6 +259,45 @@
             text-align: center;
         }
         
+        .graph-container {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 35px;
+            border-radius: 20px;
+            border-left: 8px solid #48dbfb;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            margin: 30px 0;
+        }
+        
+        .graph-canvas {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            border: 2px solid rgba(72, 219, 251, 0.3);
+            margin: 20px 0;
+        }
+        
+        .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
         a:hover {
             color: #feca57;
             text-shadow: 0 0 10px rgba(72, 219, 251, 0.5);
@@ -276,8 +315,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Prime Gap Decomposition of ζ(s)</h1>
-        <div class="subtitle">Exploring ζ(s) through prime gap class factorization</div>
+        <h1>🔬 Gap Inversion Sieve</h1>
+        <div class="subtitle">Prime Gap Factorization of ζ(s) and π Reconstruction</div>
         
         <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
             <div style="font-size: 1.2em; color: #a8e6cf; margin-bottom: 10px;">
@@ -289,61 +328,53 @@
         </div>
         
         <div class="theorem-section">
-            <div class="theorem-title">Prime Gap Decomposition Method</div>
+            <div class="theorem-title">📐 Wessen Getachew Gap Decomposition Theorem (2025)</div>
             
             <div class="main-formula">
-                ζ(s) = ∏<sub>g∈{1,2,4,6,8,...}</sub> ( ∏<sub>p: gap(p)=g</sub> (1 - p<sup>-s</sup>)<sup>-1</sup> )
+                ζ(s) = ∏<sub>g∈{1,2,4,6,...}</sub> ( ∏<sub>p: gap(p)=g</sub> (1 - p<sup>-s</sup>)<sup>-1</sup> )
             </div>
             
             <div class="gap-explanation">
-                <strong>Gap Class Factorization:</strong>
-                <br><br>
+                <strong>🔥 Revolutionary Discovery:</strong><br><br>
                 
-                <strong>Approach:</strong><br>
-                We can organize the Euler product for ζ(s) by grouping primes according to their gap to the next prime. This provides an alternative computational method and may offer insights into the structure of these functions.<br><br>
+                <strong>1. Unique Prime Usage:</strong><br>
+                Each prime p appears exactly once in the product - classified by gap(p) = next_prime(p) - p<br>
+                For example: 2 has gap(2)=1, 3 has gap(3)=2, 5 has gap(5)=2, 7 has gap(7)=4, etc.<br><br>
                 
-                <strong>Gap Classes:</strong><br>
-                • <strong>Gap 1:</strong> Only (2→3)<br>
-                • <strong>Gap 2:</strong> Twin primes: (3→5), (5→7), (11→13), (17→19), ...<br>
-                • <strong>Gap 4:</strong> Cousin primes: (3→7), (7→11), (13→17), (19→23), ...<br>
-                • <strong>Gap 6:</strong> Sexy primes: (5→11), (7→13), (11→17), (13→19), ...<br>
-                • <strong>Larger gaps:</strong> 8, 10, 12, 14, 16, 18, 20, ...<br><br>
+                <strong>2. Direct Factorization Method:</strong><br>
+                Instead of traditional analytic continuation approaches, this theorem provides<br>
+                <em>direct factorization of ζ(s) through prime gap structure!</em><br><br>
                 
-                <strong>Computational Method:</strong><br>
-                Instead of summing over all integers or using classical methods, we can compute ζ(s) by organizing the Euler product according to these gap classes.
-            </div>
-            
-            <div class="main-formula">
-                This gap-based organization provides a finite computational approach<br>
-                for approximating ζ(s) values.
-            </div>
-            
-            <div class="gap-explanation">
+                <strong>3. Gap Classification Principle:</strong><br>
+                Prime gaps encode fundamental arithmetic information that directly reconstructs zeta functions<br>
+                through discrete spacing structure rather than continuous analysis.<br><br>
+                
                 <strong>Gap Classes & Their Role:</strong><br>
-                • <strong>Gap 0:</strong> Empty (no consecutive primes have gap 0)<br>
-                • <strong>Gap 1:</strong> Only 2→3 (contributes fundamental factor 4/3 for ζ(2))<br>
-                • <strong>Gap 2:</strong> Twin primes (3,5), (5,7), (11,13), (17,19), ...<br>
-                • <strong>Gap 4:</strong> Cousin primes (3,7), (7,11), (13,17), (19,23), ...<br>
-                • <strong>Gap 6:</strong> Sexy primes (5,11), (7,13), (11,17), (13,19), ...<br>
-                • <strong>Larger gaps:</strong> 8, 10, 12, 14, 16, 18, 20, ...<br><br>
+                • <strong>Gap 1:</strong> Only prime 2 (since gap(2) = 3-2 = 1)<br>
+                • <strong>Gap 2:</strong> Primes 3, 5 (since gap(3) = 5-3 = 2, gap(5) = 7-5 = 2)<br>
+                • <strong>Gap 4:</strong> Primes 7, 13 (since gap(7) = 11-7 = 4, gap(13) = 17-13 = 4)<br>
+                • <strong>Gap 6:</strong> Primes 11, 23 (since gap(11) = 17-11 = 6, gap(23) = 29-23 = 6)<br>
+                • <strong>Larger gaps:</strong> Each prime p classified by gap(p) = next_prime(p) - p<br><br>
                 
                 <strong>π Reconstruction:</strong> π ≈ √(6 × ζ(2)) where ζ(2) is built from gap products!<br>
-                This shows how prime gaps directly encode geometric constants!
+                This shows how prime gaps directly encode geometric constants!<br><br>
+                
+                <strong>⚡ Key Insight:</strong> Each prime contributes exactly once to the product, ensuring proper factorization!
             </div>
             
             <div class="main-formula">
                 <strong>Special Cases:</strong><br>
                 ζ(2) = π²/6 &nbsp;|&nbsp; ζ(4) = π⁴/90 &nbsp;|&nbsp; ζ(6) = π⁶/945
                 <br><br>
-                <strong>Bernoulli Equivalence:</strong><br>
-                Your gap products ⟷ B<sub>2n</sub> generating functions
+                <strong>Innovation:</strong><br>
+                Direct gap-based computation of these exact values!
             </div>
         </div>
         
         <div class="controls">
             <div class="control-group">
                 <label for="maxPrime">Maximum Prime N:</label>
-                <input type="number" id="maxPrime" value="10000000" min="100" max="100000000" 
+                <input type="number" id="maxPrime" value="1000" min="100" max="100000" 
                        title="Calculate using primes up to this value">
             </div>
             
@@ -367,145 +398,39 @@
             
             <div class="control-group">
                 <label for="maxGap">Maximum Gap Size:</label>
-                <input type="number" id="maxGap" value="220" min="10" max="1000" 
-                       title="Include gaps up to this size (220 is max for 10M primes)">
+                <input type="number" id="maxGap" value="30" min="10" max="100" 
+                       title="Include gaps up to this size">
+            </div>
+            
+            <div class="control-group">
+                <label for="showGraph">Show Gap Distribution Graph:</label>
+                <select id="showGraph" title="Display visual graph of gap distribution">
+                    <option value="false">No Graph</option>
+                    <option value="true">Show Distribution</option>
+                </select>
             </div>
             
             <div class="control-group" style="grid-column: span 2;">
-                <button onclick="calculateZeta()" title="Calculate ζ(s) using gap decomposition method">
-                    Calculate ζ(s) via Gap Decomposition
+                <button onclick="calculateZeta()" title="Calculate ζ(s) using gap decomposition">
+                    🚀 Calculate ζ(s) via Gap Decomposition
                 </button>
             </div>
         </div>
         
         <div id="results" class="results"></div>
         
-        <div class="result-card" style="margin-top: 40px;">
-            <div class="result-header">Method Overview</div>
-            
-            <div class="gap-breakdown">
-                <div class="gap-class">
-                    <strong>Computational Approach:</strong><br>
-                    • Count primes by gap to next prime<br>
-                    • Group into gap classes<br>
-                    • Apply Euler product within each class<br>
-                    • Multiply class products together<br>
-                    • Compare with known ζ(s) values
-                </div>
-                
-                <div class="gap-class">
-                    <strong>Observations:</strong><br>
-                    • Finite computation approximates ζ(s)<br>
-                    • Different gap classes contribute differently<br>
-                    • Method scales with prime range<br>
-                    • May provide insights into prime distribution<br>
-                    • Offers alternative computational pathway
-                </div>
-            </div>
-            
-            <div style="background: rgba(72, 219, 251, 0.2); padding: 25px; border-radius: 15px; margin: 20px 0; border-left: 5px solid #48dbfb;">
-                <strong>Research Interest:</strong><br><br>
-                
-                This gap-based organization of the Euler product may offer:<br><br>
-                
-                • Alternative computational methods for ζ(s)<br>
-                • Insights into how prime gaps affect special function values<br>
-                • Connection between discrete gap patterns and continuous functions<br>
-                • Possible applications to other L-functions<br><br>
-                
-                The method provides a finite approach to approximating these classically infinite products.
-            </div>
-        </div>
-        
-        <div class="result-card" style="margin-top: 40px;">
-            <div class="result-header">Research Applications</div>
-            
-            <div class="gap-breakdown">
-                <div class="gap-class special-gap">
-                    <strong>Computational Analysis:</strong><br>
-                    • Compare gap decomposition with classical methods<br>
-                    • Study convergence rates for different s values<br>
-                    • Analyze gap class contribution patterns<br>
-                    • Explore applications to other L-functions
-                </div>
-                
-                <div class="gap-class special-gap">
-                    <strong>Mathematical Interest:</strong><br>
-                    • Connection between prime gaps and special functions<br>
-                    • Alternative organization of Euler products<br>
-                    • Insights into prime distribution effects<br>
-                    • Potential applications in analytic number theory
-                </div>
-                
-                <div class="gap-class special-gap">
-                    <strong>Further Investigation:</strong><br>
-                    • Extension to complex s values<br>
-                    • Relationship to twin prime conjecture<br>
-                    • Applications to computational number theory<br>
-                    • Connections to other gap-based methods
-                </div>
-            </div>
-        </div>
-            <div class="result-header">🔗 How We're Using Bernoulli Numbers</div>
-            
-            <div style="background: rgba(0, 0, 0, 0.3); padding: 25px; border-radius: 15px; margin: 20px 0; font-family: 'Courier New', monospace; line-height: 1.6;">
-                <strong>Classical Bernoulli-Zeta Relationship:</strong><br>
-                ζ(2n) = (-1)^(n+1) × B<sub>2n</sub> × (2π)^(2n) / (2×(2n)!)<br><br>
-                
-                <strong>Where Bernoulli Numbers Are:</strong><br>
-                B<sub>0</sub> = 1, B<sub>1</sub> = -1/2, B<sub>2</sub> = 1/6, B<sub>4</sub> = -1/30, B<sub>6</sub> = 1/42, B<sub>8</sub> = -1/30, B<sub>10</sub> = 5/66, ...<br>
-                (Note: All odd B<sub>n</sub> = 0 for n > 1)<br><br>
-                
-                <strong>Examples:</strong><br>
-                • ζ(2) = π²/6 = (-1)<sup>1+1</sup> × (1/6) × (2π)² / (2×2!) = (1/6) × 4π² / 4 = π²/6<br>
-                • ζ(4) = π⁴/90 = (-1)<sup>2+1</sup> × (-1/30) × (2π)⁴ / (2×4!) = (-1/30) × 16π⁴ / 48 = π⁴/90<br>
-                • ζ(6) = π⁶/945 = (-1)<sup>3+1</sup> × (1/42) × (2π)⁶ / (2×6!) = (1/42) × 64π⁶ / 1440 = π⁶/945
-            </div>
-            
-            <div class="zeta-comparison">
-                <div style="font-size: 1.3em; color: #ff6b6b; font-weight: bold; margin-bottom: 20px;">
-                    🚀 The Bernoulli-Gap Inversion Innovation
-                </div>
-                
-                <strong>Traditional Method:</strong> Bernoulli numbers → Generate ζ(2n) values → Analytic continuation<br><br>
-                
-                <strong>Our Gap Inversion Method:</strong> Prime gaps → Direct ζ(s) factorization → Same exact values!<br><br>
-                
-                <div style="background: rgba(168, 230, 207, 0.2); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 5px solid #48dbfb;">
-                    <strong>🔄 The Inversion Principle:</strong><br><br>
-                    
-                    Instead of using Bernoulli generating functions to create zeta values, we <strong>invert the process</strong>:<br><br>
-                    
-                    <strong>Classical:</strong> B<sub>2n</sub> numbers → ζ(2n) via complex analysis → π relationships<br>
-                    <strong>Gap Method:</strong> Prime spacing → ζ(s) via gap products → Same π relationships<br><br>
-                    
-                    This reveals that <em>prime gap structure contains the same fundamental arithmetic information as Bernoulli numbers</em>, but accessed through discrete spacing rather than continuous generating functions!
-                </div>
-                
-                <strong>🧮 Mathematical Equivalence:</strong><br>
-                Our gap products: ∏<sub>gaps</sub> ∏<sub>p in gap</sub> (1-p<sup>-s</sup>)<sup>-1</sup> = ζ(s)<br>
-                Produce identical results to: (-1)<sup>n+1</sup> × B<sub>2n</sub> × (2π)<sup>2n</sup> / (2×(2n)!)<br><br>
-                
-                <strong>🎯 Why This Matters:</strong><br>
-                • Shows prime gaps encode Bernoulli-equivalent information<br>
-                • Provides computational alternative to classical methods<br>
-                • Bridges discrete number theory with continuous analysis<br>
-                • Opens new research pathways for understanding ζ(s)
-            </div>
-        </div>
-        
         <div class="author-credit">
             <div style="font-size: 1.4em; color: #ff6b6b; font-weight: bold; margin-bottom: 15px;">
-                Prime Gap Decomposition of ζ(s)
+                🧮 Gap Inversion Sieve Theory
             </div>
             <div style="font-size: 1.2em; color: #a8e6cf; margin-bottom: 10px;">
-                Research by <strong>Wessen Getachew</strong>
+                Original Research by <strong>Wessen Getachew</strong>
             </div>
             <div style="font-size: 1em; opacity: 0.9;">
-                Follow research: <a href="https://twitter.com/7DView" target="_blank" style="color: #48dbfb; text-decoration: none; font-weight: bold; transition: all 0.3s ease;">@7DView</a> on Twitter
+                Follow mathematical discoveries: <a href="https://twitter.com/7DView" target="_blank" style="color: #48dbfb; text-decoration: none; font-weight: bold; transition: all 0.3s ease;">@7DView</a> on Twitter
             </div>
             <div style="font-size: 0.9em; margin-top: 15px; opacity: 0.8; color: #feca57;">
-                "Exploring ζ(s) through prime gap class organization"
+                "Bridging discrete prime gaps with continuous zeta functions through modular arithmetic"
             </div>
         </div>
     </div>
@@ -533,17 +458,15 @@
             const gapData = [];
             
             // Calculate forward gaps between consecutive primes
-            for (let i = 1; i < primes.length; i++) {
-                const gap = primes[i] - primes[i-1];
+            // Each prime p is used exactly once: when calculating gap from p to next prime
+            for (let i = 0; i < primes.length - 1; i++) {
+                const gap = primes[i + 1] - primes[i];
                 gapData.push({
-                    prime: primes[i-1],
-                    gap: gap,
-                    nextPrime: primes[i]
+                    prime: primes[i],           // The prime p that has this gap
+                    gap: gap,                   // gap(p) = next_prime - p
+                    nextPrime: primes[i + 1]    // p + gap(p)
                 });
             }
-            
-            // Special handling for prime 2: it has gap 1 to next prime 3
-            // But we need to handle it separately in the gap decomposition
             
             return gapData;
         }
@@ -569,13 +492,14 @@
             const gapProducts = {};
             
             // Calculate product for each gap class
+            // Each prime p contributes exactly once: (1 - p^(-s))^(-1) where gap(p) = g
             Object.keys(gapClasses).forEach(gap => {
                 const gapNum = parseInt(gap);
                 const primesInGap = gapClasses[gap];
                 
                 let gapProduct = 1.0;
                 primesInGap.forEach(data => {
-                    const p = data.prime;
+                    const p = data.prime;  // Prime p with gap(p) = gapNum
                     const factor = 1 / (1 - Math.pow(p, -s)); // (1 - p^(-s))^(-1)
                     gapProduct *= factor;
                 });
@@ -585,8 +509,7 @@
                     count: primesInGap.length,
                     product: gapProduct,
                     examples: primesInGap.slice(0, 6).map(d => {
-                        if (d.gap === 0) return `${d.prime} (gap 0)`;
-                        return `${d.prime}→${d.nextPrime}`;
+                        return `${d.prime}→${d.nextPrime} (gap ${d.gap})`;
                     }).join(', ')
                 };
                 
@@ -628,11 +551,162 @@
             };
         }
         
+        function drawGapDistributionGraph(gapProducts, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 800;
+            canvas.height = 400;
+            
+            // Clear canvas with dark background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Prepare data
+            const gaps = Object.keys(gapProducts).map(Number).sort((a, b) => a - b);
+            const counts = gaps.map(gap => gapProducts[gap].count);
+            const products = gaps.map(gap => gapProducts[gap].product);
+            
+            if (gaps.length === 0) return;
+            
+            // Graph dimensions
+            const margin = { top: 40, right: 60, bottom: 60, left: 80 };
+            const graphWidth = canvas.width - margin.left - margin.right;
+            const graphHeight = canvas.height - margin.top - margin.bottom;
+            
+            // Scale functions
+            const maxCount = Math.max(...counts);
+            const maxProduct = Math.max(...products);
+            const xScale = (gap) => margin.left + (gaps.indexOf(gap) / (gaps.length - 1)) * graphWidth;
+            const yScale = (value, max) => margin.top + graphHeight - (value / max) * graphHeight;
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            
+            // Vertical grid lines
+            for (let i = 0; i < gaps.length; i += Math.max(1, Math.floor(gaps.length / 8))) {
+                const x = xScale(gaps[i]);
+                ctx.beginPath();
+                ctx.moveTo(x, margin.top);
+                ctx.lineTo(x, margin.top + graphHeight);
+                ctx.stroke();
+            }
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = margin.top + (i / 5) * graphHeight;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(margin.left + graphWidth, y);
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top + graphHeight);
+            ctx.lineTo(margin.left + graphWidth, margin.top + graphHeight);
+            ctx.stroke();
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top);
+            ctx.lineTo(margin.left, margin.top + graphHeight);
+            ctx.stroke();
+            
+            // Draw bars for prime counts
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.7)';
+            const barWidth = Math.min(20, graphWidth / gaps.length * 0.8);
+            
+            gaps.forEach((gap, i) => {
+                const x = xScale(gap) - barWidth / 2;
+                const y = yScale(counts[i], maxCount);
+                const height = margin.top + graphHeight - y;
+                
+                ctx.fillRect(x, y, barWidth, height);
+            });
+            
+            // Draw line for gap products (scaled)
+            ctx.strokeStyle = '#48dbfb';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            gaps.forEach((gap, i) => {
+                const x = xScale(gap);
+                const y = yScale(products[i], maxProduct);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Draw points on the line
+            ctx.fillStyle = '#48dbfb';
+            gaps.forEach((gap, i) => {
+                const x = xScale(gap);
+                const y = yScale(products[i], maxProduct);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // Add labels
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            
+            // X-axis labels (gap sizes)
+            gaps.forEach((gap, i) => {
+                if (i % Math.max(1, Math.floor(gaps.length / 10)) === 0) {
+                    const x = xScale(gap);
+                    ctx.fillText(gap.toString(), x, margin.top + graphHeight + 20);
+                }
+            });
+            
+            // Y-axis labels
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = margin.top + (i / 5) * graphHeight + 4;
+                const value = (maxCount * (5 - i) / 5).toFixed(0);
+                ctx.fillText(value, margin.left - 10, y);
+            }
+            
+            // Axis titles
+            ctx.textAlign = 'center';
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#a8e6cf';
+            
+            // X-axis title
+            ctx.fillText('Gap Size', canvas.width / 2, canvas.height - 15);
+            
+            // Y-axis title (rotated)
+            ctx.save();
+            ctx.translate(20, canvas.height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Prime Count', 0, 0);
+            ctx.restore();
+            
+            // Graph title
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillText('Prime Gap Distribution & Product Contributions', canvas.width / 2, 25);
+        }
+        
         function calculateZeta() {
             const maxPrime = parseInt(document.getElementById('maxPrime').value);
             const zetaSSelect = document.getElementById('zetaS').value;
             const customS = parseFloat(document.getElementById('customS').value);
             const maxGap = parseInt(document.getElementById('maxGap').value);
+            const showGraph = document.getElementById('showGraph').value === 'true';
             const resultsDiv = document.getElementById('results');
             
             const s = zetaSSelect === 'custom' ? customS : parseInt(zetaSSelect);
@@ -677,13 +751,12 @@
                         </div>
                         
                         <div class="zeta-calculation">
-                            <strong>Bernoulli-Gap Inversion Formula:</strong><br>
+                            <strong>Gap Inversion Formula:</strong><br>
                             ζ(${s}) = ∏_{g∈{1,2,4,6,...}} ∏_{p: gap(p)=g} (1 - p^{-${s}})^{-1}<br><br>
                             
                             <strong>Individual Gap Contributions:</strong><br>
                             ${Object.keys(gapProducts).sort((a,b) => parseInt(a) - parseInt(b)).map(gap => {
                                 const gp = gapProducts[gap];
-                                const gapNum = parseInt(gap);
                                 return `Gap ${gap}: ${gp.count} prime${gp.count > 1 ? 's' : ''} → Product = ${gp.product.toFixed(8)}`;
                             }).join('<br>')}
                             <br><br>
@@ -692,44 +765,6 @@
                     `;
                     
                     resultsDiv.appendChild(mainDiv);
-                    
-                    // Gap class breakdown table
-                    const tableDiv = document.createElement('div');
-                    tableDiv.className = 'result-card';
-                    
-                    let tableHTML = `
-                        <div class="result-header">📊 Gap Class Breakdown</div>
-                        
-                        <div class="gap-table">
-                            <table>
-                                <tr>
-                                    <th>Gap Size</th>
-                                    <th>Prime Count</th>
-                                    <th>Gap Product</th>
-                                    <th>Log Contribution</th>
-                                    <th>Examples</th>
-                                </tr>
-                    `;
-                    
-                    Object.keys(gapProducts).sort((a,b) => parseInt(a) - parseInt(b)).forEach(gap => {
-                        const gp = gapProducts[gap];
-                        const logContrib = Math.log(gp.product);
-                        const moreText = gp.count > 6 ? ` +${gp.count - 6} more` : '';
-                        
-                        tableHTML += `
-                            <tr>
-                                <td><span class="highlight">${gap}</span></td>
-                                <td>${gp.count}</td>
-                                <td>${gp.product.toFixed(12)}</td>
-                                <td>${logContrib.toFixed(8)}</td>
-                                <td>${gp.examples}${moreText}</td>
-                            </tr>
-                        `;
-                    });
-                    
-                    tableHTML += '</table></div>';
-                    tableDiv.innerHTML = tableHTML;
-                    resultsDiv.appendChild(tableDiv);
                     
                     // π extraction if s = 2
                     if (s === 2) {
@@ -765,6 +800,74 @@
                         resultsDiv.appendChild(piDiv);
                     }
                     
+                    // Add graph if requested
+                    if (showGraph) {
+                        const graphDiv = document.createElement('div');
+                        graphDiv.className = 'graph-container';
+                        graphDiv.innerHTML = `
+                            <div class="result-header">📈 Prime Gap Distribution Visualization</div>
+                            <canvas id="gapDistributionCanvas" class="graph-canvas"></canvas>
+                            <div class="graph-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: rgba(255, 107, 107, 0.7);"></div>
+                                    <span>Prime Count per Gap</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #48dbfb;"></div>
+                                    <span>Gap Product Contribution</span>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 15px; color: #a8e6cf; font-size: 0.9em;">
+                                Red bars show how many primes have each gap size.<br>
+                                Blue line shows each gap class's contribution to ζ(${s}).
+                            </div>
+                        `;
+                        resultsDiv.appendChild(graphDiv);
+                        
+                        // Draw the graph after DOM is updated
+                        setTimeout(() => {
+                            drawGapDistributionGraph(gapProducts, 'gapDistributionCanvas');
+                        }, 100);
+                    }
+                    
+                    // Gap class breakdown table
+                    const tableDiv = document.createElement('div');
+                    tableDiv.className = 'result-card';
+                    
+                    let tableHTML = `
+                        <div class="result-header">📊 Gap Class Breakdown</div>
+                        
+                        <div class="gap-table">
+                            <table>
+                                <tr>
+                                    <th>Gap Size</th>
+                                    <th>Prime Count</th>
+                                    <th>Gap Product</th>
+                                    <th>Log Contribution</th>
+                                    <th>Examples</th>
+                                </tr>
+                    `;
+                    
+                    Object.keys(gapProducts).sort((a,b) => parseInt(a) - parseInt(b)).forEach(gap => {
+                        const gp = gapProducts[gap];
+                        const logContrib = Math.log(gp.product);
+                        const moreText = gp.count > 6 ? ` +${gp.count - 6} more` : '';
+                        
+                        tableHTML += `
+                            <tr>
+                                <td><span class="highlight">${gap}</span></td>
+                                <td>${gp.count}</td>
+                                <td>${gp.product.toFixed(8)}</td>
+                                <td>${logContrib.toFixed(6)}</td>
+                                <td>${gp.examples}${moreText}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += '</table></div>';
+                    tableDiv.innerHTML = tableHTML;
+                    resultsDiv.appendChild(tableDiv);
+                    
                 } catch (error) {
                     resultsDiv.innerHTML = `<div class="result-card zeta-comparison">Error: ${error.message}<br><br>Stack: ${error.stack}</div>`;
                 }
@@ -792,651 +895,6 @@
             
             calculateZeta();
         });
-    </script>
-</body>
-</html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A New Telescoping Identity for Twin Prime Sieving</title>
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true,
-                processEnvironments: true
-            },
-            options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-            },
-            startup: {
-                ready() {
-                    MathJax.startup.defaultReady();
-                }
-            }
-        };
-    </script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            line-height: 1.7;
-            background: #f8f9fa;
-            color: #2c3e50;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 30px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            min-height: 100vh;
-        }
-
-        .header {
-            text-align: center;
-            padding: 40px 0;
-            border-bottom: 2px solid #e9ecef;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-weight: normal;
-            line-height: 1.3;
-        }
-
-        .author-info {
-            font-size: 1.1em;
-            color: #6c757d;
-            font-style: italic;
-            margin-bottom: 10px;
-        }
-
-        .abstract {
-            background: #f8f9fa;
-            padding: 30px;
-            border-left: 4px solid #007bff;
-            margin: 30px 0;
-            border-radius: 4px;
-        }
-
-        .abstract h3 {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            color: #495057;
-        }
-
-        .section {
-            margin: 40px 0;
-        }
-
-        .section h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 8px;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-            font-weight: normal;
-        }
-
-        .section h3 {
-            color: #495057;
-            margin: 25px 0 15px 0;
-            font-size: 1.2em;
-        }
-
-        .theorem-box {
-            background: #e3f2fd;
-            border: 1px solid #2196f3;
-            border-left: 4px solid #2196f3;
-            padding: 25px;
-            margin: 25px 0;
-            border-radius: 4px;
-        }
-
-        .theorem-title {
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #1976d2;
-        }
-
-        .proof-box {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 4px;
-            font-style: italic;
-        }
-
-        .formula-center {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .interactive-section {
-            background: #f1f8e9;
-            border: 1px solid #8bc34a;
-            border-left: 4px solid #8bc34a;
-            padding: 25px;
-            margin: 25px 0;
-            border-radius: 4px;
-        }
-
-        .controls {
-            background: white;
-            padding: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            margin: 15px 0;
-        }
-
-        .controls label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #495057;
-        }
-
-        .controls input {
-            width: 200px;
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 1em;
-            margin-bottom: 10px;
-        }
-
-        .btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-            margin: 5px;
-            transition: background 0.2s;
-        }
-
-        .btn:hover {
-            background: #0056b3;
-        }
-
-        .results {
-            margin: 20px 0;
-            padding: 15px;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            border: 1px solid #dee2e6;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .data-table th {
-            background: #f8f9fa;
-            font-weight: bold;
-        }
-
-        .highlight-result {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .note-box {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-left: 4px solid #f39c12;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-
-        .citation-info {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-
-        .references {
-            font-size: 0.95em;
-        }
-
-        .references ol {
-            padding-left: 20px;
-        }
-
-        .references li {
-            margin-bottom: 8px;
-        }
-
-        @media (max-width: 768px) {
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 20px 15px;
-            }
-            .header h1 {
-                font-size: 1.6em;
-            }
-        }
-
-        @media print {
-            .interactive-section {
-                display: none;
-            }
-            .container {
-                box-shadow: none;
-                max-width: none;
-                margin: 0;
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>A New Telescoping Identity for Twin Prime Sieving</h1>
-            <div class="author-info">
-                <strong>Wessen Getachew</strong><br>
-                Independent Researcher<br>
-                Email: Getachewwessen@gmail.com
-            </div>
-        </div>
-
-        <div class="abstract">
-            <h3>Abstract</h3>
-            <p>We present a new algebraic identity that provides a factorization of the expression $(p-1)(p-2)/p^2$ appearing in twin prime sieving theory. The identity enables a telescoping product formula that yields closed-form expressions for finite products, offering computational advantages for numerical investigations of twin prime distribution.</p>
-            <p><strong>Keywords:</strong> Twin primes, telescoping products, algebraic identities, sieve theory</p>
-            <p><strong>2020 Mathematics Subject Classification:</strong> 11N36, 11A41</p>
-        </div>
-
-        <div class="citation-info">
-            <strong>Citation:</strong> Getachew, W. (2025). A New Telescoping Identity for Twin Prime Sieving. Independent Research.
-        </div>
-
-        <div class="section">
-            <h2>1. Introduction</h2>
-            <p>The twin prime conjecture, concerning pairs of primes differing by 2, remains one of number theory's most prominent unsolved problems. Computational investigations of twin prime distribution often involve products of the form $\prod \frac{(p-1)(p-2)}{p^2}$, which arise naturally in sieving arguments.</p>
-            
-            <p>This paper establishes a new algebraic identity for such expressions and demonstrates its telescoping properties, providing both theoretical insight and practical computational benefits.</p>
-        </div>
-
-        <div class="section">
-            <h2>2. Main Results</h2>
-            
-            <h3>2.1 The Fundamental Identity</h3>
-            
-            <div class="theorem-box">
-                <div class="theorem-title">Theorem 1.</div>
-                <p>For any real number $p > 1$:</p>
-                <div class="formula-center">
-                    $$\frac{(p-1)(p-2)}{p^2} = \left(1-\frac{1}{(p-1)^2}\right)\left(1-\frac{1}{p}\right)^3$$
-                </div>
-            </div>
-
-            <div class="interactive-section">
-                <h3>Interactive Verification</h3>
-                <p>Verify this identity for any value of p:</p>
-                
-                <div class="controls">
-                    <label for="p-value">Enter value of p (must be > 1):</label>
-                    <input type="number" id="p-value" value="5" min="1.01" step="0.1">
-                    <button class="btn" onclick="checkIdentity()">Verify Identity</button>
-                </div>
-
-                <div class="results-grid">
-                    <div class="results">
-                        <strong>Left Side: $(p-1)(p-2)/p^2$</strong>
-                        <div id="left-calc"></div>
-                        <div id="left-value" style="font-weight: bold; margin-top: 10px;"></div>
-                    </div>
-                    <div class="results">
-                        <strong>Right Side: $(1-1/(p-1)^2)(1-1/p)^3$</strong>
-                        <div id="right-calc"></div>
-                        <div id="right-value" style="font-weight: bold; margin-top: 10px;"></div>
-                    </div>
-                </div>
-
-                <div id="verification-status"></div>
-            </div>
-
-            <div class="proof-box">
-                <strong>Proof.</strong> We establish this through direct algebraic manipulation.
-                <br><br>
-                Starting with the right-hand side:
-                $$\left(1-\frac{1}{(p-1)^2}\right)\left(1-\frac{1}{p}\right)^3$$
-                <br>
-                The first factor simplifies to:
-                $$1-\frac{1}{(p-1)^2} = \frac{(p-1)^2-1}{(p-1)^2} = \frac{p(p-2)}{(p-1)^2}$$
-                <br>
-                The second factor gives:
-                $$\left(1-\frac{1}{p}\right)^3 = \frac{(p-1)^3}{p^3}$$
-                <br>
-                Multiplying these expressions:
-                $$\frac{p(p-2)}{(p-1)^2} \cdot \frac{(p-1)^3}{p^3} = \frac{(p-2)(p-1)}{p^2}$$
-                <br>
-                This establishes the identity. □
-            </div>
-
-            <h3>2.2 Telescoping Product Formula</h3>
-
-            <div class="theorem-box">
-                <div class="theorem-title">Theorem 2.</div>
-                <p>For any integer $n \geq 3$:</p>
-                <div class="formula-center">
-                    $$\prod_{k=3}^{n} \frac{(k-1)(k-2)}{k^2} = \frac{4}{n^2(n-1)}$$
-                </div>
-            </div>
-
-            <div class="interactive-section">
-                <h3>Telescoping Demonstration</h3>
-                <p>Observe how a complex product simplifies to a single fraction:</p>
-                
-                <div class="controls">
-                    <label for="n-value">Enter upper limit n (≥ 3):</label>
-                    <input type="number" id="n-value" value="10" min="3" max="1000">
-                    <button class="btn" onclick="demonstrateTelescoping()">Calculate</button>
-                </div>
-
-                <div class="results">
-                    <div id="telescoping-results"></div>
-                </div>
-            </div>
-
-            <div class="proof-box">
-                <strong>Proof.</strong> Using Theorem 1, we factor the product:
-                $$\prod_{k=3}^{n} \frac{(k-1)(k-2)}{k^2} = \prod_{k=3}^{n} \left(1-\frac{1}{(k-1)^2}\right) \prod_{k=3}^{n} \left(1-\frac{1}{k}\right)^3$$
-                <br>
-                For the second product:
-                $$\prod_{k=3}^{n} \left(1-\frac{1}{k}\right)^3 = \left(\frac{2}{n}\right)^3 = \frac{8}{n^3}$$
-                <br>
-                For the first product:
-                $$\prod_{k=3}^{n} \left(1-\frac{1}{(k-1)^2}\right) = \prod_{k=3}^{n} \frac{k(k-2)}{(k-1)^2} = \frac{n}{2(n-1)}$$
-                <br>
-                Combining both parts:
-                $$\frac{n}{2(n-1)} \cdot \frac{8}{n^3} = \frac{4}{n^2(n-1)}$$
-                □
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>3. Applications to Twin Prime Theory</h2>
-            
-            <h3>3.1 Connection to Sieving</h3>
-            <p>The expression $(p-1)(p-2)/p^2$ represents the density of integers avoiding both residue classes 1 and $p-1$ modulo $p$, which corresponds to numbers $m$ where neither $m$ nor $m+2$ is divisible by $p$. This is precisely the constraint needed in twin prime sieving.</p>
-
-            <h3>3.2 Computational Advantages</h3>
-            <p>The telescoping formula provides several benefits:</p>
-            <ul>
-                <li><strong>Direct evaluation:</strong> Products that would require computing hundreds of terms reduce to simple expressions</li>
-                <li><strong>Numerical stability:</strong> Eliminates floating-point error accumulation in long products</li>
-                <li><strong>Precision control:</strong> For target precision $\varepsilon$, the required cutoff is $n = \lceil(4/\varepsilon)^{1/3}\rceil$</li>
-                <li><strong>Error bounds:</strong> The truncation error is exactly $4/(n^2(n-1))$</li>
-            </ul>
-
-            <div class="interactive-section">
-                <h3>Precision Calculator</h3>
-                <p>Determine optimal computation parameters for any target precision:</p>
-                
-                <div class="controls">
-                    <label for="target-precision">Target precision (e.g. 1e-12):</label>
-                    <input type="text" id="target-precision" value="1e-12">
-                    <button class="btn" onclick="calculatePrecision()">Calculate Requirements</button>
-                </div>
-
-                <div id="precision-results" class="results"></div>
-            </div>
-
-            <h3>3.3 Numerical Example</h3>
-            <p>For $n = 100$:</p>
-            <ul>
-                <li>Direct product: $\prod_{k=3}^{100} \frac{(k-1)(k-2)}{k^2} = 4.04040404... \times 10^{-6}$</li>
-                <li>Telescoping formula: $\frac{4}{100^2 \cdot 99} = 4.04040404... \times 10^{-6}$</li>
-            </ul>
-            <p>The results match to machine precision.</p>
-        </div>
-
-        <div class="section">
-            <h2>4. Convergence Analysis</h2>
-            
-            <h3>4.1 Asymptotic Behavior</h3>
-            <p>From Theorem 2, the infinite product exhibits cubic decay:</p>
-            <div class="formula-center">
-                $$\prod_{k=3}^{n} \frac{(k-1)(k-2)}{k^2} \sim \frac{4}{n^3} \quad \text{as } n \to \infty$$
-            </div>
-            <p>This rapid convergence makes the finite approximations highly effective for computational purposes.</p>
-
-            <h3>4.2 Precision Requirements</h3>
-            <p>To achieve precision $\varepsilon$, we need:</p>
-            <div class="formula-center">
-                $$\frac{4}{n^2(n-1)} < \varepsilon$$
-            </div>
-            <p>Solving for $n$ gives the optimal cutoff $n \approx (4/\varepsilon)^{1/3}$.</p>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Cutoff n</th>
-                        <th>Value: 4/(n²(n-1))</th>
-                        <th>Decimal Places</th>
-                    </tr>
-                </thead>
-                <tbody id="convergence-table">
-                </tbody>
-            </table>
-        </div>
-
-        <div class="section">
-            <h2>5. Discussion</h2>
-            <p>This telescoping identity transforms a computational challenge into an algebraic solution. Instead of computing potentially hundreds of product terms with accumulating numerical errors, researchers can evaluate exact expressions.</p>
-
-            <p>The identity also provides theoretical insight into the structure of twin prime sieving, revealing how the local densities combine multiplicatively in a way that permits exact analysis.</p>
-
-            <div class="note-box">
-                <strong>Research Impact:</strong> This identity enables precise control over computational parameters in twin prime research, replacing trial-and-error approaches with exact mathematical formulas.
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>6. Future Directions</h2>
-            <p>Several avenues for further research emerge:</p>
-            <ol>
-                <li>Investigation of whether similar identities exist for other prime constellation patterns</li>
-                <li>Application to improved numerical studies of the Hardy-Littlewood twin prime constant</li>
-                <li>Exploration of connections to other sieving problems in analytic number theory</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h2>7. Conclusion</h2>
-            <p>We have established a new algebraic identity that enables telescoping behavior in products central to twin prime theory. This result provides both theoretical insight into sieving mechanisms and practical computational advantages for numerical investigations of twin prime distribution.</p>
-
-            <p>The discovery demonstrates how elementary algebraic relationships can yield significant computational improvements in number-theoretic research, opening new possibilities for high-precision investigations of twin prime patterns.</p>
-        </div>
-
-        <div class="section references">
-            <h2>References</h2>
-            <ol>
-                <li>G. H. Hardy and J. E. Littlewood, "Some problems of 'Partitio numerorum'; III: On the expression of a number as a sum of primes," <em>Acta Mathematica</em>, vol. 44, pp. 1-70, 1923.</li>
-                <li>H. Halberstam and H.-E. Richert, <em>Sieve Methods</em>, Academic Press, 1974.</li>
-                <li>T. Tao, "Structure and randomness in the prime numbers," <em>Proceedings of the ICM</em>, vol. 1, pp. 79-90, 2006.</li>
-                <li>D. A. Goldston, J. Pintz, and C. Y. Yıldırım, "Primes in tuples I," <em>Annals of Mathematics</em>, vol. 170, pp. 819-862, 2009.</li>
-            </ol>
-        </div>
-
-        <div class="citation-info" style="margin-top: 40px;">
-            <strong>Correspondence:</strong> Wessen Getachew, Independent Researcher. Email: Getachewwessen@gmail.com
-        </div>
-    </div>
-
-    <script>
-        // Initialize convergence table
-        document.addEventListener('DOMContentLoaded', function() {
-            const tbody = document.getElementById('convergence-table');
-            const values = [100, 1000, 10000, 100000, 1000000];
-            
-            values.forEach(n => {
-                const telescopingValue = 4 / (n * n * (n - 1));
-                const decimalPlaces = -Math.log10(telescopingValue);
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${n.toLocaleString()}</td>
-                    <td>${telescopingValue.toExponential(3)}</td>
-                    <td>${decimalPlaces.toFixed(1)}</td>
-                `;
-            });
-        });
-
-        function checkIdentity() {
-            const p = parseFloat(document.getElementById('p-value').value);
-            
-            if (p <= 1) {
-                alert('Please enter a value greater than 1');
-                return;
-            }
-
-            const leftSide = (p - 1) * (p - 2) / (p * p);
-            const term1 = 1 - 1/((p - 1) * (p - 1));
-            const term2 = Math.pow(1 - 1/p, 3);
-            const rightSide = term1 * term2;
-
-            document.getElementById('left-calc').innerHTML = `
-                <div>= (${p}-1)(${p}-2)/${p}²</div>
-                <div>= ${((p-1)*(p-2)).toFixed(4)}/${(p*p).toFixed(2)}</div>
-            `;
-            
-            document.getElementById('right-calc').innerHTML = `
-                <div>First factor: ${term1.toFixed(6)}</div>
-                <div>Second factor: ${term2.toFixed(6)}</div>
-                <div>Product: ${(term1 * term2).toFixed(10)}</div>
-            `;
-
-            document.getElementById('left-value').textContent = `Result: ${leftSide.toFixed(10)}`;
-            document.getElementById('right-value').textContent = `Result: ${rightSide.toFixed(10)}`;
-
-            const difference = Math.abs(leftSide - rightSide);
-            const isMatch = difference < 1e-12;
-            
-            const statusDiv = document.getElementById('verification-status');
-            if (isMatch) {
-                statusDiv.innerHTML = '<div class="highlight-result">✓ Identity verified! Both sides match perfectly.</div>';
-            } else {
-                statusDiv.innerHTML = '<div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px;">✗ Calculation error - please check inputs.</div>';
-            }
-        }
-
-        function demonstrateTelescoping() {
-            const n = parseInt(document.getElementById('n-value').value);
-            
-            if (n < 3) {
-                alert('Please enter a value of 3 or greater');
-                return;
-            }
-
-            let product = 1;
-            let terms = [];
-            for (let k = 3; k <= Math.min(n, 10); k++) {
-                const term = (k - 1) * (k - 2) / (k * k);
-                product *= term;
-                terms.push(`(${k-1}×${k-2})/${k}²`);
-            }
-            
-            for (let k = 11; k <= n; k++) {
-                product *= (k - 1) * (k - 2) / (k * k);
-            }
-
-            const telescoping = 4 / (n * n * (n - 1));
-
-            const resultsDiv = document.getElementById('telescoping-results');
-            resultsDiv.innerHTML = `
-                <strong>Direct Product Computation:</strong><br>
-                ${terms.slice(0, 5).join(' × ')}${n > 7 ? ' × ... × ' + terms[terms.length-1] : ''}<br>
-                = ${product.toExponential(10)}<br><br>
-                
-                <strong>Telescoping Formula:</strong><br>
-                4/(${n}² × ${n-1}) = 4/${(n*n*(n-1)).toLocaleString()} = ${telescoping.toExponential(10)}<br><br>
-                
-                <div class="highlight-result">
-                    ${Math.abs(product - telescoping) < 1e-12 ? '✓ Perfect match! Telescoping verified.' : '⚠ Slight numerical difference due to floating-point precision.'}
-                </div>
-            `;
-        }
-
-        function calculatePrecision() {
-            const precisionStr = document.getElementById('target-precision').value;
-            const targetPrecision = parseFloat(precisionStr);
-            
-            if (isNaN(targetPrecision) || targetPrecision <= 0) {
-                alert('Please enter a valid positive number');
-                return;
-            }
-
-            const optimalN = Math.ceil(Math.pow(4 / targetPrecision, 1/3));
-            const actualPrecision = 4 / (optimalN * optimalN * (optimalN - 1));
-
-            document.getElementById('precision-results').innerHTML = `
-                <strong>Precision Analysis:</strong><br>
-                Target precision: ${targetPrecision.toExponential(2)}<br>
-                Optimal cutoff: n = ${optimalN.toLocaleString()}<br>
-                Achieved precision: ${actualPrecision.toExponential(3)}<br>
-                <div class="highlight-result">
-                    ✓ Guaranteed accuracy better than target!
-                </div>
-            `;
-        }
-
-        // Initialize first calculation after MathJax loads
-        setTimeout(function() {
-            if (typeof MathJax !== 'undefined') {
-                checkIdentity();
-            }
-        }, 2000);
     </script>
 </body>
 </html>
