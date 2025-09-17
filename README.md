@@ -979,21 +979,36 @@
                                 <div class="result-value">${analysis.gaps.length}</div>
                             </div>
                         </div>
-                        ${analysis.gaps.length <= 20 ? `
-                            <div style="margin-top: 15px;">
-                                <strong>All gaps:</strong>
-                                <div style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-top: 5px; font-size: 0.9rem;">
-                                    ${analysis.gaps.join(', ')}
-                                </div>
+                        <div style="margin-top: 15px;">
+                            <strong>All ${analysis.gaps.length} gaps between consecutive k-tuples:</strong>
+                            <div style="
+                                font-family: 'JetBrains Mono', monospace; 
+                                background: rgba(0,0,0,0.3); 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                margin-top: 10px; 
+                                font-size: 0.9rem;
+                                max-height: ${analysis.gaps.length <= 50 ? '200px' : analysis.gaps.length <= 200 ? '300px' : '400px'};
+                                overflow-y: auto;
+                                border: 1px solid rgba(255,255,255,0.2);
+                                line-height: 1.6;
+                            ">
+                                ${analysis.gaps.map((gap, i) => {
+                                    const color = gap === analysis.minGap ? '#43e97b' : 
+                                                 gap === analysis.maxGap ? '#f5576c' : 
+                                                 'rgba(255,255,255,0.9)';
+                                    return `<span style="color: ${color}; margin-right: 8px;" title="Gap ${i+1}: ${gap}">${gap}</span>`;
+                                }).join('')}
                             </div>
-                        ` : `
-                            <div style="margin-top: 15px;">
-                                <strong>First 20 gaps:</strong>
-                                <div style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-top: 5px; font-size: 0.9rem;">
-                                    ${analysis.gaps.slice(0, 20).join(', ')}${analysis.gaps.length > 20 ? `, ... (${analysis.gaps.length - 20} more)` : ''}
+                            ${analysis.gaps.length > 50 ? `
+                                <div style="margin-top: 10px; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; font-size: 0.85rem;">
+                                    <strong>💡 Color coding:</strong> 
+                                    <span style="color: #43e97b;">■</span> Minimum gap (${analysis.minGap}) • 
+                                    <span style="color: #f5576c;">■</span> Maximum gap (${analysis.maxGap}) • 
+                                    <span style="color: rgba(255,255,255,0.9);">■</span> Other gaps
                                 </div>
-                            </div>
-                        `}
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
             ` : '';
