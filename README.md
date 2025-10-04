@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modular Sieve Analysis - Goldbach's Conjecture</title>
+    <title>Modular Farey Sequence and Dyadic Lifts</title>
     <style>
         * {
             margin: 0;
@@ -12,232 +12,232 @@
         }
         
         body {
-            font-family: 'Times New Roman', serif;
-            background: #f5f5f5;
-            color: #222;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
             padding: 20px;
+            min-height: 100vh;
         }
         
         .container {
-            max-width: 1800px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
         
         header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px 40px;
-            border-bottom: 3px solid #34495e;
+            padding: 30px;
+            text-align: center;
         }
         
         h1 {
-            font-size: 1.8em;
-            font-weight: normal;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
         
         .subtitle {
-            font-size: 0.95em;
-            opacity: 0.9;
-            font-style: italic;
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 300;
         }
         
-        .paper-ref {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #445566;
-            font-size: 0.85em;
-            line-height: 1.6;
-        }
-        
-        .content {
+        .main-content {
             display: grid;
-            grid-template-columns: 380px 1fr;
+            grid-template-columns: 350px 1fr;
             gap: 0;
         }
         
         .controls {
-            background: #fafafa;
+            background: #f8f9fa;
+            border-right: 2px solid #e0e0e0;
             padding: 25px;
-            border-right: 1px solid #ddd;
-            font-size: 0.9em;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
         }
         
-        .section-title {
-            font-weight: bold;
-            font-size: 1em;
-            margin: 20px 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #2c3e50;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .control-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .control-section:last-child {
+            border-bottom: none;
+        }
+        
+        .control-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
         }
         
         .control-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
         
-        .control-group label {
+        label {
             display: block;
-            font-weight: normal;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
             font-size: 0.9em;
         }
         
-        input[type="number"], select {
+        input[type="number"],
+        input[type="range"],
+        select {
             width: 100%;
             padding: 8px;
-            border: 1px solid #999;
-            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             font-size: 0.9em;
-            font-family: 'Courier New', monospace;
         }
         
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: #2c3e50;
+        input[type="range"] {
+            padding: 0;
+        }
+        
+        .range-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: 600;
+            color: #667eea;
         }
         
         input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
             margin-right: 8px;
         }
         
         .checkbox-label {
             display: flex;
             align-items: center;
-            margin: 8px 0;
+            margin-bottom: 8px;
             cursor: pointer;
-            font-size: 0.9em;
         }
         
         button {
             width: 100%;
-            padding: 10px;
-            background: #2c3e50;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            font-size: 0.9em;
-            font-weight: normal;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 8px;
-            font-family: 'Times New Roman', serif;
-            letter-spacing: 0.5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
         
         button:hover {
-            background: #34495e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
         
         button:active {
-            background: #1a252f;
+            transform: translateY(0);
         }
         
-        .zoom-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        
-        .export-btn {
-            background: #27ae60;
-            margin-top: 15px;
-        }
-        
-        .export-btn:hover {
-            background: #229954;
-        }
-        
-        .visualization {
+        .canvas-container {
             padding: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            background: #fafbfc;
         }
         
         canvas {
-            border: 1px solid #999;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
             background: white;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         
         .info-panel {
-            background: #fafafa;
-            padding: 20px;
-            border: 1px solid #ddd;
             margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
             width: 100%;
-            max-width: 1200px;
-            font-size: 0.9em;
+            max-width: 800px;
         }
         
-        .info-panel h3 {
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-item strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 4px;
+            font-size: 0.85em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+        .info-item span {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
         }
         
-        .stat {
-            padding: 10px;
-            background: white;
-            border: 1px solid #ddd;
-        }
-        
-        .stat-label {
-            font-weight: normal;
-            color: #666;
-            font-size: 0.85em;
-            margin-bottom: 4px;
-        }
-        
-        .stat-value {
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .theorem-box {
-            background: #fff9e6;
-            border: 1px solid #d4c190;
+        .legend {
+            margin-top: 15px;
             padding: 15px;
-            margin-top: 20px;
-            font-size: 0.88em;
-            line-height: 1.7;
+            background: #f8f9fa;
+            border-radius: 6px;
         }
         
-        .theorem-box h4 {
-            font-weight: bold;
+        .legend-item {
+            display: flex;
+            align-items: center;
             margin-bottom: 8px;
-            font-size: 1em;
         }
         
-        .theorem-box em {
-            font-style: italic;
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #333;
         }
         
-        @media (max-width: 1400px) {
-            .content {
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #856404;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
                 grid-template-columns: 1fr;
             }
             
             .controls {
+                max-height: none;
                 border-right: none;
-                border-bottom: 1px solid #ddd;
+                border-bottom: 2px solid #e0e0e0;
             }
         }
     </style>
@@ -245,367 +245,512 @@
 <body>
     <div class="container">
         <header>
-            <h1>Mathematical Analysis: Modular Sieve Approaches to Goldbach's Conjecture</h1>
-            <p class="subtitle">Visualization of fundamental limitations in modular arithmetic methods</p>
-            <div class="paper-ref">
-                <strong>Key Finding:</strong> Modular residue classes partition ALL integers. The assertion that "mod 30 captures even numbers ≥ 18" constitutes a categorical error in understanding residue class properties.<br>
-                <strong>Parity Problem (Selberg, 1949):</strong> Sieve methods cannot distinguish primes from semiprimes, yielding bounds off by factor ≥ 2.<br>
-                <strong>Theoretical Limit:</strong> Chen's Theorem (1973) represents maximum achievement of pure sieve methods: every sufficiently large even number = prime + (prime OR semiprime).
-            </div>
+            <h1>Modular Farey Sequence Visualization</h1>
+            <p class="subtitle">Interactive exploration of coprime residue shells and dyadic lifts</p>
         </header>
         
-        <div class="content">
-            <div class="controls">
-                <div class="section-title">Parameters</div>
-                
-                <div class="control-group">
-                    <label for="modulus">Modulus m:</label>
-                    <input type="number" id="modulus" value="30" min="2" max="1000">
-                </div>
-                
-                <div class="control-group">
-                    <label for="rings">Concentric Rings:</label>
-                    <input type="number" id="rings" value="8" min="1" max="30">
-                </div>
-                
-                <div class="control-group">
-                    <label for="baseRange">Base Range [1, n]:</label>
-                    <input type="number" id="baseRange" value="500" min="10" max="100000">
-                </div>
-                
-                <div class="control-group">
-                    <label for="zoomLevel">Zoom Level (10^x):</label>
-                    <select id="zoomLevel">
-                        <option value="0.1">10^-1 (×0.1)</option>
-                        <option value="1" selected>10^0 (×1)</option>
-                        <option value="10">10^1 (×10)</option>
-                        <option value="100">10^2 (×100)</option>
-                        <option value="1000">10^3 (×1000)</option>
-                        <option value="10000">10^4 (×10000)</option>
-                    </select>
-                </div>
-                
-                <div class="zoom-controls">
-                    <button onclick="zoomIn()">Zoom In (×10)</button>
-                    <button onclick="zoomOut()">Zoom Out (÷10)</button>
-                </div>
-                
-                <div class="section-title">Visualization Options</div>
-                
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showPrimes" checked>
-                    <span>Mark Prime Numbers</span>
-                </label>
-                
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showSemiprimes" checked>
-                    <span>Mark Semiprimes</span>
-                </label>
-                
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showGCD" checked>
-                    <span>Color by GCD(n, m)</span>
-                </label>
-                
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showCoprimeOnly">
-                    <span>Show Only GCD(n, m) = 1</span>
-                </label>
-                
-                <div class="section-title">Canvas Settings</div>
-                
-                <div class="control-group">
-                    <label for="resolution">Resolution:</label>
-                    <select id="resolution">
-                        <option value="1200">1200×1200</option>
-                        <option value="2400">2400×2400</option>
-                        <option value="3840" selected>3840×3840 (4K)</option>
-                        <option value="7680">7680×7680 (8K)</option>
-                    </select>
-                </div>
-                
-                <button onclick="drawVisualization()">RENDER</button>
-                <button class="export-btn" onclick="saveCanvas()">EXPORT PNG</button>
-            </div>
-            
-            <div class="visualization">
-                <canvas id="mainCanvas"></canvas>
-                
-                <div class="info-panel">
-                    <h3>Computational Results</h3>
-                    <div class="stat-grid">
-                        <div class="stat">
-                            <div class="stat-label">Modulus</div>
-                            <div class="stat-value" id="statMod">30</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Euler φ(m)</div>
-                            <div class="stat-value" id="statPhi">8</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Effective Range</div>
-                            <div class="stat-value" id="statRange">[1, 500]</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Integers Plotted</div>
-                            <div class="stat-value" id="statCount">0</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Primes</div>
-                            <div class="stat-value" id="statPrimes">0</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Semiprimes</div>
-                            <div class="stat-value" id="statSemiprimes">0</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">GCD = 1 Count</div>
-                            <div class="stat-value" id="statCoprime">0</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Resolution</div>
-                            <div class="stat-value" id="statRes">3840×3840</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Zoom Factor</div>
-                            <div class="stat-value" id="statZoom">1×</div>
-                        </div>
+        <div class="main-content">
+            <aside class="controls">
+                <div class="control-section">
+                    <h3>Modulus Configuration</h3>
+                    <div class="control-group">
+                        <label for="baseModulus">Base Modulus (M₀)</label>
+                        <input type="number" id="baseModulus" value="30" min="2" max="100" step="1">
+                    </div>
+                    <div class="control-group">
+                        <label for="numShells">Number of Shells (n)</label>
+                        <input type="range" id="numShells" value="3" min="1" max="6" step="1">
+                        <span class="range-value" id="numShellsValue">3</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="liftType">Lift Type</label>
+                        <select id="liftType">
+                            <option value="dyadic">Dyadic (×2)</option>
+                            <option value="triadic">Triadic (×3)</option>
+                            <option value="custom">Custom Factor</option>
+                        </select>
+                    </div>
+                    <div class="control-group" id="customFactorGroup" style="display:none;">
+                        <label for="customFactor">Custom Factor</label>
+                        <input type="number" id="customFactor" value="2" min="2" max="10" step="1">
                     </div>
                 </div>
                 
-                <div class="theorem-box">
-                    <h4>Fundamental Limitations of Modular Sieve Methods</h4>
-                    <p><strong>1. Categorical Error:</strong> Every integer n belongs to exactly one residue class modulo m. The claim that specific moduli "capture" certain subsets (e.g., "mod 30 captures even numbers ≥ 18") demonstrates fundamental misunderstanding of modular arithmetic.</p>
-                    
-                    <p><strong>2. Parity Problem (Selberg, 1949):</strong> Sieve theory cannot distinguish between numbers with odd vs. even prime factor counts. For set A containing only products of odd number of primes, sieves cannot provide non-trivial lower bounds on |A|. Upper bounds are off by factor ≥ 2.</p>
-                    
-                    <p><strong>3. Chen's Theorem (1973):</strong> Every sufficiently large even integer n can be expressed as n = p + P₂, where p is prime and P₂ is either prime or semiprime. This represents the theoretical maximum of pure sieve methods—the 1+2 result cannot be improved to 1+1 (Goldbach's Conjecture) using sieve techniques alone.</p>
-                    
-                    <p><strong>4. Verification Status:</strong> Computational verification extends to n ≤ 4×10¹⁸ (Oliveira e Silva, 2013), but computational evidence does not constitute proof. The conjecture requires demonstration for ALL even integers, not merely "almost all" or "sufficiently large" integers.</p>
+                <div class="control-section">
+                    <h3>Display Options</h3>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="showAngles" checked>
+                        <label for="showAngles">Show Angular Positions</label>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="showLabels" checked>
+                        <label for="showLabels">Show Residue Labels</label>
+                    </div>
+                    <div class="control-group">
+                        <label for="connectionType">Lift Connections</label>
+                        <select id="connectionType">
+                            <option value="none">None</option>
+                            <option value="direct">Direct (r → r)</option>
+                            <option value="both">Both (r → r and r → r+M)</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="showParity" checked>
+                        <label for="showParity">Color by Parity</label>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="showFarey">
+                        <label for="showFarey">Show Farey Projection</label>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="showDirichlet">
+                        <label for="showDirichlet">Highlight Dirichlet Support</label>
+                    </div>
                 </div>
-            </div>
+                
+                <div class="control-section">
+                    <h3>Visualization Style</h3>
+                    <div class="control-group">
+                        <label for="pointSize">Point Size</label>
+                        <input type="range" id="pointSize" value="6" min="2" max="12" step="1">
+                        <span class="range-value" id="pointSizeValue">6</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="scaleFactor">Scale Factor</label>
+                        <input type="range" id="scaleFactor" value="80" min="40" max="150" step="10">
+                        <span class="range-value" id="scaleFactorValue">80</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="animationSpeed">Animation Speed</label>
+                        <input type="range" id="animationSpeed" value="50" min="0" max="100" step="10">
+                        <span class="range-value" id="animationSpeedValue">50</span>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <button id="updateBtn">Update Visualization</button>
+                    <button id="animateBtn">Animate Lifting</button>
+                    <button id="resetBtn">Reset View</button>
+                </div>
+            </aside>
+            
+            <main class="canvas-container">
+                <canvas id="mainCanvas" width="800" height="800"></canvas>
+                
+                <div class="info-panel">
+                    <div class="info-grid" id="infoGrid">
+                        <!-- Dynamically populated -->
+                    </div>
+                    
+                    <div class="legend">
+                        <strong>Legend</strong>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4CAF50;"></div>
+                            <span>Odd Residues</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #2196F3;"></div>
+                            <span>Even Residues</span>
+                        </div>
+                        <div class="legend-item">
+                            <div style="width: 30px; height: 3px; background: #4CAF50; margin-right: 10px;"></div>
+                            <span>Direct Lift (r → r)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div style="width: 30px; height: 3px; background: #9C27B0; margin-right: 10px; border-top: 2px dashed #9C27B0;"></div>
+                            <span>Offset Lift (r → r+M)</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
-
+    
     <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        
+        // Utility functions
         function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
             while (b !== 0) {
-                let t = b;
+                let temp = b;
                 b = a % b;
-                a = t;
+                a = temp;
             }
             return a;
         }
         
         function eulerPhi(n) {
-            let result = 0;
-            for (let i = 1; i < n; i++) {
-                if (gcd(i, n) === 1) result++;
-            }
-            return result;
-        }
-        
-        function isPrime(n) {
-            if (n < 2) return false;
-            if (n === 2) return true;
-            if (n % 2 === 0) return false;
-            for (let i = 3; i * i <= n; i += 2) {
-                if (n % i === 0) return false;
-            }
-            return true;
-        }
-        
-        function primeFactorCount(n) {
-            let count = 0;
-            let num = n;
-            
-            for (let i = 2; i * i <= num; i++) {
-                while (num % i === 0) {
-                    count++;
-                    num /= i;
+            let result = n;
+            for (let p = 2; p * p <= n; p++) {
+                if (n % p === 0) {
+                    while (n % p === 0) n /= p;
+                    result -= result / p;
                 }
             }
-            if (num > 1) count++;
-            return count;
+            if (n > 1) result -= result / n;
+            return Math.round(result);
         }
         
-        function isSemiprime(n) {
-            return primeFactorCount(n) === 2;
+        function getCoprimeResidues(m) {
+            const residues = [];
+            for (let r = 1; r < m; r++) {
+                if (gcd(r, m) === 1) {
+                    residues.push(r);
+                }
+            }
+            return residues;
         }
         
-        function getGCDColor(gcdVal, maxGCD) {
-            if (gcdVal === 1) return '#2c3e50';
-            const intensity = 200 - (gcdVal / maxGCD) * 150;
-            return `rgb(${intensity}, ${intensity}, ${intensity})`;
-        }
-        
-        function zoomIn() {
-            const select = document.getElementById('zoomLevel');
-            const options = Array.from(select.options);
-            const currentIndex = select.selectedIndex;
-            if (currentIndex < options.length - 1) {
-                select.selectedIndex = currentIndex + 1;
-                drawVisualization();
+        // Main visualization class
+        class ModularVisualizer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.centerX = this.canvas.width / 2;
+                this.centerY = this.canvas.height / 2;
+                
+                this.config = {
+                    baseModulus: 30,
+                    numShells: 3,
+                    liftFactor: 2,
+                    pointSize: 6,
+                    scaleFactor: 80,
+                    showAngles: true,
+                    showLabels: true,
+                    connectionType: 'none',
+                    showParity: true,
+                    showFarey: false,
+                    showDirichlet: false
+                };
+                
+                this.shells = [];
+                this.animating = false;
+                this.animationFrame = 0;
+            }
+            
+            computeShells() {
+                this.shells = [];
+                let currentModulus = this.config.baseModulus;
+                
+                for (let i = 0; i < this.config.numShells; i++) {
+                    const residues = getCoprimeResidues(currentModulus);
+                    const radius = 50 + (i * this.config.scaleFactor);
+                    
+                    const points = residues.map(r => ({
+                        residue: r,
+                        modulus: currentModulus,
+                        angle: (2 * Math.PI * r) / currentModulus,
+                        radius: radius,
+                        x: this.centerX + radius * Math.cos((2 * Math.PI * r) / currentModulus - Math.PI / 2),
+                        y: this.centerY + radius * Math.sin((2 * Math.PI * r) / currentModulus - Math.PI / 2),
+                        parity: r % 2 === 0 ? 'even' : 'odd'
+                    }));
+                    
+                    this.shells.push({
+                        modulus: currentModulus,
+                        radius: radius,
+                        points: points,
+                        phi: residues.length
+                    });
+                    
+                    currentModulus *= this.config.liftFactor;
+                }
+            }
+            
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw shells (circles)
+                this.shells.forEach((shell, idx) => {
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.centerX, this.centerY, shell.radius, 0, 2 * Math.PI);
+                    this.ctx.strokeStyle = '#ddd';
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                    
+                    // Draw modulus label
+                    this.ctx.fillStyle = '#666';
+                    this.ctx.font = '14px Arial';
+                    this.ctx.fillText(`M = ${shell.modulus}`, this.centerX + shell.radius + 10, this.centerY);
+                });
+                
+                // Draw connections between shells
+                if (this.config.connectionType !== 'none' && this.shells.length > 1) {
+                    for (let i = 0; i < this.shells.length - 1; i++) {
+                        const currentShell = this.shells[i];
+                        const nextShell = this.shells[i + 1];
+                        
+                        currentShell.points.forEach(point => {
+                            if (this.config.connectionType === 'direct') {
+                                // Only r → r connections
+                                const liftedDirect = this.findDirectLift(point, nextShell);
+                                if (liftedDirect) {
+                                    this.ctx.beginPath();
+                                    this.ctx.moveTo(point.x, point.y);
+                                    this.ctx.lineTo(liftedDirect.x, liftedDirect.y);
+                                    this.ctx.strokeStyle = point.parity === 'odd' ? 'rgba(76, 175, 80, 0.4)' : 'rgba(33, 150, 243, 0.4)';
+                                    this.ctx.lineWidth = 2;
+                                    this.ctx.stroke();
+                                }
+                            } else if (this.config.connectionType === 'both') {
+                                // Both r → r and r → r+M connections
+                                const liftedPoints = this.findAllLifts(point, nextShell);
+                                liftedPoints.forEach((lifted, idx) => {
+                                    this.ctx.beginPath();
+                                    this.ctx.moveTo(point.x, point.y);
+                                    this.ctx.lineTo(lifted.x, lifted.y);
+                                    // Different styles for direct vs offset lift
+                                    if (idx === 0) {
+                                        // Direct lift (r → r)
+                                        this.ctx.strokeStyle = point.parity === 'odd' ? 'rgba(76, 175, 80, 0.5)' : 'rgba(33, 150, 243, 0.5)';
+                                        this.ctx.lineWidth = 2;
+                                    } else {
+                                        // Offset lift (r → r+M)
+                                        this.ctx.strokeStyle = point.parity === 'odd' ? 'rgba(156, 39, 176, 0.4)' : 'rgba(255, 152, 0, 0.4)';
+                                        this.ctx.lineWidth = 1.5;
+                                        this.ctx.setLineDash([5, 5]);
+                                    }
+                                    this.ctx.stroke();
+                                    this.ctx.setLineDash([]);
+                                });
+                            }
+                        });
+                    }
+                }
+                
+                // Draw points
+                this.shells.forEach(shell => {
+                    shell.points.forEach(point => {
+                        let color;
+                        if (this.config.showParity) {
+                            color = point.parity === 'odd' ? '#4CAF50' : '#2196F3';
+                        } else {
+                            color = '#9C27B0';
+                        }
+                        
+                        if (this.config.showDirichlet) {
+                            this.ctx.beginPath();
+                            this.ctx.arc(point.x, point.y, this.config.pointSize + 3, 0, 2 * Math.PI);
+                            this.ctx.fillStyle = 'rgba(255, 193, 7, 0.3)';
+                            this.ctx.fill();
+                        }
+                        
+                        this.ctx.beginPath();
+                        this.ctx.arc(point.x, point.y, this.config.pointSize, 0, 2 * Math.PI);
+                        this.ctx.fillStyle = color;
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = '#333';
+                        this.ctx.lineWidth = 1.5;
+                        this.ctx.stroke();
+                        
+                        if (this.config.showLabels) {
+                            this.ctx.fillStyle = '#333';
+                            this.ctx.font = '11px Arial';
+                            this.ctx.fillText(point.residue, point.x + 10, point.y - 10);
+                        }
+                        
+                        if (this.config.showAngles) {
+                            const angleLabel = `${(point.angle * 180 / Math.PI).toFixed(1)}°`;
+                            this.ctx.fillStyle = '#999';
+                            this.ctx.font = '9px Arial';
+                            this.ctx.fillText(angleLabel, point.x + 10, point.y + 5);
+                        }
+                    });
+                });
+                
+                // Draw Farey projection
+                if (this.config.showFarey) {
+                    this.drawFareyProjection();
+                }
+            }
+            
+            findDirectLift(point, nextShell) {
+                // Find r → r lift (direct mapping)
+                const r = point.residue;
+                const normalized = r % nextShell.modulus;
+                return nextShell.points.find(p => p.residue === normalized);
+            }
+            
+            findAllLifts(point, nextShell) {
+                // Find both r → r and r → r+M lifts
+                const lifted = [];
+                const m = point.modulus;
+                const r = point.residue;
+                
+                // Direct lift: r → r
+                const directNormalized = r % nextShell.modulus;
+                const directPoint = nextShell.points.find(p => p.residue === directNormalized);
+                if (directPoint) lifted.push(directPoint);
+                
+                // Offset lift: r → r+M
+                const offsetNormalized = (r + m) % nextShell.modulus;
+                const offsetPoint = nextShell.points.find(p => p.residue === offsetNormalized);
+                if (offsetPoint && offsetPoint !== directPoint) {
+                    lifted.push(offsetPoint);
+                }
+                
+                return lifted;
+            }
+            
+            drawFareyProjection() {
+                const y = this.canvas.height - 40;
+                
+                // Draw baseline
+                this.ctx.beginPath();
+                this.ctx.moveTo(50, y);
+                this.ctx.lineTo(this.canvas.width - 50, y);
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                
+                // Project points
+                this.shells.forEach(shell => {
+                    shell.points.forEach(point => {
+                        const fraction = point.residue / point.modulus;
+                        const x = 50 + fraction * (this.canvas.width - 100);
+                        
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                        this.ctx.fillStyle = point.parity === 'odd' ? '#4CAF50' : '#2196F3';
+                        this.ctx.fill();
+                    });
+                });
+            }
+            
+            updateInfo() {
+                const infoGrid = document.getElementById('infoGrid');
+                infoGrid.innerHTML = '';
+                
+                let totalPoints = 0;
+                this.shells.forEach(shell => {
+                    totalPoints += shell.phi;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'info-item';
+                    item.innerHTML = `
+                        <strong>M = ${shell.modulus}</strong>
+                        <span>φ(M) = ${shell.phi}</span>
+                    `;
+                    infoGrid.appendChild(item);
+                });
+                
+                const totalItem = document.createElement('div');
+                totalItem.className = 'info-item';
+                totalItem.innerHTML = `
+                    <strong>Total Points</strong>
+                    <span>${totalPoints}</span>
+                `;
+                infoGrid.appendChild(totalItem);
+            }
+            
+            update() {
+                this.computeShells();
+                this.draw();
+                this.updateInfo();
             }
         }
         
-        function zoomOut() {
-            const select = document.getElementById('zoomLevel');
-            const currentIndex = select.selectedIndex;
-            if (currentIndex > 0) {
-                select.selectedIndex = currentIndex - 1;
-                drawVisualization();
-            }
-        }
+        // Initialize
+        const viz = new ModularVisualizer('mainCanvas');
+        viz.update();
         
-        function drawVisualization() {
-            const m = parseInt(document.getElementById('modulus').value);
-            const numRings = parseInt(document.getElementById('rings').value);
-            const baseRange = parseInt(document.getElementById('baseRange').value);
-            const zoomFactor = parseFloat(document.getElementById('zoomLevel').value);
-            const resolution = parseInt(document.getElementById('resolution').value);
-            const showPrimes = document.getElementById('showPrimes').checked;
-            const showSemiprimes = document.getElementById('showSemiprimes').checked;
-            const showGCD = document.getElementById('showGCD').checked;
-            const showCoprimeOnly = document.getElementById('showCoprimeOnly').checked;
+        // Event listeners
+        document.getElementById('numShells').addEventListener('input', (e) => {
+            document.getElementById('numShellsValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('pointSize').addEventListener('input', (e) => {
+            document.getElementById('pointSizeValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('scaleFactor').addEventListener('input', (e) => {
+            document.getElementById('scaleFactorValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('animationSpeed').addEventListener('input', (e) => {
+            document.getElementById('animationSpeedValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('liftType').addEventListener('change', (e) => {
+            const customGroup = document.getElementById('customFactorGroup');
+            if (e.target.value === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+                viz.config.liftFactor = e.target.value === 'dyadic' ? 2 : 3;
+            }
+        });
+        
+        document.getElementById('updateBtn').addEventListener('click', () => {
+            viz.config.baseModulus = parseInt(document.getElementById('baseModulus').value);
+            viz.config.numShells = parseInt(document.getElementById('numShells').value);
+            viz.config.pointSize = parseInt(document.getElementById('pointSize').value);
+            viz.config.scaleFactor = parseInt(document.getElementById('scaleFactor').value);
+            viz.config.showAngles = document.getElementById('showAngles').checked;
+            viz.config.showLabels = document.getElementById('showLabels').checked;
+            viz.config.connectionType = document.getElementById('connectionType').value;
+            viz.config.showParity = document.getElementById('showParity').checked;
+            viz.config.showFarey = document.getElementById('showFarey').checked;
+            viz.config.showDirichlet = document.getElementById('showDirichlet').checked;
             
-            const maxNum = Math.floor(baseRange * zoomFactor);
-            
-            canvas.width = resolution;
-            canvas.height = resolution;
-            const scale = resolution / 1200;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const maxRadius = canvas.width * 0.42;
-            const minRadius = maxRadius * 0.12;
-            
-            // Background
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw concentric circles
-            ctx.strokeStyle = '#cccccc';
-            ctx.lineWidth = 0.5 * scale;
-            for (let ring = 0; ring <= numRings; ring++) {
-                const r = minRadius + (maxRadius - minRadius) * (ring / numRings);
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
-                ctx.stroke();
+            const liftType = document.getElementById('liftType').value;
+            if (liftType === 'custom') {
+                viz.config.liftFactor = parseInt(document.getElementById('customFactor').value);
             }
             
-            // Draw radial lines
-            ctx.strokeStyle = '#e8e8e8';
-            ctx.lineWidth = 0.3 * scale;
-            for (let i = 0; i < m; i++) {
-                const angle = (2 * Math.PI * i) / m - Math.PI / 2;
-                const isCoprime = gcd(i, m) === 1;
-                if (isCoprime) {
-                    ctx.strokeStyle = '#d0d0d0';
-                    ctx.lineWidth = 0.8 * scale;
+            viz.update();
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('baseModulus').value = 30;
+            document.getElementById('numShells').value = 3;
+            document.getElementById('numShellsValue').textContent = 3;
+            document.getElementById('pointSize').value = 6;
+            document.getElementById('pointSizeValue').textContent = 6;
+            document.getElementById('scaleFactor').value = 80;
+            document.getElementById('scaleFactorValue').textContent = 80;
+            
+            viz.config = {
+                baseModulus: 30,
+                numShells: 3,
+                liftFactor: 2,
+                pointSize: 6,
+                scaleFactor: 80,
+                showAngles: true,
+                showLabels: true,
+                connectionType: 'none',
+                showParity: true,
+                showFarey: false,
+                showDirichlet: false
+            };
+            
+            viz.update();
+        });
+        
+        document.getElementById('animateBtn').addEventListener('click', () => {
+            if (!viz.animating) {
+                viz.animating = true;
+                animateLift();
+            }
+        });
+        
+        function animateLift() {
+            // Simple animation placeholder
+            let frame = 0;
+            const maxFrames = 60;
+            
+            function animate() {
+                if (frame < maxFrames && viz.animating) {
+                    frame++;
+                    viz.draw();
+                    requestAnimationFrame(animate);
                 } else {
-                    ctx.strokeStyle = '#e8e8e8';
-                    ctx.lineWidth = 0.3 * scale;
-                }
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.lineTo(
-                    centerX + maxRadius * Math.cos(angle),
-                    centerY + maxRadius * Math.sin(angle)
-                );
-                ctx.stroke();
-            }
-            
-            // Statistics
-            let primeCount = 0;
-            let semiprimeCount = 0;
-            let coprimeCount = 0;
-            let plottedCount = 0;
-            const maxGCD = m;
-            
-            // Plot numbers
-            for (let n = 1; n <= maxNum; n++) {
-                const gcdVal = gcd(n, m);
-                
-                if (showCoprimeOnly && gcdVal !== 1) continue;
-                
-                const angle = (2 * Math.PI * n) / m - Math.PI / 2;
-                const ring = Math.floor((n - 1) / (maxNum / numRings));
-                const radius = minRadius + (maxRadius - minRadius) * (ring / numRings);
-                
-                const x = centerX + radius * Math.cos(angle);
-                const y = centerY + radius * Math.sin(angle);
-                
-                const prime = isPrime(n);
-                const semiprime = isSemiprime(n);
-                
-                if (prime) primeCount++;
-                if (semiprime) semiprimeCount++;
-                if (gcdVal === 1) coprimeCount++;
-                plottedCount++;
-                
-                // Determine color
-                let color;
-                if (showPrimes && prime) {
-                    color = '#27ae60';
-                } else if (showSemiprimes && semiprime) {
-                    color = '#e67e22';
-                } else if (showGCD) {
-                    color = getGCDColor(gcdVal, maxGCD);
-                } else {
-                    color = '#34495e';
-                }
-                
-                // Draw point
-                const pointSize = (gcdVal === 1 ? 2.5 : 2) * scale;
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
-                ctx.fill();
-                
-                if (gcdVal === 1 && showGCD) {
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 0.4 * scale;
-                    ctx.stroke();
+                    viz.animating = false;
                 }
             }
             
-            // Center label
-            ctx.fillStyle = '#2c3e50';
-            ctx.font = `${14 * scale}px Times New Roman`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`mod ${m}`, centerX, centerY);
-            
-            // Update statistics
-            document.getElementById('statMod').textContent = m;
-            document.getElementById('statPhi').textContent = eulerPhi(m);
-            document.getElementById('statRange').textContent = `[1, ${maxNum}]`;
-            document.getElementById('statCount').textContent = plottedCount;
-            document.getElementById('statPrimes').textContent = primeCount;
-            document.getElementById('statSemiprimes').textContent = semiprimeCount;
-            document.getElementById('statCoprime').textContent = coprimeCount;
-            document.getElementById('statRes').textContent = `${resolution}×${resolution}`;
-            document.getElementById('statZoom').textContent = `${zoomFactor}×`;
+            animate();
         }
-        
-        function saveCanvas() {
-            const link = document.createElement('a');
-            const m = document.getElementById('modulus').value;
-            const zoom = document.getElementById('zoomLevel').value;
-            const res = document.getElementById('resolution').value;
-            link.download = `modular_sieve_analysis_m${m}_zoom${zoom}_${res}x${res}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-        
-        // Initial render
-        drawVisualization();
     </script>
 </body>
 </html>
