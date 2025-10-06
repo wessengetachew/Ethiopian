@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,10 +152,17 @@
         }
         
         .convergence-chart {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
+        }
+        
+        .convergence-chart h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1em;
         }
         
         .tour-overlay {
@@ -348,15 +354,16 @@
         }
         
         .gap-analysis {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
         }
         
         .gap-analysis h3 {
             color: #ffd700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
         
         .gap-grid {
@@ -379,10 +386,16 @@
         }
         
         .channel-analysis {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
+        }
+        
+        .channel-analysis h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
         
         .channel-grid {
@@ -406,21 +419,29 @@
         }
         
         .chart-container {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
         }
         
         .chart-container h3 {
             color: #ffd700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
+            font-size: 1.1em;
         }
         
         #channelChart {
             width: 100%;
-            height: 400px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        #convergenceChart {
+            width: 100%;
+            height: 280px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -429,20 +450,20 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-            font-size: 0.9em;
+            gap: 10px;
+            margin-top: 12px;
+            font-size: 0.8em;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
         
         .legend-color {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 2px;
         }
     </style>
@@ -487,7 +508,7 @@
                         <span class="tooltiptext">
                             <strong>Standard:</strong> Classic Euler product<br>
                             <strong>Gap-Class:</strong> Group primes by gap sizes (p_{n+1} - p_n)<br>
-                            <strong>Residue Channels:</strong> Group primes by residue mod 30<br>
+                            <strong>Residue Channels:</strong> Group primes by residue mod N<br>
                             <strong>Combined:</strong> Both decompositions
                         </span>
                     </span>
@@ -496,9 +517,25 @@
                 <select id="method">
                     <option value="standard">Standard Euler Product</option>
                     <option value="gap">Gap-Class Analysis</option>
-                    <option value="residue">Residue Channels (mod 30)</option>
+                    <option value="residue">Residue Channels (mod N)</option>
                     <option value="both">Gap + Residue Combined</option>
                 </select>
+                
+                <label for="modulus">Modulus for Residue Channels:
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">
+                            <strong>Choose any modulus N:</strong><br>
+                            Primes will be grouped by their remainder mod N.<br><br>
+                            <strong>Common choices:</strong><br>
+                            • 6: {1, 5} (all primes > 3)<br>
+                            • 12: {1, 5, 7, 11}<br>
+                            • 30: {1, 7, 11, 13, 17, 19, 23, 29}<br>
+                            • 210: 48 residue classes<br><br>
+                            Larger moduli show finer structure but more channels.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="modulus" value="30" min="2" max="210" step="1">
                 
                 <div class="progress-container" id="progress-container">
                     <div class="progress-bar" id="progress-bar">0%</div>
@@ -766,23 +803,44 @@
             return gapClasses;
         }
         
-        // Compute residue channels mod 30
-        function computeResidueChannels(primes) {
-            const phi30 = [1, 7, 11, 13, 17, 19, 23, 29];
-            const channels = {};
+        // Compute residue channels for any modulus
+        function computeResidueChannels(primes, modulus) {
+            // Get Euler's totient function φ(n) - coprime residues
+            const coprimeResidues = [];
+            for (let a = 1; a < modulus; a++) {
+                if (gcd(a, modulus) === 1) {
+                    coprimeResidues.push(a);
+                }
+            }
             
-            phi30.forEach(a => channels[a] = []);
+            const channels = {};
+            coprimeResidues.forEach(a => channels[a] = []);
+            
+            // Collect primes that divide the modulus
+            const smallPrimes = [];
             
             primes.forEach(p => {
-                if (p > 5) { // Skip 2, 3, 5 (handled separately)
-                    const residue = p % 30;
-                    if (phi30.includes(residue)) {
+                if (p < modulus && modulus % p === 0) {
+                    smallPrimes.push(p);
+                } else if (p >= modulus || modulus % p !== 0) {
+                    const residue = p % modulus;
+                    if (coprimeResidues.includes(residue)) {
                         channels[residue].push(p);
                     }
                 }
             });
             
-            return channels;
+            return { channels, coprimeResidues, smallPrimes };
+        }
+        
+        // Greatest common divisor
+        function gcd(a, b) {
+            while (b !== 0) {
+                const temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
         }
         
         // Compute Y cutoff for given epsilon and constant type
@@ -898,26 +956,29 @@
         }
         
         function showResidueAnalysis(primes, constantType) {
-            const channels = computeResidueChannels(primes);
+            const modulus = parseInt(document.getElementById('modulus').value);
+            const { channels, coprimeResidues, smallPrimes } = computeResidueChannels(primes, modulus);
             const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
-            const phi30 = [1, 7, 11, 13, 17, 19, 23, 29];
             
             let html = '';
             const channelData = [];
             
-            // Handle small primes separately
-            const smallPrimes = primes.filter(p => p <= 5);
-            const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+            // Handle small primes that divide the modulus
+            if (smallPrimes.length > 0) {
+                const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+                html += `
+                    <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
+                        <div>Primes dividing ${modulus}</div>
+                        <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
+                        <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
+                    </div>
+                `;
+            }
             
-            html += `
-                <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
-                    <div>Small Primes</div>
-                    <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
-                    <div style="font-size: 0.8em;">{2, 3, 5}</div>
-                </div>
-            `;
+            // Sort residues for consistent display
+            const sortedResidues = coprimeResidues.sort((a, b) => a - b);
             
-            for (const a of phi30) {
+            for (const a of sortedResidues) {
                 const channelPrimes = channels[a];
                 let contribution = 1;
                 
@@ -926,7 +987,7 @@
                     
                     html += `
                         <div class="channel-item">
-                            <div>≡ ${a} (mod 30)</div>
+                            <div>≡ ${a} (mod ${modulus})</div>
                             <div style="font-weight: bold; color: #4ecdc4;">${contribution.toFixed(4)}</div>
                             <div style="font-size: 0.8em;">${channelPrimes.length} primes</div>
                         </div>
@@ -934,7 +995,7 @@
                 } else {
                     html += `
                         <div class="channel-item" style="opacity: 0.5;">
-                            <div>≡ ${a} (mod 30)</div>
+                            <div>≡ ${a} (mod ${modulus})</div>
                             <div>1.0000</div>
                             <div style="font-size: 0.8em;">0 primes</div>
                         </div>
@@ -952,13 +1013,17 @@
             document.getElementById('channel-grid').innerHTML = html;
             document.getElementById('channel-analysis').style.display = 'block';
             
+            // Update the heading
+            document.querySelector('#channel-analysis h3').textContent = `Residue Channels (mod ${modulus})`;
+            
             // Create chart
-            createChannelChart(channelData, smallProduct);
+            const smallProduct = smallPrimes.length > 0 ? computeTruncatedProduct(smallPrimes, exponent) : null;
+            createChannelChart(channelData, smallProduct, modulus, smallPrimes);
         }
         
         let channelChart = null;
         
-        function createChannelChart(channelData, smallPrimesContrib) {
+        function createChannelChart(channelData, smallPrimesContrib, modulus, smallPrimes) {
             const ctx = document.getElementById('channelChart').getContext('2d');
             
             // Destroy existing chart if it exists
@@ -967,23 +1032,27 @@
             }
             
             // Prepare data for chart
-            const labels = ['Small Primes (2,3,5)', ...channelData.map(d => `≡ ${d.residue} (mod 30)`)];
-            const contributions = [smallPrimesContrib, ...channelData.map(d => d.contribution)];
-            const logContributions = [Math.log(smallPrimesContrib), ...channelData.map(d => d.logContribution)];
-            const primeCounts = [3, ...channelData.map(d => d.primeCount)];
+            const labels = [];
+            const contributions = [];
+            const logContributions = [];
+            const primeCounts = [];
             
-            // Create gradient colors
-            const colors = [
-                'rgba(255, 215, 0, 0.8)', // Gold for small primes
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)', 
-                'rgba(255, 205, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(199, 199, 199, 0.8)',
-                'rgba(83, 102, 255, 0.8)'
-            ];
+            if (smallPrimesContrib !== null && smallPrimes.length > 0) {
+                labels.push(`Primes dividing ${modulus}`);
+                contributions.push(smallPrimesContrib);
+                logContributions.push(Math.log(smallPrimesContrib));
+                primeCounts.push(smallPrimes.length);
+            }
+            
+            channelData.forEach(d => {
+                labels.push(`≡ ${d.residue} (mod ${modulus})`);
+                contributions.push(d.contribution);
+                logContributions.push(d.logContribution);
+                primeCounts.push(d.primeCount);
+            });
+            
+            // Create gradient colors - use more colors for larger moduli
+            const colors = generateColors(labels.length);
             
             channelChart = new Chart(ctx, {
                 type: 'bar',
@@ -1034,7 +1103,7 @@
                                 color: '#fff',
                                 maxRotation: 45,
                                 font: {
-                                    size: 10
+                                    size: modulus > 50 ? 8 : 10
                                 }
                             },
                             grid: {
@@ -1053,7 +1122,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'ℤₐ(s;30) Contribution',
+                                text: `ℤₐ(s;${modulus}) Contribution`,
                                 color: '#fff',
                                 font: {
                                     size: 14,
@@ -1072,20 +1141,61 @@
             // Show chart section
             document.getElementById('chart-section').style.display = 'block';
             
-            // Create legend
-            createChartLegend(labels, colors, primeCounts);
+            // Update the heading
+            document.querySelector('#chart-section h3').textContent = `Residue Channel Contributions (ℤ_a(s;${modulus}))`;
+            
+            // Create legend (limit to first 20 items for readability)
+            createChartLegend(labels.slice(0, 20), colors.slice(0, 20), primeCounts.slice(0, 20), modulus > 50);
         }
         
-        function createChartLegend(labels, colors, primeCounts) {
+        // Generate colors for any number of channels
+        function generateColors(count) {
+            const baseColors = [
+                'rgba(255, 215, 0, 0.8)', // Gold for first (small primes)
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)', 
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(199, 199, 199, 0.8)',
+                'rgba(83, 102, 255, 0.8)',
+                'rgba(255, 105, 180, 0.8)',
+                'rgba(64, 224, 208, 0.8)',
+                'rgba(255, 140, 0, 0.8)'
+            ];
+            
+            if (count <= baseColors.length) {
+                return baseColors.slice(0, count);
+            }
+            
+            // Generate more colors using HSL
+            const colors = [baseColors[0]]; // Keep gold for first
+            for (let i = 1; i < count; i++) {
+                const hue = (i * 360 / (count - 1)) % 360;
+                const saturation = 70 + (i % 3) * 10;
+                const lightness = 55 + (i % 2) * 10;
+                colors.push(`hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`);
+            }
+            return colors;
+        }
+        
+        function createChartLegend(labels, colors, primeCounts, compact = false) {
             let legendHtml = '';
             
-            for (let i = 0; i < labels.length; i++) {
-                legendHtml += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: ${colors[i]};"></div>
-                        <span>${labels[i]} (${primeCounts[i]} primes)</span>
-                    </div>
-                `;
+            if (compact) {
+                legendHtml = `<div style="text-align: center; opacity: 0.7; font-size: 0.85em;">
+                    Showing ${labels.length} of ${primeCounts.length} channels (hover bars for details)
+                </div>`;
+            } else {
+                for (let i = 0; i < labels.length; i++) {
+                    legendHtml += `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: ${colors[i]};"></div>
+                            <span>${labels[i]} (${primeCounts[i]} primes)</span>
+                        </div>
+                    `;
+                }
             }
             
             document.getElementById('chartLegend').innerHTML = legendHtml;
