@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,6 +18,221 @@
             color: #fff;
             min-height: 100vh;
             padding: 20px;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            color: #ffd700;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 15px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            line-height: 1.4;
+            border: 1px solid #ffd700;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 25px;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            padding: 8px 15px;
+            background: linear-gradient(45deg, #44a08d, #4ecdc4);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.4);
+        }
+        
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .preset-btn {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .formula-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            font-weight: bold;
+        }
+        
+        .convergence-chart {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tour-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            border: 2px solid #ffd700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .tour-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tour-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .help-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3c72;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .help-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .keyboard-shortcuts {
+            font-size: 0.85em;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+        
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
         }
         
         .container {
@@ -236,6 +452,19 @@
         <h1>Modular Sieve Calculator</h1>
         <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
         
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="presets">
+            <button class="preset-btn" onclick="loadPreset('quick')">Quick Demo<br>(ε=0.01)</button>
+            <button class="preset-btn" onclick="loadPreset('accurate')">High Accuracy<br>(ε=0.0001)</button>
+            <button class="preset-btn" onclick="loadPreset('ultra')">Ultra Precise<br>(ε=0.00001)</button>
+            <button class="preset-btn" onclick="loadPreset('compare')">Compare All<br>Methods</button>
+        </div>
+        
+        <div class="keyboard-shortcuts">
+            ⌨️ Shortcuts: <strong>Ctrl+Enter</strong> Calculate | <strong>Ctrl+E</strong> Export | <strong>Ctrl+H</strong> Help
+        </div>
+        
         <div class="controls">
             <div class="control-group">
                 <h3>Target Accuracy</h3>
@@ -253,7 +482,16 @@
             </div>
             
             <div class="control-group">
-                <h3>Computation Method</h3>
+                <h3>Computation Method
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">
+                            <strong>Standard:</strong> Classic Euler product<br>
+                            <strong>Gap-Class:</strong> Group primes by gap sizes (p_{n+1} - p_n)<br>
+                            <strong>Residue Channels:</strong> Group primes by residue mod 30<br>
+                            <strong>Combined:</strong> Both decompositions
+                        </span>
+                    </span>
+                </h3>
                 <label for="method">Decomposition:</label>
                 <select id="method">
                     <option value="standard">Standard Euler Product</option>
@@ -262,7 +500,17 @@
                     <option value="both">Gap + Residue Combined</option>
                 </select>
                 
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar">0%</div>
+                </div>
+                
                 <button onclick="compute()">Calculate</button>
+                
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportCSV()">📊 Export CSV</button>
+                    <button class="export-btn" onclick="exportJSON()">📄 Export JSON</button>
+                    <button class="export-btn" onclick="exportImage()">🖼️ Save Chart</button>
+                </div>
             </div>
         </div>
         
@@ -296,10 +544,193 @@
             <canvas id="channelChart"></canvas>
             <div class="chart-legend" id="chartLegend"></div>
         </div>
+        
+        <div id="convergence-section" class="convergence-chart" style="display: none;">
+            <h3>Convergence Analysis</h3>
+            <canvas id="convergenceChart"></canvas>
+        </div>
+        
+        <div id="comparison-section" class="gap-analysis" style="display: none;">
+            <h3>Method Comparison</h3>
+            <table class="comparison-table" id="comparison-table"></table>
+        </div>
+    </div>
+    
+    <div class="help-icon" onclick="showTour()" aria-label="Help and Tutorial">?</div>
+    
+    <div class="tour-overlay" id="tour-overlay">
+        <div class="tour-content">
+            <h2 style="color: #ffd700; margin-bottom: 15px;">Welcome to Modular Sieve Calculator!</h2>
+            <div id="tour-text"></div>
+            <div class="tour-buttons">
+                <button class="tour-btn" style="background: #666; color: white;" onclick="closeTour()">Skip</button>
+                <button class="tour-btn" style="background: #ffd700; color: #1e3c72;" onclick="nextTourStep()">Next</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
+        // Global state
+        let computationCache = {};
+        let currentResults = null;
+        let tourStep = 0;
+        
+        const tourSteps = [
+            {
+                title: "Mathematical Foundation",
+                text: "This calculator uses the <strong>Euler Product Formula</strong> to compute mathematical constants:<br><br>ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup><br><br>We can compute π and ζ(2n) by truncating this infinite product."
+            },
+            {
+                title: "Accuracy Control",
+                text: "Set your desired <strong>relative error (ε)</strong> to control accuracy. The calculator automatically determines how many primes are needed to guarantee this error bound."
+            },
+            {
+                title: "Decomposition Methods",
+                text: "<strong>Gap-Class:</strong> Groups primes by their spacing<br><strong>Residue Channels:</strong> Groups primes by their remainder mod 30<br><br>These reveal hidden structure in prime distribution!"
+            },
+            {
+                title: "Export & Analysis",
+                text: "Export your results as CSV or JSON, save charts as images, and compare different methods side-by-side. Use keyboard shortcuts for faster workflow!"
+            }
+        ];
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    compute();
+                } else if (e.key === 'e') {
+                    e.preventDefault();
+                    exportJSON();
+                } else if (e.key === 'h') {
+                    e.preventDefault();
+                    showTour();
+                }
+            }
+        });
+        
+        // Tour functions
+        function showTour() {
+            tourStep = 0;
+            document.getElementById('tour-overlay').style.display = 'flex';
+            updateTourContent();
+        }
+        
+        function closeTour() {
+            document.getElementById('tour-overlay').style.display = 'none';
+        }
+        
+        function nextTourStep() {
+            tourStep++;
+            if (tourStep >= tourSteps.length) {
+                closeTour();
+            } else {
+                updateTourContent();
+            }
+        }
+        
+        function updateTourContent() {
+            const step = tourSteps[tourStep];
+            document.getElementById('tour-text').innerHTML = `
+                <h3 style="color: #4ecdc4; margin-bottom: 10px;">${step.title}</h3>
+                <p style="line-height: 1.6;">${step.text}</p>
+                <p style="margin-top: 15px; opacity: 0.7; font-size: 0.9em;">Step ${tourStep + 1} of ${tourSteps.length}</p>
+            `;
+        }
+        
+        // Preset configurations
+        function loadPreset(type) {
+            const epsilonInput = document.getElementById('epsilon');
+            const methodSelect = document.getElementById('method');
+            
+            switch(type) {
+                case 'quick':
+                    epsilonInput.value = 0.01;
+                    methodSelect.value = 'standard';
+                    break;
+                case 'accurate':
+                    epsilonInput.value = 0.0001;
+                    methodSelect.value = 'residue';
+                    break;
+                case 'ultra':
+                    epsilonInput.value = 0.00001;
+                    methodSelect.value = 'both';
+                    break;
+                case 'compare':
+                    epsilonInput.value = 0.001;
+                    compareAllMethods();
+                    return;
+            }
+            compute();
+        }
+        
+        // Input validation
+        function validateInputs() {
+            const epsilon = parseFloat(document.getElementById('epsilon').value);
+            const errors = [];
+            
+            if (isNaN(epsilon) || epsilon <= 0) {
+                errors.push('Epsilon must be a positive number');
+            }
+            if (epsilon > 0.1) {
+                errors.push('Epsilon too large (max 0.1) - results may be inaccurate');
+            }
+            if (epsilon < 0.00001) {
+                errors.push('Epsilon too small (min 0.00001) - computation may take very long');
+            }
+            
+            if (errors.length > 0) {
+                showError(errors.join('<br>'));
+                return false;
+            }
+            
+            hideError();
+            return true;
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = `<strong>⚠️ Error:</strong> ${message}`;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+        
+        // Progress indicator
+        function updateProgress(percent, message = '') {
+            const container = document.getElementById('progress-container');
+            const bar = document.getElementById('progress-bar');
+            container.style.display = 'block';
+            bar.style.width = percent + '%';
+            bar.textContent = message || percent + '%';
+        }
+        
+        function hideProgress() {
+            document.getElementById('progress-container').style.display = 'none';
+        }
+        
+        // Update formula display
+        function updateFormulaDisplay() {
+            const constantType = document.getElementById('constant').value;
+            const formulaDiv = document.getElementById('formula-display');
+            
+            let formula = '';
+            if (constantType === 'pi') {
+                formula = 'π = √(6 · ∏<sub>p</sub>(1-p<sup>-2</sup>)<sup>-1</sup>)';
+            } else {
+                const n = parseInt(constantType.replace('zeta', '')) / 2;
+                formula = `ζ(${2*n}) = ∏<sub>p</sub>(1-p<sup>-${2*n}</sup>)<sup>-1</sup>`;
+            }
+            
+            formulaDiv.innerHTML = formula;
+        }
+        
+        // Listen for constant change
+        document.getElementById('constant').addEventListener('change', updateFormulaDisplay);
         // Sieve of Eratosthenes optimized for our needs
         function sieveOfEratosthenes(limit) {
             if (limit < 2) return [];
