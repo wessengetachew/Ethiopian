@@ -152,17 +152,10 @@
         }
         
         .convergence-chart {
-            margin-top: 20px;
+            margin-top: 30px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
-        }
-        
-        .convergence-chart h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.1em;
         }
         
         .tour-overlay {
@@ -354,16 +347,15 @@
         }
         
         .gap-analysis {
-            margin-top: 20px;
+            margin-top: 30px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
         }
         
         .gap-analysis h3 {
             color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+            margin-bottom: 20px;
         }
         
         .gap-grid {
@@ -386,22 +378,53 @@
         }
         
         .channel-analysis {
-            margin-top: 20px;
+            margin-top: 30px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
+            max-height: 600px;
+            overflow-y: auto;
         }
         
-        .channel-analysis h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+        .channel-analysis::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .channel-analysis::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .channel-analysis::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 4px;
         }
         
         .channel-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .channel-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .channel-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .channel-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 4px;
+        }
+        
+        .channel-grid::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 215, 0, 0.7);
         }
         
         .channel-item {
@@ -419,29 +442,22 @@
         }
         
         .chart-container {
-            margin-top: 20px;
+            margin-top: 30px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
         }
         
         .chart-container h3 {
             color: #ffd700;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
-            font-size: 1.1em;
         }
         
         #channelChart {
             width: 100%;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        #convergenceChart {
-            width: 100%;
-            height: 280px;
+            height: 400px;
+            max-height: 400px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -450,20 +466,37 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 12px;
-            font-size: 0.8em;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .chart-legend::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chart-legend::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        
+        .chart-legend::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 3px;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
         
         .legend-color {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 2px;
         }
     </style>
@@ -508,7 +541,7 @@
                         <span class="tooltiptext">
                             <strong>Standard:</strong> Classic Euler product<br>
                             <strong>Gap-Class:</strong> Group primes by gap sizes (p_{n+1} - p_n)<br>
-                            <strong>Residue Channels:</strong> Group primes by residue mod N<br>
+                            <strong>Residue Channels:</strong> Group primes by residue mod k<br>
                             <strong>Combined:</strong> Both decompositions
                         </span>
                     </span>
@@ -517,25 +550,25 @@
                 <select id="method">
                     <option value="standard">Standard Euler Product</option>
                     <option value="gap">Gap-Class Analysis</option>
-                    <option value="residue">Residue Channels (mod N)</option>
+                    <option value="residue">Residue Channels</option>
                     <option value="both">Gap + Residue Combined</option>
                 </select>
                 
-                <label for="modulus">Modulus for Residue Channels:
-                    <span class="tooltip">ℹ️
-                        <span class="tooltiptext">
-                            <strong>Choose any modulus N:</strong><br>
-                            Primes will be grouped by their remainder mod N.<br><br>
-                            <strong>Common choices:</strong><br>
-                            • 6: {1, 5} (all primes > 3)<br>
-                            • 12: {1, 5, 7, 11}<br>
-                            • 30: {1, 7, 11, 13, 17, 19, 23, 29}<br>
-                            • 210: 48 residue classes<br><br>
-                            Larger moduli show finer structure but more channels.
+                <div id="modulus-control" style="display: none;">
+                    <label for="modulus">Modulus (k):
+                        <span class="tooltip">ℹ️
+                            <span class="tooltiptext">
+                                Primes are grouped by their remainder when divided by k. Common choices:<br>
+                                <strong>k=6:</strong> Primes ≡ 1,5 (mod 6)<br>
+                                <strong>k=12:</strong> Primes ≡ 1,5,7,11 (mod 12)<br>
+                                <strong>k=30:</strong> 8 residue classes (Euler's φ(30)=8)<br>
+                                <strong>Higher k:</strong> More refined decomposition
+                            </span>
                         </span>
-                    </span>
-                </label>
-                <input type="number" id="modulus" value="30" min="2" max="210" step="1">
+                    </label>
+                    <input type="number" id="modulus" value="30" min="3" max="210" step="1">
+                    <div style="font-size: 0.85em; opacity: 0.8; margin-top: 5px;" id="phi-info"></div>
+                </div>
                 
                 <div class="progress-container" id="progress-container">
                     <div class="progress-bar" id="progress-bar">0%</div>
@@ -566,18 +599,34 @@
             </div>
         </div>
         
+        <div id="intermediate-section" class="gap-analysis" style="display: none;">
+            <h3>Mathematical Structure 
+                <span class="tooltip">ℹ️
+                    <span class="tooltiptext">
+                        Shows the exact mathematical form of the truncated product before transformation. This reveals what constant you're actually computing!
+                    </span>
+                </span>
+            </h3>
+            <div class="result-card" style="background: rgba(255, 215, 0, 0.1); border: 2px solid rgba(255, 215, 0, 0.3);">
+                <h4>Intermediate Value</h4>
+                <div id="intermediate-product" class="value"></div>
+                <div id="intermediate-formula" class="error-info" style="margin-top: 15px; font-size: 1.05em;"></div>
+                <div id="intermediate-explanation" class="error-info" style="margin-top: 10px; line-height: 1.6;"></div>
+            </div>
+        </div>
+        
         <div id="gap-analysis" class="gap-analysis" style="display: none;">
             <h3>Gap-Class Decomposition</h3>
             <div id="gap-grid" class="gap-grid"></div>
         </div>
         
         <div id="channel-analysis" class="channel-analysis" style="display: none;">
-            <h3>Residue Channels (mod 30)</h3>
+            <h3 id="channel-title">Residue Channels</h3>
             <div id="channel-grid" class="channel-grid"></div>
         </div>
         
         <div id="chart-section" class="chart-container" style="display: none;">
-            <h3>Residue Channel Contributions (ℤ_a(s;30))</h3>
+            <h3 id="chart-title">Residue Channel Contributions</h3>
             <canvas id="channelChart"></canvas>
             <div class="chart-legend" id="chartLegend"></div>
         </div>
@@ -768,6 +817,75 @@
         
         // Listen for constant change
         document.getElementById('constant').addEventListener('change', updateFormulaDisplay);
+        
+        // Listen for method change to show/hide modulus control
+        document.getElementById('method').addEventListener('change', function() {
+            const method = this.value;
+            const modulusControl = document.getElementById('modulus-control');
+            
+            if (method === 'residue' || method === 'both') {
+                modulusControl.style.display = 'block';
+                updatePhiInfo();
+            } else {
+                modulusControl.style.display = 'none';
+            }
+        });
+        
+        // Listen for modulus change
+        document.getElementById('modulus').addEventListener('input', updatePhiInfo);
+        
+        // Update phi(k) information
+        function updatePhiInfo() {
+            const k = parseInt(document.getElementById('modulus').value);
+            const phi = eulerPhi(k);
+            const coprimes = getCoprimesTo(k);
+            
+            document.getElementById('phi-info').innerHTML = 
+                `φ(${k}) = ${phi} residue classes: {${coprimes.slice(0, 10).join(', ')}${coprimes.length > 10 ? ', ...' : ''}}`;
+        }
+        
+        // Compute Euler's totient function φ(n)
+        function eulerPhi(n) {
+            let result = n;
+            let p = 2;
+            
+            while (p * p <= n) {
+                if (n % p === 0) {
+                    while (n % p === 0) {
+                        n = Math.floor(n / p);
+                    }
+                    result -= Math.floor(result / p);
+                }
+                p++;
+            }
+            
+            if (n > 1) {
+                result -= Math.floor(result / n);
+            }
+            
+            return result;
+        }
+        
+        // Get all numbers coprime to k
+        function getCoprimesTo(k) {
+            const coprimes = [];
+            for (let a = 1; a < k; a++) {
+                if (gcd(a, k) === 1) {
+                    coprimes.push(a);
+                }
+            }
+            return coprimes;
+        }
+        
+        // Greatest common divisor
+        function gcd(a, b) {
+            while (b !== 0) {
+                const temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
         // Sieve of Eratosthenes optimized for our needs
         function sieveOfEratosthenes(limit) {
             if (limit < 2) return [];
@@ -790,57 +908,60 @@
             return primes;
         }
         
-        // Compute gap classes
+        // Compute gap classes: gap = p_next - p_current
         function computeGapClasses(primes) {
             const gapClasses = {};
             
-            for (let i = 1; i < primes.length; i++) {
-                const gap = primes[i] - primes[i-1];
+            for (let i = 0; i < primes.length - 1; i++) {
+                const gap = primes[i + 1] - primes[i];
                 if (!gapClasses[gap]) gapClasses[gap] = [];
+                // Store the current prime (the one before the gap)
                 gapClasses[gap].push(primes[i]);
             }
+            
+            // Add the last prime to a special category since it has no gap after it
+            const lastPrime = primes[primes.length - 1];
+            if (!gapClasses['last']) gapClasses['last'] = [];
+            gapClasses['last'].push(lastPrime);
             
             return gapClasses;
         }
         
-        // Compute residue channels for any modulus
+        // Compute residue channels for any modulus k
         function computeResidueChannels(primes, modulus) {
-            // Get Euler's totient function φ(n) - coprime residues
-            const coprimeResidues = [];
-            for (let a = 1; a < modulus; a++) {
-                if (gcd(a, modulus) === 1) {
-                    coprimeResidues.push(a);
+            const coprimes = getCoprimesTo(modulus);
+            const channels = {};
+            
+            // Initialize channels
+            coprimes.forEach(a => channels[a] = []);
+            
+            // Get small primes that divide the modulus (need special handling)
+            const smallPrimes = [];
+            let tempMod = modulus;
+            for (let p = 2; p <= modulus; p++) {
+                if (tempMod % p === 0) {
+                    smallPrimes.push(p);
+                    while (tempMod % p === 0) {
+                        tempMod = Math.floor(tempMod / p);
+                    }
                 }
             }
             
-            const channels = {};
-            coprimeResidues.forEach(a => channels[a] = []);
-            
-            // Collect primes that divide the modulus
-            const smallPrimes = [];
-            
+            // Classify primes by residue
             primes.forEach(p => {
-                if (p < modulus && modulus % p === 0) {
-                    smallPrimes.push(p);
-                } else if (p >= modulus || modulus % p !== 0) {
+                if (!smallPrimes.includes(p)) {
                     const residue = p % modulus;
-                    if (coprimeResidues.includes(residue)) {
+                    if (channels[residue] !== undefined) {
                         channels[residue].push(p);
                     }
                 }
             });
             
-            return { channels, coprimeResidues, smallPrimes };
-        }
-        
-        // Greatest common divisor
-        function gcd(a, b) {
-            while (b !== 0) {
-                const temp = b;
-                b = a % b;
-                a = temp;
-            }
-            return a;
+            return {
+                channels: channels,
+                smallPrimes: smallPrimes.filter(p => primes.includes(p)),
+                coprimes: coprimes
+            };
         }
         
         // Compute Y cutoff for given epsilon and constant type
@@ -888,16 +1009,24 @@
                     const primes = sieveOfEratosthenes(Y - 1);
                     
                     let computedValue;
+                    let intermediateValue;
                     let analysisHtml = '';
                     
                     if (constantType === 'pi') {
-                        // π = √6 * ∏(1-p^-2)^-1/2
+                        // π = √(6 * ζ(2))
                         const zetaProduct = computeTruncatedProduct(primes, 2);
+                        intermediateValue = zetaProduct;
                         computedValue = Math.sqrt(6 * zetaProduct);
+                        
+                        // Show intermediate structure
+                        showIntermediateStructure(zetaProduct, primes, constantType);
                     } else {
                         // ζ(2n) = ∏(1-p^-2n)^-1
                         const n = parseInt(constantType.replace('zeta', '')) / 2;
                         computedValue = computeTruncatedProduct(primes, 2 * n);
+                        intermediateValue = computedValue;
+                        
+                        showIntermediateStructure(computedValue, primes, constantType);
                     }
                     
                     // Display results
@@ -934,18 +1063,45 @@
             const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
             
             let html = '';
-            const sortedGaps = Object.keys(gapClasses).map(Number).sort((a, b) => a - b);
+            const sortedGaps = Object.keys(gapClasses)
+                .filter(g => g !== 'last')
+                .map(Number)
+                .sort((a, b) => a - b);
             
-            for (const gap of sortedGaps.slice(0, 12)) { // Show first 12 gap classes
+            // Show gap 1 separately (only prime 2)
+            if (gapClasses[1]) {
+                const gap1Primes = gapClasses[1];
+                const contribution = computeTruncatedProduct(gap1Primes, exponent);
+                const logContrib = Math.log(contribution);
+                
+                html += `
+                    <div class="gap-item" style="background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700;">
+                        <div><strong>Gap 1</strong></div>
+                        <div style="font-size: 0.85em; color: #ffd700;">Only prime 2 → 3</div>
+                        <div class="gap-value">R₁ = ${contribution.toFixed(6)}</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">${gap1Primes.length} prime: [${gap1Primes.join(', ')}]</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">log R = ${logContrib.toFixed(4)}</div>
+                    </div>
+                `;
+            }
+            
+            // Show even gaps
+            for (const gap of sortedGaps.filter(g => g !== 1).slice(0, 11)) {
                 const gapPrimes = gapClasses[gap];
                 const contribution = computeTruncatedProduct(gapPrimes, exponent);
                 const logContrib = Math.log(contribution);
                 
+                // Show first few primes in this gap class
+                const samplePrimes = gapPrimes.slice(0, 5);
+                const primeList = samplePrimes.join(', ') + (gapPrimes.length > 5 ? ', ...' : '');
+                
                 html += `
                     <div class="gap-item">
-                        <div>Gap ${gap}</div>
+                        <div><strong>Gap ${gap}</strong></div>
+                        <div style="font-size: 0.75em; opacity: 0.7; margin: 3px 0;">p where p' - p = ${gap}</div>
                         <div class="gap-value">R_${gap} = ${contribution.toFixed(6)}</div>
                         <div style="font-size: 0.8em; opacity: 0.8;">${gapPrimes.length} primes</div>
+                        <div style="font-size: 0.75em; opacity: 0.6; margin-top: 3px;">[${primeList}]</div>
                         <div style="font-size: 0.8em; opacity: 0.8;">log R = ${logContrib.toFixed(4)}</div>
                     </div>
                 `;
@@ -955,10 +1111,84 @@
             document.getElementById('gap-analysis').style.display = 'block';
         }
         
+        function showIntermediateStructure(intermediateValue, primes, constantType) {
+            document.getElementById('intermediate-section').style.display = 'block';
+            document.getElementById('intermediate-product').textContent = intermediateValue.toFixed(12);
+            
+            let formulaHtml = '';
+            let explanationHtml = '';
+            
+            if (constantType === 'pi') {
+                // For pi, show ζ(2) approximation
+                const primeList = primes.length <= 5 ? 
+                    `{${primes.join(', ')}}` : 
+                    `{${primes.slice(0, 3).join(', ')}, ..., ${primes[primes.length-1]}}`;
+                
+                formulaHtml = `<strong>ζ(2) ≈ ∏<sub>p∈${primeList}</sub> (1-p<sup>-2</sup>)<sup>-1</sup></strong>`;
+                
+                // Calculate what this equals exactly for small cases
+                if (primes.length === 1 && primes[0] === 2) {
+                    const exactForm = '4/3';
+                    explanationHtml = `
+                        With only prime <strong>p=2</strong>:<br>
+                        ζ(2) ≈ 1/(1-2<sup>-2</sup>) = 1/(1-1/4) = <strong>${exactForm}</strong><br>
+                        Therefore: π ≈ √(6 · 4/3) = √8 = <strong>2√2</strong>
+                    `;
+                } else if (primes.length === 2 && primes[0] === 2 && primes[1] === 3) {
+                    const product1 = 1/(1-1/4);
+                    const product2 = 1/(1-1/9);
+                    const total = product1 * product2;
+                    explanationHtml = `
+                        With primes <strong>{2, 3}</strong>:<br>
+                        ζ(2) ≈ [1/(1-1/4)] · [1/(1-1/9)] = (4/3) · (9/8) = <strong>${total.toFixed(6)}</strong><br>
+                        Therefore: π ≈ √(6 · ${total.toFixed(4)}) ≈ <strong>${Math.sqrt(6*total).toFixed(6)}</strong>
+                    `;
+                } else {
+                    explanationHtml = `
+                        Using ${primes.length} primes up to ${primes[primes.length-1]}, the truncated Euler product gives:<br>
+                        ζ(2) ≈ <strong>${intermediateValue.toFixed(12)}</strong><br>
+                        Then: π = √(6 · ζ(2)) ≈ √(6 · ${intermediateValue.toFixed(6)}) ≈ <strong>${Math.sqrt(6*intermediateValue).toFixed(12)}</strong>
+                    `;
+                }
+            } else {
+                // For ζ(2n)
+                const n = parseInt(constantType.replace('zeta', ''));
+                const primeList = primes.length <= 5 ? 
+                    `{${primes.join(', ')}}` : 
+                    `{${primes.slice(0, 3).join(', ')}, ..., ${primes[primes.length-1]}}`;
+                
+                formulaHtml = `<strong>ζ(${n}) ≈ ∏<sub>p∈${primeList}</sub> (1-p<sup>-${n}</sup>)<sup>-1</sup></strong>`;
+                
+                if (primes.length === 1 && primes[0] === 2) {
+                    const denom = 1 - Math.pow(2, -n);
+                    explanationHtml = `
+                        With only prime <strong>p=2</strong>:<br>
+                        ζ(${n}) ≈ 1/(1-2<sup>-${n}</sup>) = <strong>${intermediateValue.toFixed(12)}</strong>
+                    `;
+                } else {
+                    explanationHtml = `
+                        Using ${primes.length} primes, the truncated Euler product directly gives:<br>
+                        ζ(${n}) ≈ <strong>${intermediateValue.toFixed(12)}</strong>
+                    `;
+                }
+            }
+            
+            document.getElementById('intermediate-formula').innerHTML = formulaHtml;
+            document.getElementById('intermediate-explanation').innerHTML = explanationHtml;
+        }
+        
         function showResidueAnalysis(primes, constantType) {
             const modulus = parseInt(document.getElementById('modulus').value);
-            const { channels, coprimeResidues, smallPrimes } = computeResidueChannels(primes, modulus);
             const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+            
+            const result = computeResidueChannels(primes, modulus);
+            const channels = result.channels;
+            const smallPrimes = result.smallPrimes;
+            const coprimes = result.coprimes;
+            
+            // Update titles
+            document.getElementById('channel-title').textContent = `Residue Channels (mod ${modulus})`;
+            document.getElementById('chart-title').textContent = `Residue Channel Contributions ℤ_a(s;${modulus})`;
             
             let html = '';
             const channelData = [];
@@ -966,30 +1196,37 @@
             // Handle small primes that divide the modulus
             if (smallPrimes.length > 0) {
                 const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+                const gridSpan = Math.min(coprimes.length, 4);
+                
                 html += `
-                    <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
-                        <div>Primes dividing ${modulus}</div>
-                        <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
+                    <div class="channel-item" style="grid-column: span ${gridSpan}; background: rgba(255, 215, 0, 0.2);">
+                        <div>Prime Divisors of ${modulus}</div>
+                        <div style="font-weight: bold;">${smallProduct.toFixed(6)}</div>
                         <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
                     </div>
                 `;
             }
             
-            // Sort residues for consistent display
-            const sortedResidues = coprimeResidues.sort((a, b) => a - b);
-            
-            for (const a of sortedResidues) {
+            // Display each residue channel
+            for (const a of coprimes) {
                 const channelPrimes = channels[a];
                 let contribution = 1;
                 
                 if (channelPrimes.length > 0) {
                     contribution = computeTruncatedProduct(channelPrimes, exponent);
                     
+                    // Show sample primes for this channel
+                    const sampleSize = 3;
+                    const samplePrimes = channelPrimes.slice(0, sampleSize);
+                    const primeDisplay = samplePrimes.join(', ') + 
+                        (channelPrimes.length > sampleSize ? ', ...' : '');
+                    
                     html += `
                         <div class="channel-item">
                             <div>≡ ${a} (mod ${modulus})</div>
-                            <div style="font-weight: bold; color: #4ecdc4;">${contribution.toFixed(4)}</div>
-                            <div style="font-size: 0.8em;">${channelPrimes.length} primes</div>
+                            <div style="font-weight: bold; color: #4ecdc4;">${contribution.toFixed(6)}</div>
+                            <div style="font-size: 0.75em;">${channelPrimes.length} primes</div>
+                            <div style="font-size: 0.7em; opacity: 0.6; margin-top: 3px;">[${primeDisplay}]</div>
                         </div>
                     `;
                 } else {
@@ -1013,11 +1250,9 @@
             document.getElementById('channel-grid').innerHTML = html;
             document.getElementById('channel-analysis').style.display = 'block';
             
-            // Update the heading
-            document.querySelector('#channel-analysis h3').textContent = `Residue Channels (mod ${modulus})`;
-            
             // Create chart
-            const smallProduct = smallPrimes.length > 0 ? computeTruncatedProduct(smallPrimes, exponent) : null;
+            const smallProduct = smallPrimes.length > 0 ? 
+                computeTruncatedProduct(smallPrimes, exponent) : null;
             createChannelChart(channelData, smallProduct, modulus, smallPrimes);
         }
         
@@ -1037,13 +1272,15 @@
             const logContributions = [];
             const primeCounts = [];
             
-            if (smallPrimesContrib !== null && smallPrimes.length > 0) {
-                labels.push(`Primes dividing ${modulus}`);
+            // Add small primes if they exist
+            if (smallPrimesContrib !== null && smallPrimesContrib !== 1) {
+                labels.push(`Divisors of ${modulus} (${smallPrimes.join(',')})`);
                 contributions.push(smallPrimesContrib);
                 logContributions.push(Math.log(smallPrimesContrib));
                 primeCounts.push(smallPrimes.length);
             }
             
+            // Add residue channels
             channelData.forEach(d => {
                 labels.push(`≡ ${d.residue} (mod ${modulus})`);
                 contributions.push(d.contribution);
@@ -1051,8 +1288,18 @@
                 primeCounts.push(d.primeCount);
             });
             
-            // Create gradient colors - use more colors for larger moduli
-            const colors = generateColors(labels.length);
+            // Create gradient colors - more colors for larger moduli
+            const numColors = labels.length;
+            const colors = [];
+            
+            for (let i = 0; i < numColors; i++) {
+                if (i === 0 && smallPrimesContrib !== null && smallPrimesContrib !== 1) {
+                    colors.push('rgba(255, 215, 0, 0.8)'); // Gold for small primes
+                } else {
+                    const hue = (i * 360 / numColors) % 360;
+                    colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+                }
+            }
             
             channelChart = new Chart(ctx, {
                 type: 'bar',
@@ -1070,7 +1317,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.5,
                     plugins: {
                         legend: {
                             display: false
@@ -1101,10 +1349,13 @@
                         x: {
                             ticks: {
                                 color: '#fff',
-                                maxRotation: 45,
+                                maxRotation: 90,
+                                minRotation: 45,
                                 font: {
-                                    size: modulus > 50 ? 8 : 10
-                                }
+                                    size: labels.length > 30 ? 7 : (labels.length > 20 ? 8 : 10)
+                                },
+                                autoSkip: labels.length > 50,
+                                maxTicksLimit: labels.length > 50 ? 50 : undefined
                             },
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
@@ -1141,61 +1392,20 @@
             // Show chart section
             document.getElementById('chart-section').style.display = 'block';
             
-            // Update the heading
-            document.querySelector('#chart-section h3').textContent = `Residue Channel Contributions (ℤ_a(s;${modulus}))`;
-            
-            // Create legend (limit to first 20 items for readability)
-            createChartLegend(labels.slice(0, 20), colors.slice(0, 20), primeCounts.slice(0, 20), modulus > 50);
+            // Create legend
+            createChartLegend(labels, colors, primeCounts);
         }
         
-        // Generate colors for any number of channels
-        function generateColors(count) {
-            const baseColors = [
-                'rgba(255, 215, 0, 0.8)', // Gold for first (small primes)
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)', 
-                'rgba(255, 205, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(199, 199, 199, 0.8)',
-                'rgba(83, 102, 255, 0.8)',
-                'rgba(255, 105, 180, 0.8)',
-                'rgba(64, 224, 208, 0.8)',
-                'rgba(255, 140, 0, 0.8)'
-            ];
-            
-            if (count <= baseColors.length) {
-                return baseColors.slice(0, count);
-            }
-            
-            // Generate more colors using HSL
-            const colors = [baseColors[0]]; // Keep gold for first
-            for (let i = 1; i < count; i++) {
-                const hue = (i * 360 / (count - 1)) % 360;
-                const saturation = 70 + (i % 3) * 10;
-                const lightness = 55 + (i % 2) * 10;
-                colors.push(`hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`);
-            }
-            return colors;
-        }
-        
-        function createChartLegend(labels, colors, primeCounts, compact = false) {
+        function createChartLegend(labels, colors, primeCounts) {
             let legendHtml = '';
             
-            if (compact) {
-                legendHtml = `<div style="text-align: center; opacity: 0.7; font-size: 0.85em;">
-                    Showing ${labels.length} of ${primeCounts.length} channels (hover bars for details)
-                </div>`;
-            } else {
-                for (let i = 0; i < labels.length; i++) {
-                    legendHtml += `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: ${colors[i]};"></div>
-                            <span>${labels[i]} (${primeCounts[i]} primes)</span>
-                        </div>
-                    `;
-                }
+            for (let i = 0; i < labels.length; i++) {
+                legendHtml += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: ${colors[i]};"></div>
+                        <span>${labels[i]} (${primeCounts[i]} primes)</span>
+                    </div>
+                `;
             }
             
             document.getElementById('chartLegend').innerHTML = legendHtml;
