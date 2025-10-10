@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modular Sieve: π and ζ(2n) Calculator</title>
+    <title>Advanced Modular Ring System</title>
     <style>
         * {
             margin: 0;
@@ -13,1408 +13,933 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: #fff;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
             min-height: 100vh;
             padding: 20px;
         }
         
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-            color: #ffd700;
-            margin-left: 5px;
-            font-weight: bold;
-        }
-        
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 300px;
-            background-color: rgba(0, 0, 0, 0.95);
-            color: #fff;
-            text-align: left;
-            border-radius: 8px;
-            padding: 15px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -150px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.9em;
-            line-height: 1.4;
-            border: 1px solid #ffd700;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        
-        .progress-container {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-            display: none;
-        }
-        
-        .progress-bar {
-            height: 25px;
-            background: linear-gradient(90deg, #4ecdc4, #44a08d);
-            width: 0%;
-            transition: width 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-        
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .export-btn {
-            padding: 8px 15px;
-            background: linear-gradient(45deg, #44a08d, #4ecdc4);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        .export-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.4);
-        }
-        
-        .presets {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .preset-btn {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: all 0.3s;
-        }
-        
-        .preset-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .formula-display {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-            text-align: center;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-        
-        .comparison-table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        
-        .comparison-table th,
-        .comparison-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .comparison-table th {
-            background: rgba(255, 215, 0, 0.2);
-            font-weight: bold;
-        }
-        
-        .convergence-chart {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-        }
-        
-        .tour-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .tour-content {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            border: 2px solid #ffd700;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-        
-        .tour-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .tour-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .help-icon {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e3c72;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-            transition: transform 0.3s;
-            z-index: 1000;
-        }
-        
-        .help-icon:hover {
-            transform: scale(1.1);
-        }
-        
-        .keyboard-shortcuts {
-            font-size: 0.85em;
-            opacity: 0.7;
-            margin-top: 10px;
-        }
-        
-        .error-message {
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: none;
-        }
-        
         .container {
-            max-width: 1200px;
+            max-width: 1900px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
+            background: white;
             border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: white;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
         
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
+        .header h1 {
+            font-size: 2.8em;
             margin-bottom: 10px;
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
-        .subtitle {
-            text-align: center;
-            font-size: 1.1em;
-            opacity: 0.9;
-            margin-bottom: 30px;
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+            padding: 30px;
         }
         
         .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            height: fit-content;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .control-group {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
         }
         
-        .control-group h3 {
-            margin-bottom: 15px;
-            color: #ffd700;
-        }
-        
-        label {
+        .control-group label {
             display: block;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        .control-group input[type="number"],
+        .control-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .control-group input[type="number"]:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #7e22ce;
+        }
+        
+        .control-group input[type="range"] {
+            width: 100%;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
             font-weight: 500;
         }
         
-        input, select, button {
+        .color-input-group {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        input[type="color"] {
             width: 100%;
-            padding: 12px;
-            border: none;
+            height: 40px;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
+            cursor: pointer;
         }
         
         button {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(238, 90, 82, 0.3);
-        }
-        
-        .results {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .result-card {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .result-card h4 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .value {
-            font-family: 'Courier New', monospace;
-            font-size: 1.2em;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
             border-radius: 8px;
-            margin: 10px 0;
-            word-break: break-all;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
         }
         
-        .error-info {
+        .btn-primary {
+            background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(126, 34, 206, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-tertiary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-tertiary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .canvas-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 900px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: crosshair;
+        }
+        
+        .info-panel {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
             font-size: 0.9em;
-            opacity: 0.8;
+        }
+        
+        .info-panel h3 {
+            margin-bottom: 10px;
+            color: #1e40af;
+        }
+        
+        .info-item {
+            margin-bottom: 5px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+        
+        .value-display {
+            display: inline-block;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: 700;
+            color: #7e22ce;
+        }
+        
+        .export-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #7e22ce;
+            border-bottom: 2px solid #7e22ce;
+            padding-bottom: 8px;
+        }
+        
+        .gcd-colormap {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
             margin-top: 10px;
         }
         
-        .gap-analysis {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-        }
-        
-        .gap-analysis h3 {
-            color: #ffd700;
-            margin-bottom: 20px;
-        }
-        
-        .gap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .gap-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .gap-value {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #4ecdc4;
-        }
-        
-        .channel-analysis {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        
-        .channel-analysis::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .channel-analysis::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-        
-        .channel-analysis::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.5);
-            border-radius: 4px;
-        }
-        
-        .channel-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        
-        .channel-grid::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .channel-grid::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-        
-        .channel-grid::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.5);
-            border-radius: 4px;
-        }
-        
-        .channel-grid::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 215, 0, 0.7);
-        }
-        
-        .channel-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-        
-        .loading {
-            text-align: center;
-            font-style: italic;
-            opacity: 0.7;
-        }
-        
-        .chart-container {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-        }
-        
-        .chart-container h3 {
-            color: #ffd700;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        #channelChart {
-            width: 100%;
-            height: 400px;
-            max-height: 400px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        .chart-legend {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        
-        .chart-legend::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .chart-legend::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-        
-        .chart-legend::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.5);
-            border-radius: 3px;
-        }
-        
-        .legend-item {
+        .gcd-color-item {
             display: flex;
             align-items: center;
             gap: 5px;
+            font-size: 0.85em;
         }
         
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
+        .gcd-color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .preset-btn {
+            padding: 8px;
+            font-size: 0.9em;
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        .preset-btn:hover {
+            background: #cbd5e1;
+        }
+        
+        @media (max-width: 1400px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Modular Sieve Calculator</h1>
-        <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
-        
-        <div class="error-message" id="error-message"></div>
-        
-        <div class="presets">
-            <button class="preset-btn" onclick="loadPreset('quick')">Quick Demo<br>(ε=0.01)</button>
-            <button class="preset-btn" onclick="loadPreset('accurate')">High Accuracy<br>(ε=0.0001)</button>
-            <button class="preset-btn" onclick="loadPreset('ultra')">Ultra Precise<br>(ε=0.00001)</button>
-            <button class="preset-btn" onclick="loadPreset('compare')">Compare All<br>Methods</button>
+        <div class="header">
+            <h1>🌟 Advanced Modular Ring System</h1>
+            <p>Interactive visualization with GCD color coding, Farey fractions, and ultra high-res export</p>
         </div>
         
-        <div class="keyboard-shortcuts">
-            ⌨️ Shortcuts: <strong>Ctrl+Enter</strong> Calculate | <strong>Ctrl+E</strong> Export | <strong>Ctrl+H</strong> Help
-        </div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <h3>Target Accuracy</h3>
-                <label for="epsilon">Relative Error (ε):</label>
-                <input type="number" id="epsilon" value="0.001" step="0.0001" min="0.0001" max="0.1">
+        <div class="content">
+            <div class="controls">
+                <div class="section-title">⚙️ Ring Configuration</div>
                 
-                <label for="constant">Constant to Compute:</label>
-                <select id="constant">
-                    <option value="pi">π (from ζ(2))</option>
-                    <option value="zeta4">ζ(4)</option>
-                    <option value="zeta6">ζ(6)</option>
-                    <option value="zeta8">ζ(8)</option>
-                    <option value="zeta10">ζ(10)</option>
-                </select>
+                <div class="control-group">
+                    <label for="maxMod">Maximum Modulus (1-100):</label>
+                    <input type="number" id="maxMod" min="1" max="100" value="15">
+                </div>
+                
+                <div class="control-group">
+                    <label for="startMod">Start Modulus:</label>
+                    <input type="number" id="startMod" min="1" max="100" value="1">
+                </div>
+                
+                <div class="control-group">
+                    <label for="ringSpacing">Ring Spacing:</label>
+                    <input type="range" id="ringSpacing" min="10" max="120" value="45">
+                    <span class="value-display" id="ringSpacingValue">45</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="pointSize">Point Size:</label>
+                    <input type="range" id="pointSize" min="1" max="25" value="7">
+                    <span class="value-display" id="pointSizeValue">7</span>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showRingGuides" checked>
+                    <label for="showRingGuides">Show Ring Guides</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showRadialLines">
+                    <label for="showRadialLines">Show Radial Lines</label>
+                </div>
+                
+                <div class="section-title">🎨 Color Mode</div>
+                
+                <div class="control-group">
+                    <label for="colorMode">Color Mode:</label>
+                    <select id="colorMode" onchange="updateColorMode()">
+                        <option value="binary">Binary (Coprime/Non-coprime)</option>
+                        <option value="gcd">GCD Value</option>
+                        <option value="gradient">Gradient by Angle</option>
+                        <option value="totient">Euler Totient Class</option>
+                    </select>
+                </div>
+                
+                <div id="binaryColorControls">
+                    <div class="control-group">
+                        <label>Coprime Color (GCD=1):</label>
+                        <div class="color-input-group">
+                            <input type="color" id="coprimeColor" value="#3b82f6">
+                            <span class="value-display">#3b82f6</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Non-Coprime Color (GCD>1):</label>
+                        <div class="color-input-group">
+                            <input type="color" id="nonCoprimeColor" value="#ef4444">
+                            <span class="value-display">#ef4444</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Background Color:</label>
+                    <div class="color-input-group">
+                        <input type="color" id="bgColor" value="#FFFFFF">
+                        <span class="value-display">#FFFFFF</span>
+                    </div>
+                </div>
+                
+                <div class="section-title">🏷️ Label Options</div>
+                
+                <div class="control-group">
+                    <label for="labelType">Label Type:</label>
+                    <select id="labelType">
+                        <option value="none">No Labels</option>
+                        <option value="angle">Angle (degrees)</option>
+                        <option value="angle_rad">Angle (radians)</option>
+                        <option value="gcd">GCD Value</option>
+                        <option value="farey">Farey Fraction (k/m)</option>
+                        <option value="farey_reduced">Farey Reduced</option>
+                        <option value="element">Element (k)</option>
+                        <option value="element_mod">Element k (mod m)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="labelMod">Label Specific Modulus (0 = all):</label>
+                    <input type="number" id="labelMod" min="0" max="100" value="0">
+                </div>
+                
+                <div class="control-group">
+                    <label for="labelFilter">Label Filter:</label>
+                    <select id="labelFilter">
+                        <option value="all">All Points</option>
+                        <option value="coprime">Coprime Only (GCD=1)</option>
+                        <option value="noncoprime">Non-Coprime Only (GCD>1)</option>
+                        <option value="gcd_specific">Specific GCD Value</option>
+                    </select>
+                </div>
+                
+                <div class="control-group" id="gcdFilterGroup" style="display:none;">
+                    <label for="gcdFilterValue">GCD Value to Label:</label>
+                    <input type="number" id="gcdFilterValue" min="1" max="100" value="2">
+                </div>
+                
+                <div class="control-group">
+                    <label for="labelSize">Label Font Size:</label>
+                    <input type="range" id="labelSize" min="4" max="24" value="9">
+                    <span class="value-display" id="labelSizeValue">9</span>
+                </div>
+                
+                <div class="control-group">
+                    <label>Label Color:</label>
+                    <div class="color-input-group">
+                        <input type="color" id="labelColor" value="#000000">
+                        <span class="value-display">#000000</span>
+                    </div>
+                </div>
+                
+                <div class="section-title">🎯 Presets</div>
+                
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="loadPreset('classic')">Classic</button>
+                    <button class="preset-btn" onclick="loadPreset('dark')">Dark Mode</button>
+                    <button class="preset-btn" onclick="loadPreset('rainbow')">Rainbow</button>
+                    <button class="preset-btn" onclick="loadPreset('minimal')">Minimal</button>
+                </div>
+                
+                <div class="section-title">📤 Export</div>
+                
+                <div class="control-group">
+                    <label for="exportFormat">Format:</label>
+                    <select id="exportFormat">
+                        <option value="png">PNG (Lossless)</option>
+                        <option value="jpeg">JPEG (Compressed)</option>
+                    </select>
+                </div>
+                
+                <div class="export-options">
+                    <button class="btn-secondary" onclick="exportImage(4096)">📥 4K (4096px)</button>
+                    <button class="btn-secondary" onclick="exportImage(7680)">📥 8K (7680px)</button>
+                </div>
+                
+                <button class="btn-tertiary" onclick="exportImage(1920)">📥 Full HD (1920px)</button>
+                <button class="btn-tertiary" onclick="exportImage(3840)">📥 4K UHD (3840px)</button>
+                
+                <button class="btn-primary" onclick="drawRings()">🔄 Redraw</button>
+                
+                <div class="info-panel">
+                    <h3>📊 Statistics</h3>
+                    <div class="info-item">Total Rings: <span class="value-display" id="totalRings">15</span></div>
+                    <div class="info-item">Total Points: <span class="value-display" id="totalPoints">0</span></div>
+                    <div class="info-item">Coprime: <span class="value-display" id="coprimePoints">0</span></div>
+                    <div class="info-item">Non-Coprime: <span class="value-display" id="nonCoprimePoints">0</span></div>
+                    <div class="info-item">Coprime %: <span class="value-display" id="coprimePercent">0%</span></div>
+                </div>
             </div>
             
-            <div class="control-group">
-                <h3>Computation Method
-                    <span class="tooltip">ℹ️
-                        <span class="tooltiptext">
-                            <strong>Standard:</strong> Classic Euler product<br>
-                            <strong>Gap-Class:</strong> Group primes by gap sizes (p_{n+1} - p_n)<br>
-                            <strong>Residue Channels:</strong> Group primes by residue mod k<br>
-                            <strong>Combined:</strong> Both decompositions
-                        </span>
-                    </span>
-                </h3>
-                <label for="method">Decomposition:</label>
-                <select id="method">
-                    <option value="standard">Standard Euler Product</option>
-                    <option value="gap">Gap-Class Analysis</option>
-                    <option value="residue">Residue Channels</option>
-                    <option value="both">Gap + Residue Combined</option>
-                </select>
-                
-                <div id="modulus-control" style="display: none;">
-                    <label for="modulus">Modulus (k):
-                        <span class="tooltip">ℹ️
-                            <span class="tooltiptext">
-                                Primes are grouped by their remainder when divided by k. Common choices:<br>
-                                <strong>k=6:</strong> Primes ≡ 1,5 (mod 6)<br>
-                                <strong>k=12:</strong> Primes ≡ 1,5,7,11 (mod 12)<br>
-                                <strong>k=30:</strong> 8 residue classes (Euler's φ(30)=8)<br>
-                                <strong>Higher k:</strong> More refined decomposition
-                            </span>
-                        </span>
-                    </label>
-                    <input type="number" id="modulus" value="30" min="3" max="210" step="1">
-                    <div style="font-size: 0.85em; opacity: 0.8; margin-top: 5px;" id="phi-info"></div>
-                </div>
-                
-                <div class="progress-container" id="progress-container">
-                    <div class="progress-bar" id="progress-bar">0%</div>
-                </div>
-                
-                <button onclick="compute()">Calculate</button>
-                
-                <div class="export-buttons">
-                    <button class="export-btn" onclick="exportCSV()">📊 Export CSV</button>
-                    <button class="export-btn" onclick="exportJSON()">📄 Export JSON</button>
-                    <button class="export-btn" onclick="exportImage()">🖼️ Save Chart</button>
-                </div>
+            <div class="canvas-container">
+                <canvas id="ringCanvas"></canvas>
             </div>
-        </div>
-        
-        <div id="results" class="results" style="display: none;">
-            <div class="result-card">
-                <h4>Computed Value</h4>
-                <div id="computed-value" class="value"></div>
-                <div id="error-bound" class="error-info"></div>
-                <div id="prime-count" class="error-info"></div>
-            </div>
-            
-            <div class="result-card">
-                <h4>Exact Reference</h4>
-                <div id="exact-value" class="value"></div>
-                <div id="actual-error" class="error-info"></div>
-            </div>
-        </div>
-        
-        <div id="intermediate-section" class="gap-analysis" style="display: none;">
-            <h3>Mathematical Structure 
-                <span class="tooltip">ℹ️
-                    <span class="tooltiptext">
-                        Shows the exact mathematical form of the truncated product before transformation. This reveals what constant you're actually computing!
-                    </span>
-                </span>
-            </h3>
-            <div class="result-card" style="background: rgba(255, 215, 0, 0.1); border: 2px solid rgba(255, 215, 0, 0.3);">
-                <h4>Intermediate Value</h4>
-                <div id="intermediate-product" class="value"></div>
-                <div id="intermediate-formula" class="error-info" style="margin-top: 15px; font-size: 1.05em;"></div>
-                <div id="intermediate-explanation" class="error-info" style="margin-top: 10px; line-height: 1.6;"></div>
-            </div>
-        </div>
-        
-        <div id="gap-analysis" class="gap-analysis" style="display: none;">
-            <h3>Gap-Class Decomposition</h3>
-            <div id="gap-grid" class="gap-grid"></div>
-        </div>
-        
-        <div id="channel-analysis" class="channel-analysis" style="display: none;">
-            <h3 id="channel-title">Residue Channels</h3>
-            <div id="channel-grid" class="channel-grid"></div>
-        </div>
-        
-        <div id="chart-section" class="chart-container" style="display: none;">
-            <h3 id="chart-title">Residue Channel Contributions</h3>
-            <canvas id="channelChart"></canvas>
-            <div class="chart-legend" id="chartLegend"></div>
-        </div>
-        
-        <div id="convergence-section" class="convergence-chart" style="display: none;">
-            <h3>Convergence Analysis</h3>
-            <canvas id="convergenceChart"></canvas>
-        </div>
-        
-        <div id="comparison-section" class="gap-analysis" style="display: none;">
-            <h3>Method Comparison</h3>
-            <table class="comparison-table" id="comparison-table"></table>
         </div>
     </div>
     
-    <div class="help-icon" onclick="showTour()" aria-label="Help and Tutorial">?</div>
-    
-    <div class="tour-overlay" id="tour-overlay">
-        <div class="tour-content">
-            <h2 style="color: #ffd700; margin-bottom: 15px;">Welcome to Modular Sieve Calculator!</h2>
-            <div id="tour-text"></div>
-            <div class="tour-buttons">
-                <button class="tour-btn" style="background: #666; color: white;" onclick="closeTour()">Skip</button>
-                <button class="tour-btn" style="background: #ffd700; color: #1e3c72;" onclick="nextTourStep()">Next</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Global state
-        let computationCache = {};
-        let currentResults = null;
-        let tourStep = 0;
-        
-        const tourSteps = [
-            {
-                title: "Mathematical Foundation",
-                text: "This calculator uses the <strong>Euler Product Formula</strong> to compute mathematical constants:<br><br>ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup><br><br>We can compute π and ζ(2n) by truncating this infinite product."
-            },
-            {
-                title: "Accuracy Control",
-                text: "Set your desired <strong>relative error (ε)</strong> to control accuracy. The calculator automatically determines how many primes are needed to guarantee this error bound."
-            },
-            {
-                title: "Decomposition Methods",
-                text: "<strong>Gap-Class:</strong> Groups primes by their spacing<br><strong>Residue Channels:</strong> Groups primes by their remainder mod 30<br><br>These reveal hidden structure in prime distribution!"
-            },
-            {
-                title: "Export & Analysis",
-                text: "Export your results as CSV or JSON, save charts as images, and compare different methods side-by-side. Use keyboard shortcuts for faster workflow!"
+        // Utility functions
+        function gcd(a, b) {
+            while (b !== 0) {
+                let temp = b;
+                b = a % b;
+                a = temp;
             }
-        ];
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    compute();
-                } else if (e.key === 'e') {
-                    e.preventDefault();
-                    exportJSON();
-                } else if (e.key === 'h') {
-                    e.preventDefault();
-                    showTour();
-                }
-            }
-        });
-        
-        // Tour functions
-        function showTour() {
-            tourStep = 0;
-            document.getElementById('tour-overlay').style.display = 'flex';
-            updateTourContent();
+            return Math.abs(a);
         }
         
-        function closeTour() {
-            document.getElementById('tour-overlay').style.display = 'none';
-        }
-        
-        function nextTourStep() {
-            tourStep++;
-            if (tourStep >= tourSteps.length) {
-                closeTour();
-            } else {
-                updateTourContent();
-            }
-        }
-        
-        function updateTourContent() {
-            const step = tourSteps[tourStep];
-            document.getElementById('tour-text').innerHTML = `
-                <h3 style="color: #4ecdc4; margin-bottom: 10px;">${step.title}</h3>
-                <p style="line-height: 1.6;">${step.text}</p>
-                <p style="margin-top: 15px; opacity: 0.7; font-size: 0.9em;">Step ${tourStep + 1} of ${tourSteps.length}</p>
-            `;
-        }
-        
-        // Preset configurations
-        function loadPreset(type) {
-            const epsilonInput = document.getElementById('epsilon');
-            const methodSelect = document.getElementById('method');
-            
-            switch(type) {
-                case 'quick':
-                    epsilonInput.value = 0.01;
-                    methodSelect.value = 'standard';
-                    break;
-                case 'accurate':
-                    epsilonInput.value = 0.0001;
-                    methodSelect.value = 'residue';
-                    break;
-                case 'ultra':
-                    epsilonInput.value = 0.00001;
-                    methodSelect.value = 'both';
-                    break;
-                case 'compare':
-                    epsilonInput.value = 0.001;
-                    compareAllMethods();
-                    return;
-            }
-            compute();
-        }
-        
-        // Input validation
-        function validateInputs() {
-            const epsilon = parseFloat(document.getElementById('epsilon').value);
-            const errors = [];
-            
-            if (isNaN(epsilon) || epsilon <= 0) {
-                errors.push('Epsilon must be a positive number');
-            }
-            if (epsilon > 0.1) {
-                errors.push('Epsilon too large (max 0.1) - results may be inaccurate');
-            }
-            if (epsilon < 0.00001) {
-                errors.push('Epsilon too small (min 0.00001) - computation may take very long');
-            }
-            
-            if (errors.length > 0) {
-                showError(errors.join('<br>'));
-                return false;
-            }
-            
-            hideError();
-            return true;
-        }
-        
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.innerHTML = `<strong>⚠️ Error:</strong> ${message}`;
-            errorDiv.style.display = 'block';
-        }
-        
-        function hideError() {
-            document.getElementById('error-message').style.display = 'none';
-        }
-        
-        // Progress indicator
-        function updateProgress(percent, message = '') {
-            const container = document.getElementById('progress-container');
-            const bar = document.getElementById('progress-bar');
-            container.style.display = 'block';
-            bar.style.width = percent + '%';
-            bar.textContent = message || percent + '%';
-        }
-        
-        function hideProgress() {
-            document.getElementById('progress-container').style.display = 'none';
-        }
-        
-        // Update formula display
-        function updateFormulaDisplay() {
-            const constantType = document.getElementById('constant').value;
-            const formulaDiv = document.getElementById('formula-display');
-            
-            let formula = '';
-            if (constantType === 'pi') {
-                formula = 'π = √(6 · ∏<sub>p</sub>(1-p<sup>-2</sup>)<sup>-1</sup>)';
-            } else {
-                const n = parseInt(constantType.replace('zeta', '')) / 2;
-                formula = `ζ(${2*n}) = ∏<sub>p</sub>(1-p<sup>-${2*n}</sup>)<sup>-1</sup>`;
-            }
-            
-            formulaDiv.innerHTML = formula;
-        }
-        
-        // Listen for constant change
-        document.getElementById('constant').addEventListener('change', updateFormulaDisplay);
-        
-        // Listen for method change to show/hide modulus control
-        document.getElementById('method').addEventListener('change', function() {
-            const method = this.value;
-            const modulusControl = document.getElementById('modulus-control');
-            
-            if (method === 'residue' || method === 'both') {
-                modulusControl.style.display = 'block';
-                updatePhiInfo();
-            } else {
-                modulusControl.style.display = 'none';
-            }
-        });
-        
-        // Listen for modulus change
-        document.getElementById('modulus').addEventListener('input', updatePhiInfo);
-        
-        // Update phi(k) information
-        function updatePhiInfo() {
-            const k = parseInt(document.getElementById('modulus').value);
-            const phi = eulerPhi(k);
-            const coprimes = getCoprimesTo(k);
-            
-            document.getElementById('phi-info').innerHTML = 
-                `φ(${k}) = ${phi} residue classes: {${coprimes.slice(0, 10).join(', ')}${coprimes.length > 10 ? ', ...' : ''}}`;
-        }
-        
-        // Compute Euler's totient function φ(n)
-        function eulerPhi(n) {
-            let result = n;
-            let p = 2;
-            
-            while (p * p <= n) {
-                if (n % p === 0) {
-                    while (n % p === 0) {
-                        n = Math.floor(n / p);
-                    }
-                    result -= Math.floor(result / p);
-                }
-                p++;
-            }
-            
-            if (n > 1) {
-                result -= Math.floor(result / n);
-            }
-            
-            return result;
-        }
-        
-        // Get all numbers coprime to k
-        function getCoprimesTo(k) {
+        function getCoprimElements(m) {
+            if (m === 1) return [0];
             const coprimes = [];
-            for (let a = 1; a < k; a++) {
-                if (gcd(a, k) === 1) {
-                    coprimes.push(a);
+            for (let k = 0; k < m; k++) {
+                if (gcd(k, m) === 1) {
+                    coprimes.push(k);
                 }
             }
             return coprimes;
         }
         
-        // Greatest common divisor
-        function gcd(a, b) {
-            while (b !== 0) {
-                const temp = b;
-                b = a % b;
-                a = temp;
-            }
-            return a;
-        }
-        // Sieve of Eratosthenes optimized for our needs
-        function sieveOfEratosthenes(limit) {
-            if (limit < 2) return [];
-            
-            const isPrime = new Array(limit + 1).fill(true);
-            isPrime[0] = isPrime[1] = false;
-            
-            for (let i = 2; i * i <= limit; i++) {
-                if (isPrime[i]) {
-                    for (let j = i * i; j <= limit; j += i) {
-                        isPrime[j] = false;
-                    }
-                }
-            }
-            
-            const primes = [];
-            for (let i = 2; i <= limit; i++) {
-                if (isPrime[i]) primes.push(i);
-            }
-            return primes;
+        function simplifyFraction(num, den) {
+            const g = gcd(num, den);
+            return [num / g, den / g];
         }
         
-        // Compute gap classes: gap = p_next - p_current
-        function computeGapClasses(primes) {
-            const gapClasses = {};
-            
-            for (let i = 0; i < primes.length - 1; i++) {
-                const gap = primes[i + 1] - primes[i];
-                if (!gapClasses[gap]) gapClasses[gap] = [];
-                // Store the current prime (the one before the gap)
-                gapClasses[gap].push(primes[i]);
+        function eulerPhi(n) {
+            let result = n;
+            for (let p = 2; p * p <= n; p++) {
+                if (n % p === 0) {
+                    while (n % p === 0) n /= p;
+                    result -= result / p;
+                }
             }
-            
-            // Add the last prime to a special category since it has no gap after it
-            const lastPrime = primes[primes.length - 1];
-            if (!gapClasses['last']) gapClasses['last'] = [];
-            gapClasses['last'].push(lastPrime);
-            
-            return gapClasses;
+            if (n > 1) result -= result / n;
+            return Math.floor(result);
         }
         
-        // Compute residue channels for any modulus k
-        function computeResidueChannels(primes, modulus) {
-            const coprimes = getCoprimesTo(modulus);
-            const channels = {};
-            
-            // Initialize channels
-            coprimes.forEach(a => channels[a] = []);
-            
-            // Get small primes that divide the modulus (need special handling)
-            const smallPrimes = [];
-            let tempMod = modulus;
-            for (let p = 2; p <= modulus; p++) {
-                if (tempMod % p === 0) {
-                    smallPrimes.push(p);
-                    while (tempMod % p === 0) {
-                        tempMod = Math.floor(tempMod / p);
-                    }
-                }
-            }
-            
-            // Classify primes by residue
-            primes.forEach(p => {
-                if (!smallPrimes.includes(p)) {
-                    const residue = p % modulus;
-                    if (channels[residue] !== undefined) {
-                        channels[residue].push(p);
-                    }
-                }
-            });
-            
-            return {
-                channels: channels,
-                smallPrimes: smallPrimes.filter(p => primes.includes(p)),
-                coprimes: coprimes
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
             };
+            return `#${f(0)}${f(8)}${f(4)}`;
         }
         
-        // Compute Y cutoff for given epsilon and constant type
-        function computeCutoff(epsilon, constantType) {
-            if (constantType === 'pi') {
-                return Math.ceil(1 + 1 / Math.log(1 + epsilon));
-            } else {
-                const n = parseInt(constantType.replace('zeta', '')) / 2;
-                const power = 1 / (2 * n - 1);
-                return Math.ceil(Math.pow(2 / ((2 * n - 1) * Math.log(1 + epsilon)), power));
-            }
+        function getColorByGCD(gcdValue, maxGcd) {
+            // Generate distinct colors for different GCD values
+            const hue = (gcdValue * 137.5) % 360; // Golden angle for distribution
+            const saturation = 70;
+            const lightness = gcdValue === 1 ? 50 : 45 + (gcdValue / maxGcd) * 20;
+            return hslToHex(hue, saturation, lightness);
         }
         
-        // Compute truncated product
-        function computeTruncatedProduct(primes, exponent) {
-            let product = 1;
-            for (const p of primes) {
-                product *= 1 / (1 - Math.pow(p, -exponent));
-            }
-            return product;
-        }
+        // Canvas drawing
+        const canvas = document.getElementById('ringCanvas');
+        const ctx = canvas.getContext('2d');
         
-        // Exact values for reference
-        const exactValues = {
-            'pi': Math.PI,
-            'zeta4': Math.PI ** 4 / 90,
-            'zeta6': Math.PI ** 6 / 945,
-            'zeta8': Math.PI ** 8 / 9450,
-            'zeta10': Math.PI ** 10 / 93555
-        };
+        // Initialize canvas size
+        canvas.width = 1400;
+        canvas.height = 1400;
         
-        function compute() {
-            const epsilon = parseFloat(document.getElementById('epsilon').value);
-            const constantType = document.getElementById('constant').value;
-            const method = document.getElementById('method').value;
+        function drawRings() {
+            const maxMod = parseInt(document.getElementById('maxMod').value);
+            const startMod = parseInt(document.getElementById('startMod').value);
+            const ringSpacing = parseInt(document.getElementById('ringSpacing').value);
+            const pointSize = parseInt(document.getElementById('pointSize').value);
+            const labelType = document.getElementById('labelType').value;
+            const labelMod = parseInt(document.getElementById('labelMod').value);
+            const labelFilter = document.getElementById('labelFilter').value;
+            const gcdFilterValue = parseInt(document.getElementById('gcdFilterValue').value);
+            const labelSize = parseInt(document.getElementById('labelSize').value);
+            const labelColor = document.getElementById('labelColor').value;
+            const coprimeColor = document.getElementById('coprimeColor').value;
+            const nonCoprimeColor = document.getElementById('nonCoprimeColor').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const colorMode = document.getElementById('colorMode').value;
+            const showRingGuides = document.getElementById('showRingGuides').checked;
+            const showRadialLines = document.getElementById('showRadialLines').checked;
             
-            // Show loading
-            document.getElementById('results').style.display = 'block';
-            document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...</div>';
+            // Clear canvas
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            setTimeout(() => {
-                try {
-                    // Compute required cutoff
-                    const Y = computeCutoff(epsilon, constantType);
-                    const primes = sieveOfEratosthenes(Y - 1);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.44;
+            
+            let totalPoints = 0;
+            let coprimePointsCount = 0;
+            let nonCoprimePointsCount = 0;
+            
+            // Find max GCD for color scaling
+            let maxGcdValue = 1;
+            for (let m = startMod; m <= maxMod; m++) {
+                for (let k = 0; k < m; k++) {
+                    maxGcdValue = Math.max(maxGcdValue, gcd(k, m));
+                }
+            }
+            
+            // Draw radial lines if enabled
+            if (showRadialLines) {
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1;
+                const numLines = 12;
+                for (let i = 0; i < numLines; i++) {
+                    const angle = (2 * Math.PI * i / numLines) - Math.PI / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(
+                        centerX + maxRadius * Math.cos(angle),
+                        centerY + maxRadius * Math.sin(angle)
+                    );
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw rings
+            for (let m = startMod; m <= maxMod; m++) {
+                const radius = (m - startMod + 1) * ringSpacing;
+                if (radius > maxRadius) continue;
+                
+                // Draw ring circle (guide)
+                if (showRingGuides) {
+                    ctx.strokeStyle = '#e5e7eb';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.stroke();
+                }
+                
+                // Get coprime elements
+                const coprimes = new Set(getCoprimElements(m));
+                
+                // Draw points for this modulus
+                for (let k = 0; k < m; k++) {
+                    const angle = (2 * Math.PI * k / m) - Math.PI / 2; // Start from top
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
                     
-                    let computedValue;
-                    let intermediateValue;
-                    let analysisHtml = '';
+                    const isCoprime = coprimes.has(k);
+                    const gcdValue = gcd(k, m);
                     
-                    if (constantType === 'pi') {
-                        // π = √(6 * ζ(2))
-                        const zetaProduct = computeTruncatedProduct(primes, 2);
-                        intermediateValue = zetaProduct;
-                        computedValue = Math.sqrt(6 * zetaProduct);
-                        
-                        // Show intermediate structure
-                        showIntermediateStructure(zetaProduct, primes, constantType);
-                    } else {
-                        // ζ(2n) = ∏(1-p^-2n)^-1
-                        const n = parseInt(constantType.replace('zeta', '')) / 2;
-                        computedValue = computeTruncatedProduct(primes, 2 * n);
-                        intermediateValue = computedValue;
-                        
-                        showIntermediateStructure(computedValue, primes, constantType);
+                    // Choose color based on mode
+                    let pointColor;
+                    switch (colorMode) {
+                        case 'binary':
+                            pointColor = isCoprime ? coprimeColor : nonCoprimeColor;
+                            break;
+                        case 'gcd':
+                            pointColor = getColorByGCD(gcdValue, maxGcdValue);
+                            break;
+                        case 'gradient':
+                            const hue = (k * 360 / m) % 360;
+                            pointColor = hslToHex(hue, 70, isCoprime ? 50 : 40);
+                            break;
+                        case 'totient':
+                            const phi = eulerPhi(m);
+                            const hue2 = (phi * 30) % 360;
+                            pointColor = hslToHex(hue2, 65, isCoprime ? 55 : 45);
+                            break;
                     }
                     
-                    // Display results
-                    document.getElementById('computed-value').textContent = computedValue.toFixed(12);
-                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(12);
+                    ctx.fillStyle = pointColor;
                     
-                    const actualError = Math.abs(computedValue - exactValues[constantType]) / exactValues[constantType];
-                    document.getElementById('actual-error').innerHTML = `Actual relative error: ${(actualError * 100).toFixed(6)}%`;
-                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ ${(epsilon * 100).toFixed(4)}%`;
-                    document.getElementById('prime-count').innerHTML = `Using ${primes.length} primes up to ${Y-1}`;
-                    
-                    // Method-specific analysis
-                    if (method === 'gap' || method === 'both') {
-                        showGapAnalysis(primes, constantType);
+                    // Draw point
+                    if (isCoprime) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, pointSize / 2, 0, 2 * Math.PI);
+                        ctx.fill();
+                        coprimePointsCount++;
                     } else {
-                        document.getElementById('gap-analysis').style.display = 'none';
+                        ctx.strokeStyle = pointColor;
+                        ctx.lineWidth = 2.5;
+                        const offset = pointSize / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(x - offset, y - offset);
+                        ctx.lineTo(x + offset, y + offset);
+                        ctx.moveTo(x + offset, y - offset);
+                        ctx.lineTo(x - offset, y + offset);
+                        ctx.stroke();
+                        nonCoprimePointsCount++;
                     }
                     
-                    if (method === 'residue' || method === 'both') {
-                        showResidueAnalysis(primes, constantType);
-                    } else {
-                        document.getElementById('channel-analysis').style.display = 'none';
-                        document.getElementById('chart-section').style.display = 'none';
-                    }
+                    totalPoints++;
                     
-                } catch (error) {
-                    document.getElementById('computed-value').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
-                }
-            }, 100);
-        }
-        
-        function showGapAnalysis(primes, constantType) {
-            const gapClasses = computeGapClasses(primes);
-            const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
-            
-            let html = '';
-            const sortedGaps = Object.keys(gapClasses)
-                .filter(g => g !== 'last')
-                .map(Number)
-                .sort((a, b) => a - b);
-            
-            // Show gap 1 separately (only prime 2)
-            if (gapClasses[1]) {
-                const gap1Primes = gapClasses[1];
-                const contribution = computeTruncatedProduct(gap1Primes, exponent);
-                const logContrib = Math.log(contribution);
-                
-                html += `
-                    <div class="gap-item" style="background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700;">
-                        <div><strong>Gap 1</strong></div>
-                        <div style="font-size: 0.85em; color: #ffd700;">Only prime 2 → 3</div>
-                        <div class="gap-value">R₁ = ${contribution.toFixed(6)}</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">${gap1Primes.length} prime: [${gap1Primes.join(', ')}]</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">log R = ${logContrib.toFixed(4)}</div>
-                    </div>
-                `;
-            }
-            
-            // Show even gaps
-            for (const gap of sortedGaps.filter(g => g !== 1).slice(0, 11)) {
-                const gapPrimes = gapClasses[gap];
-                const contribution = computeTruncatedProduct(gapPrimes, exponent);
-                const logContrib = Math.log(contribution);
-                
-                // Show first few primes in this gap class
-                const samplePrimes = gapPrimes.slice(0, 5);
-                const primeList = samplePrimes.join(', ') + (gapPrimes.length > 5 ? ', ...' : '');
-                
-                html += `
-                    <div class="gap-item">
-                        <div><strong>Gap ${gap}</strong></div>
-                        <div style="font-size: 0.75em; opacity: 0.7; margin: 3px 0;">p where p' - p = ${gap}</div>
-                        <div class="gap-value">R_${gap} = ${contribution.toFixed(6)}</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">${gapPrimes.length} primes</div>
-                        <div style="font-size: 0.75em; opacity: 0.6; margin-top: 3px;">[${primeList}]</div>
-                        <div style="font-size: 0.8em; opacity: 0.8;">log R = ${logContrib.toFixed(4)}</div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('gap-grid').innerHTML = html;
-            document.getElementById('gap-analysis').style.display = 'block';
-        }
-        
-        function showIntermediateStructure(intermediateValue, primes, constantType) {
-            document.getElementById('intermediate-section').style.display = 'block';
-            document.getElementById('intermediate-product').textContent = intermediateValue.toFixed(12);
-            
-            let formulaHtml = '';
-            let explanationHtml = '';
-            
-            if (constantType === 'pi') {
-                // For pi, show ζ(2) approximation
-                const primeList = primes.length <= 5 ? 
-                    `{${primes.join(', ')}}` : 
-                    `{${primes.slice(0, 3).join(', ')}, ..., ${primes[primes.length-1]}}`;
-                
-                formulaHtml = `<strong>ζ(2) ≈ ∏<sub>p∈${primeList}</sub> (1-p<sup>-2</sup>)<sup>-1</sup></strong>`;
-                
-                // Calculate what this equals exactly for small cases
-                if (primes.length === 1 && primes[0] === 2) {
-                    const exactForm = '4/3';
-                    explanationHtml = `
-                        With only prime <strong>p=2</strong>:<br>
-                        ζ(2) ≈ 1/(1-2<sup>-2</sup>) = 1/(1-1/4) = <strong>${exactForm}</strong><br>
-                        Therefore: π ≈ √(6 · 4/3) = √8 = <strong>2√2</strong>
-                    `;
-                } else if (primes.length === 2 && primes[0] === 2 && primes[1] === 3) {
-                    const product1 = 1/(1-1/4);
-                    const product2 = 1/(1-1/9);
-                    const total = product1 * product2;
-                    explanationHtml = `
-                        With primes <strong>{2, 3}</strong>:<br>
-                        ζ(2) ≈ [1/(1-1/4)] · [1/(1-1/9)] = (4/3) · (9/8) = <strong>${total.toFixed(6)}</strong><br>
-                        Therefore: π ≈ √(6 · ${total.toFixed(4)}) ≈ <strong>${Math.sqrt(6*total).toFixed(6)}</strong>
-                    `;
-                } else {
-                    explanationHtml = `
-                        Using ${primes.length} primes up to ${primes[primes.length-1]}, the truncated Euler product gives:<br>
-                        ζ(2) ≈ <strong>${intermediateValue.toFixed(12)}</strong><br>
-                        Then: π = √(6 · ζ(2)) ≈ √(6 · ${intermediateValue.toFixed(6)}) ≈ <strong>${Math.sqrt(6*intermediateValue).toFixed(12)}</strong>
-                    `;
-                }
-            } else {
-                // For ζ(2n)
-                const n = parseInt(constantType.replace('zeta', ''));
-                const primeList = primes.length <= 5 ? 
-                    `{${primes.join(', ')}}` : 
-                    `{${primes.slice(0, 3).join(', ')}, ..., ${primes[primes.length-1]}}`;
-                
-                formulaHtml = `<strong>ζ(${n}) ≈ ∏<sub>p∈${primeList}</sub> (1-p<sup>-${n}</sup>)<sup>-1</sup></strong>`;
-                
-                if (primes.length === 1 && primes[0] === 2) {
-                    const denom = 1 - Math.pow(2, -n);
-                    explanationHtml = `
-                        With only prime <strong>p=2</strong>:<br>
-                        ζ(${n}) ≈ 1/(1-2<sup>-${n}</sup>) = <strong>${intermediateValue.toFixed(12)}</strong>
-                    `;
-                } else {
-                    explanationHtml = `
-                        Using ${primes.length} primes, the truncated Euler product directly gives:<br>
-                        ζ(${n}) ≈ <strong>${intermediateValue.toFixed(12)}</strong>
-                    `;
-                }
-            }
-            
-            document.getElementById('intermediate-formula').innerHTML = formulaHtml;
-            document.getElementById('intermediate-explanation').innerHTML = explanationHtml;
-        }
-        
-        function showResidueAnalysis(primes, constantType) {
-            const modulus = parseInt(document.getElementById('modulus').value);
-            const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
-            
-            const result = computeResidueChannels(primes, modulus);
-            const channels = result.channels;
-            const smallPrimes = result.smallPrimes;
-            const coprimes = result.coprimes;
-            
-            // Update titles
-            document.getElementById('channel-title').textContent = `Residue Channels (mod ${modulus})`;
-            document.getElementById('chart-title').textContent = `Residue Channel Contributions ℤ_a(s;${modulus})`;
-            
-            let html = '';
-            const channelData = [];
-            
-            // Handle small primes that divide the modulus
-            if (smallPrimes.length > 0) {
-                const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
-                const gridSpan = Math.min(coprimes.length, 4);
-                
-                html += `
-                    <div class="channel-item" style="grid-column: span ${gridSpan}; background: rgba(255, 215, 0, 0.2);">
-                        <div>Prime Divisors of ${modulus}</div>
-                        <div style="font-weight: bold;">${smallProduct.toFixed(6)}</div>
-                        <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
-                    </div>
-                `;
-            }
-            
-            // Display each residue channel
-            for (const a of coprimes) {
-                const channelPrimes = channels[a];
-                let contribution = 1;
-                
-                if (channelPrimes.length > 0) {
-                    contribution = computeTruncatedProduct(channelPrimes, exponent);
-                    
-                    // Show sample primes for this channel
-                    const sampleSize = 3;
-                    const samplePrimes = channelPrimes.slice(0, sampleSize);
-                    const primeDisplay = samplePrimes.join(', ') + 
-                        (channelPrimes.length > sampleSize ? ', ...' : '');
-                    
-                    html += `
-                        <div class="channel-item">
-                            <div>≡ ${a} (mod ${modulus})</div>
-                            <div style="font-weight: bold; color: #4ecdc4;">${contribution.toFixed(6)}</div>
-                            <div style="font-size: 0.75em;">${channelPrimes.length} primes</div>
-                            <div style="font-size: 0.7em; opacity: 0.6; margin-top: 3px;">[${primeDisplay}]</div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="channel-item" style="opacity: 0.5;">
-                            <div>≡ ${a} (mod ${modulus})</div>
-                            <div>1.0000</div>
-                            <div style="font-size: 0.8em;">0 primes</div>
-                        </div>
-                    `;
-                }
-                
-                channelData.push({
-                    residue: a,
-                    contribution: contribution,
-                    primeCount: channelPrimes.length,
-                    logContribution: Math.log(contribution)
-                });
-            }
-            
-            document.getElementById('channel-grid').innerHTML = html;
-            document.getElementById('channel-analysis').style.display = 'block';
-            
-            // Create chart
-            const smallProduct = smallPrimes.length > 0 ? 
-                computeTruncatedProduct(smallPrimes, exponent) : null;
-            createChannelChart(channelData, smallProduct, modulus, smallPrimes);
-        }
-        
-        let channelChart = null;
-        
-        function createChannelChart(channelData, smallPrimesContrib, modulus, smallPrimes) {
-            const ctx = document.getElementById('channelChart').getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (channelChart) {
-                channelChart.destroy();
-            }
-            
-            // Prepare data for chart
-            const labels = [];
-            const contributions = [];
-            const logContributions = [];
-            const primeCounts = [];
-            
-            // Add small primes if they exist
-            if (smallPrimesContrib !== null && smallPrimesContrib !== 1) {
-                labels.push(`Divisors of ${modulus} (${smallPrimes.join(',')})`);
-                contributions.push(smallPrimesContrib);
-                logContributions.push(Math.log(smallPrimesContrib));
-                primeCounts.push(smallPrimes.length);
-            }
-            
-            // Add residue channels
-            channelData.forEach(d => {
-                labels.push(`≡ ${d.residue} (mod ${modulus})`);
-                contributions.push(d.contribution);
-                logContributions.push(d.logContribution);
-                primeCounts.push(d.primeCount);
-            });
-            
-            // Create gradient colors - more colors for larger moduli
-            const numColors = labels.length;
-            const colors = [];
-            
-            for (let i = 0; i < numColors; i++) {
-                if (i === 0 && smallPrimesContrib !== null && smallPrimesContrib !== 1) {
-                    colors.push('rgba(255, 215, 0, 0.8)'); // Gold for small primes
-                } else {
-                    const hue = (i * 360 / numColors) % 360;
-                    colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
-                }
-            }
-            
-            channelChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Channel Contribution',
-                        data: contributions,
-                        backgroundColor: colors,
-                        borderColor: colors.map(c => c.replace('0.8', '1')),
-                        borderWidth: 2,
-                        borderRadius: 8,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2.5,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(255, 255, 255, 0.3)',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    const idx = context.dataIndex;
-                                    const contrib = contributions[idx];
-                                    const logContrib = logContributions[idx];
-                                    const count = primeCounts[idx];
-                                    
-                                    return [
-                                        `Contribution: ${contrib.toFixed(6)}`,
-                                        `log(Contribution): ${logContrib.toFixed(4)}`,
-                                        `Prime count: ${count}`
-                                    ];
-                                }
-                            }
+                    // Determine if this point should be labeled
+                    let shouldLabel = (labelMod === 0 || labelMod === m);
+                    if (shouldLabel) {
+                        switch (labelFilter) {
+                            case 'coprime':
+                                shouldLabel = isCoprime;
+                                break;
+                            case 'noncoprime':
+                                shouldLabel = !isCoprime;
+                                break;
+                            case 'gcd_specific':
+                                shouldLabel = (gcdValue === gcdFilterValue);
+                                break;
                         }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: '#fff',
-                                maxRotation: 90,
-                                minRotation: 45,
-                                font: {
-                                    size: labels.length > 30 ? 7 : (labels.length > 20 ? 8 : 10)
-                                },
-                                autoSkip: labels.length > 50,
-                                maxTicksLimit: labels.length > 50 ? 50 : undefined
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                color: '#fff',
-                                callback: function(value) {
-                                    return value.toFixed(3);
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            title: {
-                                display: true,
-                                text: `ℤₐ(s;${modulus}) Contribution`,
-                                color: '#fff',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
+                    }
+                    
+                    // Draw labels
+                    if (labelType !== 'none' && shouldLabel) {
+                        let labelText = '';
+                        
+                        switch (labelType) {
+                            case 'angle':
+                                const degrees = ((k * 360 / m) % 360).toFixed(1);
+                                labelText = degrees + '°';
+                                break;
+                            case 'angle_rad':
+                                const radians = ((k * 2 * Math.PI / m) % (2 * Math.PI)).toFixed(3);
+                                labelText = radians + 'r';
+                                break;
+                            case 'gcd':
+                                labelText = gcdValue.toString();
+                                break;
+                            case 'farey':
+                                labelText = k + '/' + m;
+                                break;
+                            case 'farey_reduced':
+                                const [num, den] = simplifyFraction(k, m);
+                                labelText = num + '/' + den;
+                                break;
+                            case 'element':
+                                labelText = k.toString();
+                                break;
+                            case 'element_mod':
+                                labelText = `${k}₍${m}₎`;
+                                break;
                         }
-                    },
-                    animation: {
-                        duration: 1500,
-                        easing: 'easeOutQuart'
+                        
+                        // Position label
+                        const labelOffset = pointSize + 10;
+                        const labelX = centerX + (radius + labelOffset) * Math.cos(angle);
+                        const labelY = centerY + (radius + labelOffset) * Math.sin(angle);
+                        
+                        // Draw label background for readability
+                        ctx.font = `${labelSize}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        const metrics = ctx.measureText(labelText);
+                        const padding = 2;
+                        
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                        ctx.fillRect(
+                            labelX - metrics.width / 2 - padding,
+                            labelY - labelSize / 2 - padding,
+                            metrics.width + padding * 2,
+                            labelSize + padding * 2
+                        );
+                        
+                        ctx.fillStyle = labelColor;
+                        ctx.fillText(labelText, labelX, labelY);
                     }
                 }
-            });
-            
-            // Show chart section
-            document.getElementById('chart-section').style.display = 'block';
-            
-            // Create legend
-            createChartLegend(labels, colors, primeCounts);
-        }
-        
-        function createChartLegend(labels, colors, primeCounts) {
-            let legendHtml = '';
-            
-            for (let i = 0; i < labels.length; i++) {
-                legendHtml += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: ${colors[i]};"></div>
-                        <span>${labels[i]} (${primeCounts[i]} primes)</span>
-                    </div>
-                `;
             }
             
-            document.getElementById('chartLegend').innerHTML = legendHtml;
+            // Draw center point
+            ctx.fillStyle = '#9333ea';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw title
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Modular Rings: mod ${startMod} to ${maxMod}`, centerX, 35);
+            
+            // Draw subtitle with label info
+            if (labelType !== 'none') {
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#64748b';
+                const labelTypeNames = {
+                    'angle': 'Angles (degrees)',
+                    'angle_rad': 'Angles (radians)',
+                    'gcd': 'GCD values',
+                    'farey': 'Farey fractions',
+                    'farey_reduced': 'Reduced fractions',
+                    'element': 'Elements',
+                    'element_mod': 'Elements with modulus'
+                };
+                ctx.fillText(`Labels: ${labelTypeNames[labelType]}`, centerX, 58);
+            }
+            
+            // Draw legend
+            const legendY = canvas.height - 45;
+            ctx.font = '16px Arial';
+            
+            if (colorMode === 'binary') {
+                ctx.fillStyle = coprimeColor;
+                ctx.beginPath();
+                ctx.arc(centerX - 180, legendY, 7, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText('Coprime (GCD=1)', centerX - 100, legendY + 5);
+                
+                ctx.strokeStyle = nonCoprimeColor;
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(centerX + 60, legendY - 7);
+                ctx.lineTo(centerX + 74, legendY + 7);
+                ctx.moveTo(centerX + 74, legendY - 7);
+                ctx.lineTo(centerX + 60, legendY + 7);
+                ctx.stroke();
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText('Non-Coprime (GCD>1)', centerX + 160, legendY + 5);
+            } else {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText(`Color Mode: ${colorMode}`, centerX, legendY + 5);
+            }
+            
+            // Update info panel
+            const numRings = maxMod - startMod + 1;
+            document.getElementById('totalRings').textContent = numRings;
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('coprimePoints').textContent = coprimePointsCount;
+            document.getElementById('nonCoprimePoints').textContent = nonCoprimePointsCount;
+            const coprimePercent = totalPoints > 0 ? 
+                (coprimePointsCount / totalPoints * 100).toFixed(1) : 0;
+            document.getElementById('coprimePercent').textContent = coprimePercent + '%';
         }
         
-        // Initialize with default computation
-        window.onload = () => {
-            compute();
-        };
+        function exportImage(resolution) {
+            const format = document.getElementById('exportFormat').value;
+            
+            // Save current canvas size
+            const originalWidth = canvas.width;
+            const originalHeight = canvas.height;
+            
+            // Calculate scale factor
+            const scale = resolution / originalWidth;
+            
+            // Save current parameter values
+            const originalValues = {
+                ringSpacing: document.getElementById('ringSpacing').value,
+                pointSize: document.getElementById('pointSize').value,
+                labelSize: document.getElementById('labelSize').value
+            };
+            
+            // Scale parameters
+            document.getElementById('ringSpacing').value = Math.round(parseInt(originalValues.ringSpacing) * scale);
+            document.getElementById('pointSize').value = Math.round(parseInt(originalValues.pointSize) * scale);
+            document.getElementById('labelSize').value = Math.round(parseInt(originalValues.labelSize) * scale);
+            
+            // Resize canvas
+            canvas.width = resolution;
+            canvas.height = resolution;
+            
+            // Draw high-res version
+            drawRings();
+            
+            // Export
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const filename = `modular_rings_${resolution}x${resolution}_${timestamp}.${format}`;
+            
+            if (format === 'png') {
+                link.href = canvas.toDataURL('image/png');
+            } else {
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+            }
+            
+            link.download = filename;
+            link.click();
+            
+            // Restore original size and parameters
+            canvas.width = originalWidth;
+            canvas.height = originalHeight;
+            document.getElementById('ringSpacing').value = originalValues.ringSpacing;
+            document.getElementById('pointSize').value = originalValues.pointSize;
+            document.getElementById('labelSize').value = originalValues.labelSize;
+            
+            // Redraw at normal resolution
+            drawRings();
+            
+            console.log(`Exported ${resolution}x${resolution} ${format.toUpperCase()} image: ${filename}`);
+        }
+        
+        function updateColorMode() {
+            const colorMode = document.getElementById('colorMode').value;
+            const binaryControls = document.getElementById('binaryColorControls');
+            
+            if (colorMode === 'binary') {
+                binaryControls.style.display = 'block';
+            } else {
+                binaryControls.style.display = 'none';
+            }
+            
+            drawRings();
+        }
+        
+        function loadPreset(presetName) {
+            switch (presetName) {
+                case 'classic':
+                    document.getElementById('coprimeColor').value = '#3b82f6';
+                    document.getElementById('nonCoprimeColor').value = '#ef4444';
+                    document.getElementById('bgColor').value = '#ffffff';
+                    document.getElementById('labelColor').value = '#000000';
+                    document.getElementById('colorMode').value = 'binary';
+                    break;
+                case 'dark':
+                    document.getElementById('coprimeColor').value = '#60a5fa';
+                    document.getElementById('nonCoprimeColor').value = '#f87171';
+                    document.getElementById('bgColor').value = '#1e293b';
+                    document.getElementById('labelColor').value = '#ffffff';
+                    document.getElementById('colorMode').value = 'binary';
+                    break;
+                case 'rainbow':
+                    document.getElementById('bgColor').value = '#0f172a';
+                    document.getElementById('labelColor').value = '#ffffff';
+                    document.getElementById('colorMode').value = 'gradient';
+                    break;
+                case 'minimal':
+                    document.getElementById('coprimeColor').value = '#000000';
+                    document.getElementById('nonCoprimeColor').value = '#999999';
+                    document.getElementById('bgColor').value = '#ffffff';
+                    document.getElementById('labelColor').value = '#000000';
+                    document.getElementById('colorMode').value = 'binary';
+                    document.getElementById('showRingGuides').checked = false;
+                    break;
+            }
+            updateColorMode();
+            updateColorDisplays();
+            drawRings();
+        }
+        
+        function updateColorDisplays() {
+            document.getElementById('coprimeColor').nextElementSibling.textContent = 
+                document.getElementById('coprimeColor').value;
+            document.getElementById('nonCoprimeColor').nextElementSibling.textContent = 
+                document.getElementById('nonCoprimeColor').value;
+            document.getElementById('bgColor').nextElementSibling.textContent = 
+                document.getElementById('bgColor').value;
+            document.getElementById('labelColor').nextElementSibling.textContent = 
+                document.getElementById('labelColor').value;
+        }
+        
+        // Event listeners
+        document.getElementById('ringSpacing').addEventListener('input', function() {
+            document.getElementById('ringSpacingValue').textContent = this.value;
+        });
+        
+        document.getElementById('pointSize').addEventListener('input', function() {
+            document.getElementById('pointSizeValue').textContent = this.value;
+        });
+        
+        document.getElementById('labelSize').addEventListener('input', function() {
+            document.getElementById('labelSizeValue').textContent = this.value;
+        });
+        
+        ['coprimeColor', 'nonCoprimeColor', 'bgColor', 'labelColor'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                this.nextElementSibling.textContent = this.value;
+            });
+        });
+        
+        document.getElementById('labelFilter').addEventListener('change', function() {
+            const gcdGroup = document.getElementById('gcdFilterGroup');
+            gcdGroup.style.display = (this.value === 'gcd_specific') ? 'block' : 'none';
+        });
+        
+        // Auto-redraw on changes
+        ['maxMod', 'startMod', 'labelType', 'labelMod', 'labelFilter', 
+         'showRingGuides', 'showRadialLines'].forEach(id => {
+            document.getElementById(id).addEventListener('change', drawRings);
+        });
+        
+        // Initial draw
+        drawRings();
     </script>
 </body>
 </html>
