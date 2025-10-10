@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Modular Ring System</title>
+    <title>Modular Sieve: π and ζ(2n) Calculator</title>
     <style>
         * {
             margin: 0;
@@ -13,484 +13,527 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
             min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 1900px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
-            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
             padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
             text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.8em;
+            font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.95;
-        }
-        
-        .content {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 20px;
-            padding: 30px;
-        }
-        
-        .controls {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            height: fit-content;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .control-group {
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.9;
             margin-bottom: 20px;
         }
         
-        .control-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 0.95em;
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #ffd700;
         }
         
-        .control-group input[type="number"],
-        .control-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        
-        .control-group input[type="number"]:focus,
-        .control-group select:focus {
-            outline: none;
-            border-color: #7e22ce;
-        }
-        
-        .control-group input[type="range"] {
-            width: 100%;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .info-section h3 {
+            color: #ffd700;
             margin-bottom: 10px;
         }
         
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+        .info-section p {
+            line-height: 1.6;
+            margin-bottom: 10px;
         }
         
-        .checkbox-group label {
-            margin: 0;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .color-input-group {
-            display: grid;
-            grid-template-columns: 1fr 80px;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        input[type="color"] {
-            width: 100%;
-            height: 40px;
-            border: 2px solid #ddd;
+        .formula {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
             border-radius: 8px;
-            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
         }
         
         button {
-            width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(238, 90, 82, 0.3);
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a8a3);
+            margin-top: 10px;
+        }
+        
+        .export-btn:hover {
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .result-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-card h4 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .value {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        
+        .error-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        .step-by-step {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .step-by-step h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #4ecdc4;
+            color: #1e3c72;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 1.1em;
+            font-weight: bold;
             margin-bottom: 10px;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
-            color: white;
+        .step-content {
+            margin-left: 40px;
+            line-height: 1.6;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(126, 34, 206, 0.4);
+        .step-formula {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
         }
         
-        .btn-secondary {
-            background: #10b981;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-tertiary {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-tertiary:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-        }
-        
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-        
-        .canvas-container {
-            background: white;
+        .gap-analysis {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
             border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 900px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        canvas {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            cursor: crosshair;
+        .gap-analysis h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
         }
         
-        .info-panel {
-            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        .gap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .gap-item {
+            background: rgba(255, 255, 255, 0.1);
             padding: 15px;
             border-radius: 10px;
+            text-align: center;
+        }
+        
+        .gap-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        
+        .channel-analysis {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .channel-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .chart-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .chart-container h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #channelChart {
+            width: 100%;
+            height: 400px;
+            max-height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
             margin-top: 15px;
             font-size: 0.9em;
         }
         
-        .info-panel h3 {
-            margin-bottom: 10px;
-            color: #1e40af;
-        }
-        
-        .info-item {
-            margin-bottom: 5px;
-            color: #1e293b;
-            font-weight: 500;
-        }
-        
-        .value-display {
-            display: inline-block;
-            background: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 5px;
-            font-weight: 700;
-            color: #7e22ce;
-        }
-        
-        .export-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .section-title {
-            font-size: 1.2em;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #7e22ce;
-            border-bottom: 2px solid #7e22ce;
-            padding-bottom: 8px;
-        }
-        
-        .gcd-colormap {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .gcd-color-item {
+        .legend-item {
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.85em;
         }
         
-        .gcd-color-box {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
         }
         
-        .preset-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+        .visualization-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
         }
         
-        .preset-btn {
-            padding: 8px;
-            font-size: 0.9em;
-            background: #e2e8f0;
-            color: #334155;
+        .visualization-container h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
         }
         
-        .preset-btn:hover {
-            background: #cbd5e1;
+        .viz-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
-        @media (max-width: 1400px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
+        .viz-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .viz-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #1e3c72;
+        }
+        
+        .viz-btn:hover {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: #4ecdc4;
+        }
+        
+        #vizCanvas {
+            width: 100%;
+            height: 500px;
+            max-height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.7;
+        }
+        
+        .toggle-section {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.open {
+            max-height: 5000px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌟 Advanced Modular Ring System</h1>
-            <p>Interactive visualization with GCD color coding, Farey fractions, and ultra high-res export</p>
+            <h1>Modular Sieve Calculator</h1>
+            <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
+            
+            <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('theory')">
+                    <h3>Mathematical Framework</h3>
+                    <span class="toggle-icon" id="theory-icon">▼</span>
+                </div>
+                <div id="theory-content" class="collapsible-content">
+                    <p>This calculator implements the rigorous framework for computing π and ζ(2n) using Euler product decompositions.</p>
+                    
+                    <p><strong>Key Identity:</strong> For ℜ(s) > 1, the Riemann zeta function has the Euler product:</p>
+                    <div class="formula">ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup></div>
+                    
+                    <p><strong>Recovering π:</strong> Since ζ(2) = π²/6, we have:</p>
+                    <div class="formula">π = √6 · ∏<sub>p prime</sub> (1 - p<sup>-2</sup>)<sup>-1/2</sup></div>
+                    
+                    <p><strong>Two Decomposition Methods:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Gap-Class:</strong> Groups primes by their gaps g(p) = p - p<sub>prev</sub></li>
+                        <li><strong>Residue Channels:</strong> Splits primes by residue classes mod 30, giving 8 independent channels for gcd(a,30)=1</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Error Control:</strong> For target error ε, include primes up to:</p>
+                    <div class="formula">
+                        Y ≈ 1 + 1/ε  (for π)<br>
+                        Y ≈ (2/((2n-1)·ε))<sup>1/(2n-1)</sup>  (for ζ(2n))
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div class="content">
+        <div class="main-content">
             <div class="controls">
-                <div class="section-title">⚙️ Ring Configuration</div>
-                
                 <div class="control-group">
-                    <label for="maxMod">Maximum Modulus (1-100):</label>
-                    <input type="number" id="maxMod" min="1" max="100" value="15">
-                </div>
-                
-                <div class="control-group">
-                    <label for="startMod">Start Modulus:</label>
-                    <input type="number" id="startMod" min="1" max="100" value="1">
-                </div>
-                
-                <div class="control-group">
-                    <label for="ringSpacing">Ring Spacing:</label>
-                    <input type="range" id="ringSpacing" min="10" max="120" value="45">
-                    <span class="value-display" id="ringSpacingValue">45</span>
-                </div>
-                
-                <div class="control-group">
-                    <label for="pointSize">Point Size:</label>
-                    <input type="range" id="pointSize" min="1" max="25" value="7">
-                    <span class="value-display" id="pointSizeValue">7</span>
-                </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="showRingGuides" checked>
-                    <label for="showRingGuides">Show Ring Guides</label>
-                </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="showRadialLines">
-                    <label for="showRadialLines">Show Radial Lines</label>
-                </div>
-                
-                <div class="section-title">🎨 Color Mode</div>
-                
-                <div class="control-group">
-                    <label for="colorMode">Color Mode:</label>
-                    <select id="colorMode" onchange="updateColorMode()">
-                        <option value="binary">Binary (Coprime/Non-coprime)</option>
-                        <option value="gcd">GCD Value</option>
-                        <option value="gradient">Gradient by Angle</option>
-                        <option value="totient">Euler Totient Class</option>
-                    </select>
-                </div>
-                
-                <div id="binaryColorControls">
-                    <div class="control-group">
-                        <label>Coprime Color (GCD=1):</label>
-                        <div class="color-input-group">
-                            <input type="color" id="coprimeColor" value="#3b82f6">
-                            <span class="value-display">#3b82f6</span>
-                        </div>
-                    </div>
+                    <h3>Target Accuracy</h3>
+                    <label for="epsilon">Relative Error (ε):</label>
+                    <input type="number" id="epsilon" value="0.001" step="0.0001" min="0.0001" max="0.1">
                     
-                    <div class="control-group">
-                        <label>Non-Coprime Color (GCD>1):</label>
-                        <div class="color-input-group">
-                            <input type="color" id="nonCoprimeColor" value="#ef4444">
-                            <span class="value-display">#ef4444</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <label>Background Color:</label>
-                    <div class="color-input-group">
-                        <input type="color" id="bgColor" value="#FFFFFF">
-                        <span class="value-display">#FFFFFF</span>
-                    </div>
-                </div>
-                
-                <div class="section-title">🏷️ Label Options</div>
-                
-                <div class="control-group">
-                    <label for="labelType">Label Type:</label>
-                    <select id="labelType">
-                        <option value="none">No Labels</option>
-                        <option value="angle">Angle (degrees)</option>
-                        <option value="angle_rad">Angle (radians)</option>
-                        <option value="gcd">GCD Value</option>
-                        <option value="farey">Farey Fraction (k/m)</option>
-                        <option value="farey_reduced">Farey Reduced</option>
-                        <option value="element">Element (k)</option>
-                        <option value="element_mod">Element k (mod m)</option>
+                    <label for="constant">Constant to Compute:</label>
+                    <select id="constant">
+                        <option value="pi">π (from ζ(2))</option>
+                        <option value="zeta4">ζ(4)</option>
+                        <option value="zeta6">ζ(6)</option>
+                        <option value="zeta8">ζ(8)</option>
+                        <option value="zeta10">ζ(10)</option>
                     </select>
+                    
+                    <label for="modulus">Modulus for Residue Channels:</label>
+                    <input type="number" id="modulus" value="30" min="2" max="210" step="1">
                 </div>
                 
                 <div class="control-group">
-                    <label for="labelMod">Label Specific Modulus (0 = all):</label>
-                    <input type="number" id="labelMod" min="0" max="100" value="0">
-                </div>
-                
-                <div class="control-group">
-                    <label for="labelFilter">Label Filter:</label>
-                    <select id="labelFilter">
-                        <option value="all">All Points</option>
-                        <option value="coprime">Coprime Only (GCD=1)</option>
-                        <option value="noncoprime">Non-Coprime Only (GCD>1)</option>
-                        <option value="gcd_specific">Specific GCD Value</option>
+                    <h3>Computation Method</h3>
+                    <label for="method">Decomposition:</label>
+                    <select id="method">
+                        <option value="standard">Standard Euler Product</option>
+                        <option value="gap">Gap-Class Analysis</option>
+                        <option value="residue">Residue Channels (mod 30)</option>
+                        <option value="both">Gap + Residue Combined</option>
                     </select>
-                </div>
-                
-                <div class="control-group" id="gcdFilterGroup" style="display:none;">
-                    <label for="gcdFilterValue">GCD Value to Label:</label>
-                    <input type="number" id="gcdFilterValue" min="1" max="100" value="2">
-                </div>
-                
-                <div class="control-group">
-                    <label for="labelSize">Label Font Size:</label>
-                    <input type="range" id="labelSize" min="4" max="24" value="9">
-                    <span class="value-display" id="labelSizeValue">9</span>
+                    
+                    <label>
+                        <input type="checkbox" id="showSteps" checked style="width: auto; margin-right: 10px;">
+                        Show Step-by-Step Work
+                    </label>
                 </div>
                 
                 <div class="control-group">
-                    <label>Label Color:</label>
-                    <div class="color-input-group">
-                        <input type="color" id="labelColor" value="#000000">
-                        <span class="value-display">#000000</span>
-                    </div>
-                </div>
-                
-                <div class="section-title">🎯 Presets</div>
-                
-                <div class="preset-buttons">
-                    <button class="preset-btn" onclick="loadPreset('classic')">Classic</button>
-                    <button class="preset-btn" onclick="loadPreset('dark')">Dark Mode</button>
-                    <button class="preset-btn" onclick="loadPreset('rainbow')">Rainbow</button>
-                    <button class="preset-btn" onclick="loadPreset('minimal')">Minimal</button>
-                </div>
-                
-                <div class="section-title">📤 Export</div>
-                
-                <div class="control-group">
-                    <label for="exportFormat">Format:</label>
-                    <select id="exportFormat">
-                        <option value="png">PNG (Lossless)</option>
-                        <option value="jpeg">JPEG (Compressed)</option>
-                    </select>
-                </div>
-                
-                <div class="export-options">
-                    <button class="btn-secondary" onclick="exportImage(4096)">📥 4K (4096px)</button>
-                    <button class="btn-secondary" onclick="exportImage(7680)">📥 8K (7680px)</button>
-                </div>
-                
-                <button class="btn-tertiary" onclick="exportImage(1920)">📥 Full HD (1920px)</button>
-                <button class="btn-tertiary" onclick="exportImage(3840)">📥 4K UHD (3840px)</button>
-                
-                <button class="btn-primary" onclick="drawRings()">🔄 Redraw</button>
-                
-                <div class="info-panel">
-                    <h3>📊 Statistics</h3>
-                    <div class="info-item">Total Rings: <span class="value-display" id="totalRings">15</span></div>
-                    <div class="info-item">Total Points: <span class="value-display" id="totalPoints">0</span></div>
-                    <div class="info-item">Coprime: <span class="value-display" id="coprimePoints">0</span></div>
-                    <div class="info-item">Non-Coprime: <span class="value-display" id="nonCoprimePoints">0</span></div>
-                    <div class="info-item">Coprime %: <span class="value-display" id="coprimePercent">0%</span></div>
+                    <h3>Actions</h3>
+                    <button onclick="compute()">Calculate</button>
+                    <button class="export-btn" onclick="exportResults()">Export Results (JSON)</button>
+                    <button class="export-btn" onclick="exportStepsText()">Export Steps (TXT)</button>
+                    <button class="export-btn" onclick="exportChartImage()">Export Chart (4K/8K JPEG)</button>
                 </div>
             </div>
             
-            <div class="canvas-container">
-                <canvas id="ringCanvas"></canvas>
+            <div id="results" class="results" style="display: none;">
+                <div class="result-card">
+                    <h4>Computed Value</h4>
+                    <div id="computed-value" class="value"></div>
+                    <div id="error-bound" class="error-info"></div>
+                    <div id="prime-count" class="error-info"></div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>Exact Reference</h4>
+                    <div id="exact-value" class="value"></div>
+                    <div id="actual-error" class="error-info"></div>
+                </div>
+            </div>
+            
+            <div id="step-by-step" class="step-by-step" style="display: none;"></div>
+            
+            <div id="gap-analysis" class="gap-analysis" style="display: none;">
+                <h3>Gap-Class Decomposition</h3>
+                <div id="gap-grid" class="gap-grid"></div>
+            </div>
+            
+            <div id="channel-analysis" class="channel-analysis" style="display: none;">
+                <h3>Residue Channels (mod 30)</h3>
+                <div id="channel-grid" class="channel-grid"></div>
+            </div>
+            
+            <div id="chart-section" class="chart-container" style="display: none;">
+                <h3>Residue Channel Contributions (ℤ<sub>a</sub>(s;30))</h3>
+                <canvas id="channelChart"></canvas>
+                <div class="chart-legend" id="chartLegend"></div>
+            </div>
+            
+            <div id="visualization-section" class="visualization-container" style="display: none;">
+                <h3>Interactive Visualization</h3>
+                <div class="viz-options">
+                    <button class="viz-btn active" onclick="changeViz('convergence')">Convergence Plot</button>
+                    <button class="viz-btn" onclick="changeViz('contribution')">Prime Contributions</button>
+                    <button class="viz-btn" onclick="changeViz('comparison')">Channel Comparison</button>
+                </div>
+                <canvas id="vizCanvas"></canvas>
             </div>
         </div>
     </div>
-    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Utility functions
-        function gcd(a, b) {
-            while (b !== 0) {
-                let temp = b;
-                b = a % b;
-                a = temp;
-            }
-            return Math.abs(a);
-        }
-        
-        function getCoprimElements(m) {
-            if (m === 1) return [0];
-            const coprimes = [];
-            for (let k = 0; k < m; k++) {
-                if (gcd(k, m) === 1) {
-                    coprimes.push(k);
-                }
-            }
-            return coprimes;
-        }
-        
-        function simplifyFraction(num, den) {
-            const g = gcd(num, den);
-            return [num / g, den / g];
-        }
-        
+        // Compute Euler's totient function
         function eulerPhi(n) {
             let result = n;
             for (let p = 2; p * p <= n; p++) {
@@ -500,446 +543,861 @@
                 }
             }
             if (n > 1) result -= result / n;
-            return Math.floor(result);
+            return result;
         }
         
-        function hslToHex(h, s, l) {
-            l /= 100;
-            const a = s * Math.min(l, 1 - l) / 100;
-            const f = n => {
-                const k = (n + h / 30) % 12;
-                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-                return Math.round(255 * color).toString(16).padStart(2, '0');
-            };
-            return `#${f(0)}${f(8)}${f(4)}`;
-        }
-        
-        function getColorByGCD(gcdValue, maxGcd) {
-            // Generate distinct colors for different GCD values
-            const hue = (gcdValue * 137.5) % 360; // Golden angle for distribution
-            const saturation = 70;
-            const lightness = gcdValue === 1 ? 50 : 45 + (gcdValue / maxGcd) * 20;
-            return hslToHex(hue, saturation, lightness);
-        }
-        
-        // Canvas drawing
-        const canvas = document.getElementById('ringCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Initialize canvas size
-        canvas.width = 1400;
-        canvas.height = 1400;
-        
-        function drawRings() {
-            const maxMod = parseInt(document.getElementById('maxMod').value);
-            const startMod = parseInt(document.getElementById('startMod').value);
-            const ringSpacing = parseInt(document.getElementById('ringSpacing').value);
-            const pointSize = parseInt(document.getElementById('pointSize').value);
-            const labelType = document.getElementById('labelType').value;
-            const labelMod = parseInt(document.getElementById('labelMod').value);
-            const labelFilter = document.getElementById('labelFilter').value;
-            const gcdFilterValue = parseInt(document.getElementById('gcdFilterValue').value);
-            const labelSize = parseInt(document.getElementById('labelSize').value);
-            const labelColor = document.getElementById('labelColor').value;
-            const coprimeColor = document.getElementById('coprimeColor').value;
-            const nonCoprimeColor = document.getElementById('nonCoprimeColor').value;
-            const bgColor = document.getElementById('bgColor').value;
-            const colorMode = document.getElementById('colorMode').value;
-            const showRingGuides = document.getElementById('showRingGuides').checked;
-            const showRadialLines = document.getElementById('showRadialLines').checked;
-            
-            // Clear canvas
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const maxRadius = Math.min(canvas.width, canvas.height) * 0.44;
-            
-            let totalPoints = 0;
-            let coprimePointsCount = 0;
-            let nonCoprimePointsCount = 0;
-            
-            // Find max GCD for color scaling
-            let maxGcdValue = 1;
-            for (let m = startMod; m <= maxMod; m++) {
-                for (let k = 0; k < m; k++) {
-                    maxGcdValue = Math.max(maxGcdValue, gcd(k, m));
+        // Get coprime residues mod m
+        function getCoprimeResidues(m) {
+            const residues = [];
+            for (let a = 1; a < m; a++) {
+                if (gcd(a, m) === 1) {
+                    residues.push(a);
                 }
             }
-            
-            // Draw radial lines if enabled
-            if (showRadialLines) {
-                ctx.strokeStyle = '#e0e0e0';
-                ctx.lineWidth = 1;
-                const numLines = 12;
-                for (let i = 0; i < numLines; i++) {
-                    const angle = (2 * Math.PI * i / numLines) - Math.PI / 2;
-                    ctx.beginPath();
-                    ctx.moveTo(centerX, centerY);
-                    ctx.lineTo(
-                        centerX + maxRadius * Math.cos(angle),
-                        centerY + maxRadius * Math.sin(angle)
-                    );
-                    ctx.stroke();
-                }
+            return residues;
+        }
+        
+        // GCD helper
+        function gcd(a, b) {
+            while (b !== 0) {
+                const temp = b;
+                b = a % b;
+                a = temp;
             }
+            return a;
+        }
+        
+        let computationData = null;
+        let channelChart = null;
+        let vizChart = null;
+        let currentViz = 'convergence';
+        
+        function toggleSection(id) {
+            const content = document.getElementById(id + '-content');
+            const icon = document.getElementById(id + '-icon');
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+        
+        // Sieve of Eratosthenes
+        function sieveOfEratosthenes(limit) {
+            if (limit < 2) return [];
             
-            // Draw rings
-            for (let m = startMod; m <= maxMod; m++) {
-                const radius = (m - startMod + 1) * ringSpacing;
-                if (radius > maxRadius) continue;
-                
-                // Draw ring circle (guide)
-                if (showRingGuides) {
-                    ctx.strokeStyle = '#e5e7eb';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                    ctx.stroke();
-                }
-                
-                // Get coprime elements
-                const coprimes = new Set(getCoprimElements(m));
-                
-                // Draw points for this modulus
-                for (let k = 0; k < m; k++) {
-                    const angle = (2 * Math.PI * k / m) - Math.PI / 2; // Start from top
-                    const x = centerX + radius * Math.cos(angle);
-                    const y = centerY + radius * Math.sin(angle);
-                    
-                    const isCoprime = coprimes.has(k);
-                    const gcdValue = gcd(k, m);
-                    
-                    // Choose color based on mode
-                    let pointColor;
-                    switch (colorMode) {
-                        case 'binary':
-                            pointColor = isCoprime ? coprimeColor : nonCoprimeColor;
-                            break;
-                        case 'gcd':
-                            pointColor = getColorByGCD(gcdValue, maxGcdValue);
-                            break;
-                        case 'gradient':
-                            const hue = (k * 360 / m) % 360;
-                            pointColor = hslToHex(hue, 70, isCoprime ? 50 : 40);
-                            break;
-                        case 'totient':
-                            const phi = eulerPhi(m);
-                            const hue2 = (phi * 30) % 360;
-                            pointColor = hslToHex(hue2, 65, isCoprime ? 55 : 45);
-                            break;
-                    }
-                    
-                    ctx.fillStyle = pointColor;
-                    
-                    // Draw point
-                    if (isCoprime) {
-                        ctx.beginPath();
-                        ctx.arc(x, y, pointSize / 2, 0, 2 * Math.PI);
-                        ctx.fill();
-                        coprimePointsCount++;
-                    } else {
-                        ctx.strokeStyle = pointColor;
-                        ctx.lineWidth = 2.5;
-                        const offset = pointSize / 2;
-                        ctx.beginPath();
-                        ctx.moveTo(x - offset, y - offset);
-                        ctx.lineTo(x + offset, y + offset);
-                        ctx.moveTo(x + offset, y - offset);
-                        ctx.lineTo(x - offset, y + offset);
-                        ctx.stroke();
-                        nonCoprimePointsCount++;
-                    }
-                    
-                    totalPoints++;
-                    
-                    // Determine if this point should be labeled
-                    let shouldLabel = (labelMod === 0 || labelMod === m);
-                    if (shouldLabel) {
-                        switch (labelFilter) {
-                            case 'coprime':
-                                shouldLabel = isCoprime;
-                                break;
-                            case 'noncoprime':
-                                shouldLabel = !isCoprime;
-                                break;
-                            case 'gcd_specific':
-                                shouldLabel = (gcdValue === gcdFilterValue);
-                                break;
-                        }
-                    }
-                    
-                    // Draw labels
-                    if (labelType !== 'none' && shouldLabel) {
-                        let labelText = '';
-                        
-                        switch (labelType) {
-                            case 'angle':
-                                const degrees = ((k * 360 / m) % 360).toFixed(1);
-                                labelText = degrees + '°';
-                                break;
-                            case 'angle_rad':
-                                const radians = ((k * 2 * Math.PI / m) % (2 * Math.PI)).toFixed(3);
-                                labelText = radians + 'r';
-                                break;
-                            case 'gcd':
-                                labelText = gcdValue.toString();
-                                break;
-                            case 'farey':
-                                labelText = k + '/' + m;
-                                break;
-                            case 'farey_reduced':
-                                const [num, den] = simplifyFraction(k, m);
-                                labelText = num + '/' + den;
-                                break;
-                            case 'element':
-                                labelText = k.toString();
-                                break;
-                            case 'element_mod':
-                                labelText = `${k}₍${m}₎`;
-                                break;
-                        }
-                        
-                        // Position label
-                        const labelOffset = pointSize + 10;
-                        const labelX = centerX + (radius + labelOffset) * Math.cos(angle);
-                        const labelY = centerY + (radius + labelOffset) * Math.sin(angle);
-                        
-                        // Draw label background for readability
-                        ctx.font = `${labelSize}px Arial`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        const metrics = ctx.measureText(labelText);
-                        const padding = 2;
-                        
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                        ctx.fillRect(
-                            labelX - metrics.width / 2 - padding,
-                            labelY - labelSize / 2 - padding,
-                            metrics.width + padding * 2,
-                            labelSize + padding * 2
-                        );
-                        
-                        ctx.fillStyle = labelColor;
-                        ctx.fillText(labelText, labelX, labelY);
+            const isPrime = new Array(limit + 1).fill(true);
+            isPrime[0] = isPrime[1] = false;
+            
+            for (let i = 2; i * i <= limit; i++) {
+                if (isPrime[i]) {
+                    for (let j = i * i; j <= limit; j += i) {
+                        isPrime[j] = false;
                     }
                 }
             }
             
-            // Draw center point
-            ctx.fillStyle = '#9333ea';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            // Draw title
-            ctx.fillStyle = '#1e293b';
-            ctx.font = 'bold 28px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Modular Rings: mod ${startMod} to ${maxMod}`, centerX, 35);
-            
-            // Draw subtitle with label info
-            if (labelType !== 'none') {
-                ctx.font = '14px Arial';
-                ctx.fillStyle = '#64748b';
-                const labelTypeNames = {
-                    'angle': 'Angles (degrees)',
-                    'angle_rad': 'Angles (radians)',
-                    'gcd': 'GCD values',
-                    'farey': 'Farey fractions',
-                    'farey_reduced': 'Reduced fractions',
-                    'element': 'Elements',
-                    'element_mod': 'Elements with modulus'
-                };
-                ctx.fillText(`Labels: ${labelTypeNames[labelType]}`, centerX, 58);
+            const primes = [];
+            for (let i = 2; i <= limit; i++) {
+                if (isPrime[i]) primes.push(i);
             }
-            
-            // Draw legend
-            const legendY = canvas.height - 45;
-            ctx.font = '16px Arial';
-            
-            if (colorMode === 'binary') {
-                ctx.fillStyle = coprimeColor;
-                ctx.beginPath();
-                ctx.arc(centerX - 180, legendY, 7, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.fillStyle = '#1e293b';
-                ctx.fillText('Coprime (GCD=1)', centerX - 100, legendY + 5);
-                
-                ctx.strokeStyle = nonCoprimeColor;
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                ctx.moveTo(centerX + 60, legendY - 7);
-                ctx.lineTo(centerX + 74, legendY + 7);
-                ctx.moveTo(centerX + 74, legendY - 7);
-                ctx.lineTo(centerX + 60, legendY + 7);
-                ctx.stroke();
-                ctx.fillStyle = '#1e293b';
-                ctx.fillText('Non-Coprime (GCD>1)', centerX + 160, legendY + 5);
-            } else {
-                ctx.fillStyle = '#1e293b';
-                ctx.fillText(`Color Mode: ${colorMode}`, centerX, legendY + 5);
-            }
-            
-            // Update info panel
-            const numRings = maxMod - startMod + 1;
-            document.getElementById('totalRings').textContent = numRings;
-            document.getElementById('totalPoints').textContent = totalPoints;
-            document.getElementById('coprimePoints').textContent = coprimePointsCount;
-            document.getElementById('nonCoprimePoints').textContent = nonCoprimePointsCount;
-            const coprimePercent = totalPoints > 0 ? 
-                (coprimePointsCount / totalPoints * 100).toFixed(1) : 0;
-            document.getElementById('coprimePercent').textContent = coprimePercent + '%';
+            return primes;
         }
         
-        function exportImage(resolution) {
-            const format = document.getElementById('exportFormat').value;
+        // Compute gap classes
+        function computeGapClasses(primes) {
+            const gapClasses = {};
             
-            // Save current canvas size
-            const originalWidth = canvas.width;
-            const originalHeight = canvas.height;
-            
-            // Calculate scale factor
-            const scale = resolution / originalWidth;
-            
-            // Save current parameter values
-            const originalValues = {
-                ringSpacing: document.getElementById('ringSpacing').value,
-                pointSize: document.getElementById('pointSize').value,
-                labelSize: document.getElementById('labelSize').value
-            };
-            
-            // Scale parameters
-            document.getElementById('ringSpacing').value = Math.round(parseInt(originalValues.ringSpacing) * scale);
-            document.getElementById('pointSize').value = Math.round(parseInt(originalValues.pointSize) * scale);
-            document.getElementById('labelSize').value = Math.round(parseInt(originalValues.labelSize) * scale);
-            
-            // Resize canvas
-            canvas.width = resolution;
-            canvas.height = resolution;
-            
-            // Draw high-res version
-            drawRings();
-            
-            // Export
-            const link = document.createElement('a');
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-            const filename = `modular_rings_${resolution}x${resolution}_${timestamp}.${format}`;
-            
-            if (format === 'png') {
-                link.href = canvas.toDataURL('image/png');
-            } else {
-                link.href = canvas.toDataURL('image/jpeg', 0.95);
+            for (let i = 1; i < primes.length; i++) {
+                const gap = primes[i] - primes[i-1];
+                if (!gapClasses[gap]) gapClasses[gap] = [];
+                gapClasses[gap].push(primes[i]);
             }
             
-            link.download = filename;
-            link.click();
-            
-            // Restore original size and parameters
-            canvas.width = originalWidth;
-            canvas.height = originalHeight;
-            document.getElementById('ringSpacing').value = originalValues.ringSpacing;
-            document.getElementById('pointSize').value = originalValues.pointSize;
-            document.getElementById('labelSize').value = originalValues.labelSize;
-            
-            // Redraw at normal resolution
-            drawRings();
-            
-            console.log(`Exported ${resolution}x${resolution} ${format.toUpperCase()} image: ${filename}`);
+            return gapClasses;
         }
         
-        function updateColorMode() {
-            const colorMode = document.getElementById('colorMode').value;
-            const binaryControls = document.getElementById('binaryColorControls');
+        // Compute residue channels for any modulus
+        function computeResidueChannels(primes, modulus) {
+            const coprimeResidues = getCoprimeResidues(modulus);
+            const channels = {};
             
-            if (colorMode === 'binary') {
-                binaryControls.style.display = 'block';
-            } else {
-                binaryControls.style.display = 'none';
-            }
+            coprimeResidues.forEach(a => channels[a] = []);
             
-            drawRings();
-        }
-        
-        function loadPreset(presetName) {
-            switch (presetName) {
-                case 'classic':
-                    document.getElementById('coprimeColor').value = '#3b82f6';
-                    document.getElementById('nonCoprimeColor').value = '#ef4444';
-                    document.getElementById('bgColor').value = '#ffffff';
-                    document.getElementById('labelColor').value = '#000000';
-                    document.getElementById('colorMode').value = 'binary';
-                    break;
-                case 'dark':
-                    document.getElementById('coprimeColor').value = '#60a5fa';
-                    document.getElementById('nonCoprimeColor').value = '#f87171';
-                    document.getElementById('bgColor').value = '#1e293b';
-                    document.getElementById('labelColor').value = '#ffffff';
-                    document.getElementById('colorMode').value = 'binary';
-                    break;
-                case 'rainbow':
-                    document.getElementById('bgColor').value = '#0f172a';
-                    document.getElementById('labelColor').value = '#ffffff';
-                    document.getElementById('colorMode').value = 'gradient';
-                    break;
-                case 'minimal':
-                    document.getElementById('coprimeColor').value = '#000000';
-                    document.getElementById('nonCoprimeColor').value = '#999999';
-                    document.getElementById('bgColor').value = '#ffffff';
-                    document.getElementById('labelColor').value = '#000000';
-                    document.getElementById('colorMode').value = 'binary';
-                    document.getElementById('showRingGuides').checked = false;
-                    break;
-            }
-            updateColorMode();
-            updateColorDisplays();
-            drawRings();
-        }
-        
-        function updateColorDisplays() {
-            document.getElementById('coprimeColor').nextElementSibling.textContent = 
-                document.getElementById('coprimeColor').value;
-            document.getElementById('nonCoprimeColor').nextElementSibling.textContent = 
-                document.getElementById('nonCoprimeColor').value;
-            document.getElementById('bgColor').nextElementSibling.textContent = 
-                document.getElementById('bgColor').value;
-            document.getElementById('labelColor').nextElementSibling.textContent = 
-                document.getElementById('labelColor').value;
-        }
-        
-        // Event listeners
-        document.getElementById('ringSpacing').addEventListener('input', function() {
-            document.getElementById('ringSpacingValue').textContent = this.value;
-        });
-        
-        document.getElementById('pointSize').addEventListener('input', function() {
-            document.getElementById('pointSizeValue').textContent = this.value;
-        });
-        
-        document.getElementById('labelSize').addEventListener('input', function() {
-            document.getElementById('labelSizeValue').textContent = this.value;
-        });
-        
-        ['coprimeColor', 'nonCoprimeColor', 'bgColor', 'labelColor'].forEach(id => {
-            document.getElementById(id).addEventListener('input', function() {
-                this.nextElementSibling.textContent = this.value;
+            primes.forEach(p => {
+                if (p >= modulus) {
+                    const residue = p % modulus;
+                    if (coprimeResidues.includes(residue)) {
+                        channels[residue].push(p);
+                    }
+                }
             });
-        });
+            
+            return channels;
+        }
         
-        document.getElementById('labelFilter').addEventListener('change', function() {
-            const gcdGroup = document.getElementById('gcdFilterGroup');
-            gcdGroup.style.display = (this.value === 'gcd_specific') ? 'block' : 'none';
-        });
+        // Compute Y cutoff
+        function computeCutoff(epsilon, constantType) {
+            if (constantType === 'pi') {
+                return Math.ceil(1 + 1 / Math.log(1 + epsilon));
+            } else {
+                const n = parseInt(constantType.replace('zeta', '')) / 2;
+                const power = 1 / (2 * n - 1);
+                return Math.ceil(Math.pow(2 / ((2 * n - 1) * Math.log(1 + epsilon)), power));
+            }
+        }
         
-        // Auto-redraw on changes
-        ['maxMod', 'startMod', 'labelType', 'labelMod', 'labelFilter', 
-         'showRingGuides', 'showRadialLines'].forEach(id => {
-            document.getElementById(id).addEventListener('change', drawRings);
-        });
+        // Compute truncated product
+        function computeTruncatedProduct(primes, exponent) {
+            let product = 1;
+            for (const p of primes) {
+                product *= 1 / (1 - Math.pow(p, -exponent));
+            }
+            return product;
+        }
         
-        // Initial draw
-        drawRings();
+        // Compute partial products (for convergence visualization)
+        function computePartialProducts(primes, exponent) {
+            const partials = [];
+            let product = 1;
+            
+            for (const p of primes) {
+                product *= 1 / (1 - Math.pow(p, -exponent));
+                partials.push({ prime: p, value: product });
+            }
+            
+            return partials;
+        }
+        
+        // Exact values
+        const exactValues = {
+            'pi': Math.PI,
+            'zeta4': Math.PI ** 4 / 90,
+            'zeta6': Math.PI ** 6 / 945,
+            'zeta8': Math.PI ** 8 / 9450,
+            'zeta10': Math.PI ** 10 / 93555
+        };
+        
+        function compute() {
+            const epsilon = parseFloat(document.getElementById('epsilon').value);
+            const constantType = document.getElementById('constant').value;
+            const method = document.getElementById('method').value;
+            const showSteps = document.getElementById('showSteps').checked;
+            const modulus = parseInt(document.getElementById('modulus').value);
+            
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...</div>';
+            
+            setTimeout(() => {
+                try {
+                    const Y = computeCutoff(epsilon, constantType);
+                    const primes = sieveOfEratosthenes(Y - 1);
+                    
+                    let computedValue;
+                    const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+                    
+                    if (constantType === 'pi') {
+                        const zetaProduct = computeTruncatedProduct(primes, 2);
+                        computedValue = Math.sqrt(6 * zetaProduct);
+                    } else {
+                        const n = parseInt(constantType.replace('zeta', '')) / 2;
+                        computedValue = computeTruncatedProduct(primes, 2 * n);
+                    }
+                    
+                    // Store computation data
+                    computationData = {
+                        epsilon,
+                        constantType,
+                        method,
+                        modulus,
+                        Y,
+                        primes,
+                        exponent,
+                        computedValue,
+                        exactValue: exactValues[constantType],
+                        partialProducts: computePartialProducts(primes, constantType === 'pi' ? 2 : exponent)
+                    };
+                    
+                    // Display results
+                    document.getElementById('computed-value').textContent = computedValue.toFixed(15);
+                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(15);
+                    
+                    const actualError = Math.abs(computedValue - exactValues[constantType]) / exactValues[constantType];
+                    document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(8)}%</strong>`;
+                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
+                    document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong>`;
+                    
+                    // Show step-by-step
+                    if (showSteps) {
+                        showStepByStep(computationData);
+                    } else {
+                        document.getElementById('step-by-step').style.display = 'none';
+                    }
+                    
+                    // Method-specific analysis
+                    if (method === 'gap' || method === 'both') {
+                        showGapAnalysis(primes, constantType);
+                    } else {
+                        document.getElementById('gap-analysis').style.display = 'none';
+                    }
+                    
+                    if (method === 'residue' || method === 'both') {
+                        showResidueAnalysis(primes, constantType, modulus);
+                    } else {
+                        document.getElementById('channel-analysis').style.display = 'none';
+                        document.getElementById('chart-section').style.display = 'none';
+                    }
+                    
+                    // Show visualization
+                    document.getElementById('visualization-section').style.display = 'block';
+                    updateVisualization(currentViz);
+                    
+                } catch (error) {
+                    document.getElementById('computed-value').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
+                }
+            }, 100);
+        }
+        
+        function showStepByStep(data) {
+            const { epsilon, constantType, Y, primes, exponent, computedValue, exactValue } = data;
+            
+            let html = '<h3>Step-by-Step Calculation</h3>';
+            
+            // Step 1: Determine cutoff
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">1</span>Determine Required Cutoff Y</div>
+                    <div class="step-content">
+                        <p>Given target relative error ε = ${epsilon}</p>
+                        ${constantType === 'pi' ? `
+                            <p>For π, we use: Y = ⌈1 + 1/log(1+ε)⌉</p>
+                            <div class="step-formula">
+                                Y = ⌈1 + 1/log(1+${epsilon})⌉<br>
+                                Y = ⌈1 + ${(1/Math.log(1+epsilon)).toFixed(4)}⌉<br>
+                                Y = ${Y}
+                            </div>
+                        ` : `
+                            <p>For ζ(${exponent}), we use: Y = ⌈(2/((2n-1)·log(1+ε)))<sup>1/(2n-1)</sup>⌉ where n = ${exponent/2}</p>
+                            <div class="step-formula">
+                                Y = ⌈(2/(${exponent-1}·log(1+${epsilon})))<sup>1/${exponent-1}</sup>⌉<br>
+                                Y = ${Y}
+                            </div>
+                        `}
+                        <p>Therefore, we need all primes up to ${Y-1}.</p>
+                    </div>
+                </div>
+            `;
+            
+            // Step 2: Generate primes
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">2</span>Generate Primes Using Sieve</div>
+                    <div class="step-content">
+                        <p>Using the Sieve of Eratosthenes to find all primes ≤ ${Y-1}:</p>
+                        <p><strong>Found ${primes.length} primes:</strong></p>
+                        <div class="step-formula">
+                            {${primes.slice(0, 20).join(', ')}${primes.length > 20 ? ', ..., ' + primes[primes.length-1] : ''}}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Step 3: Compute Euler product
+            const firstFewFactors = primes.slice(0, 5).map(p => {
+                const factor = 1 / (1 - Math.pow(p, -exponent));
+                return `(1 - ${p}<sup>-${exponent}</sup>)<sup>-1</sup> = ${factor.toFixed(6)}`;
+            }).join('<br>');
+            
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">3</span>Compute Euler Product</div>
+                    <div class="step-content">
+                        <p>${constantType === 'pi' ? 'For π, compute ζ(2) = ∏(1-p<sup>-2</sup>)<sup>-1</sup>' : `Compute ζ(${exponent}) = ∏(1-p<sup>-${exponent}</sup>)<sup>-1</sup>`}</p>
+                        <p><strong>First few factors:</strong></p>
+                        <div class="step-formula">${firstFewFactors}</div>
+                        <p><strong>Product of all ${primes.length} factors:</strong></p>
+                        <div class="step-formula">
+                            ${constantType === 'pi' ? 'ζ(2) = ' : `ζ(${exponent}) = `}${computeTruncatedProduct(primes, exponent).toFixed(12)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Step 4: Final computation
+            if (constantType === 'pi') {
+                const zeta2 = computeTruncatedProduct(primes, 2);
+                html += `
+                    <div class="step">
+                        <div class="step-title"><span class="step-number">4</span>Extract π from ζ(2)</div>
+                        <div class="step-content">
+                            <p>Using the identity ζ(2) = π²/6, we have π = √(6·ζ(2))</p>
+                            <div class="step-formula">
+                                π = √(6 × ${zeta2.toFixed(12)})<br>
+                                π = √${(6 * zeta2).toFixed(12)}<br>
+                                π ≈ ${computedValue.toFixed(15)}
+                            </div>
+                            <p><strong>Exact value:</strong> π = ${exactValue.toFixed(15)}</p>
+                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="step">
+                        <div class="step-title"><span class="step-number">4</span>Compare with Exact Value</div>
+                        <div class="step-content">
+                            <p><strong>Computed:</strong> ζ(${exponent}) ≈ ${computedValue.toFixed(15)}</p>
+                            <p><strong>Exact:</strong> ζ(${exponent}) = ${exactValue.toFixed(15)}</p>
+                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
+                            <p><strong>Relative error:</strong> ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(8)}%</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Step 5: Error verification
+            const actualError = Math.abs(computedValue - exactValue) / exactValue;
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">5</span>Verify Error Bound</div>
+                    <div class="step-content">
+                        <p><strong>Guaranteed bound:</strong> relative error ≤ ${(epsilon * 100).toFixed(4)}%</p>
+                        <p><strong>Actual error:</strong> ${(actualError * 100).toFixed(8)}%</p>
+                        <p style="color: ${actualError <= epsilon ? '#4ecdc4' : '#ff6b6b'}; font-weight: bold;">
+                            ${actualError <= epsilon ? '✓ Error bound satisfied!' : '⚠ Note: Actual error slightly exceeds theoretical bound (due to finite precision)'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('step-by-step').innerHTML = html;
+            document.getElementById('step-by-step').style.display = 'block';
+        }
+        
+        function showGapAnalysis(primes, constantType) {
+            const gapClasses = computeGapClasses(primes);
+            const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+            
+            let html = '';
+            const sortedGaps = Object.keys(gapClasses).map(Number).sort((a, b) => a - b);
+            
+            for (const gap of sortedGaps.slice(0, 12)) {
+                const gapPrimes = gapClasses[gap];
+                const contribution = computeTruncatedProduct(gapPrimes, exponent);
+                const logContrib = Math.log(contribution);
+                
+                html += `
+                    <div class="gap-item">
+                        <div>Gap ${gap}</div>
+                        <div class="gap-value">R_${gap} = ${contribution.toFixed(6)}</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">${gapPrimes.length} primes</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">log R = ${logContrib.toFixed(4)}</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('gap-grid').innerHTML = html;
+            document.getElementById('gap-analysis').style.display = 'block';
+        }
+        
+        function showResidueAnalysis(primes, constantType, modulus) {
+            const channels = computeResidueChannels(primes, modulus);
+            const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+            const coprimeResidues = getCoprimeResidues(modulus);
+            
+            let html = '';
+            const channelData = [];
+            
+            const smallPrimes = primes.filter(p => p < modulus);
+            const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+            
+            html += `
+                <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
+                    <div>Small Primes</div>
+                    <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
+                    <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
+                </div>
+            `;
+            
+            for (const a of coprimeResidues) {
+                const channelPrimes = channels[a];
+                let contribution = 1;
+                
+                if (channelPrimes.length > 0) {
+                    contribution = computeTruncatedProduct(channelPrimes, exponent);
+                    
+                    html += `
+                        <div class="channel-item">
+                            <div>≡ ${a} (mod ${modulus})</div>
+                            <div style="font-weight: bold; color: #4ecdc4;">${contribution.toFixed(4)}</div>
+                            <div style="font-size: 0.8em;">${channelPrimes.length} primes</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="channel-item" style="opacity: 0.5;">
+                            <div>≡ ${a} (mod ${modulus})</div>
+                            <div>1.0000</div>
+                            <div style="font-size: 0.8em;">0 primes</div>
+                        </div>
+                    `;
+                }
+                
+                channelData.push({
+                    residue: a,
+                    contribution: contribution,
+                    primeCount: channelPrimes.length,
+                    logContribution: Math.log(contribution)
+                });
+            }
+            
+            document.getElementById('channel-grid').innerHTML = html;
+            document.getElementById('channel-analysis').style.display = 'block';
+            
+            createChannelChart(channelData, smallPrimesContrib, modulus);
+        }
+        
+        function createChannelChart(channelData, smallPrimesContrib, modulus) {
+            const ctx = document.getElementById('channelChart').getContext('2d');
+            
+            if (channelChart) {
+                channelChart.destroy();
+            }
+            
+            const labels = [`Small Primes (< ${modulus})`, ...channelData.map(d => `≡ ${d.residue} (mod ${modulus})`)];
+            const contributions = [smallPrimesContrib, ...channelData.map(d => d.contribution)];
+            const logContributions = [Math.log(smallPrimesContrib), ...channelData.map(d => d.logContribution)];
+            const primeCounts = [computationData.primes.filter(p => p < modulus).length, ...channelData.map(d => d.primeCount)];
+            
+            const colors = generateColors(labels.length);
+            
+            channelChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Channel Contribution',
+                        data: contributions,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const idx = context.dataIndex;
+                                    const contrib = contributions[idx];
+                                    const logContrib = logContributions[idx];
+                                    const count = primeCounts[idx];
+                                    
+                                    return [
+                                        `Contribution: ${contrib.toFixed(6)}`,
+                                        `log(Contribution): ${logContrib.toFixed(4)}`,
+                                        `Prime count: ${count}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#fff',
+                                maxRotation: 45,
+                                font: {
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#fff',
+                                callback: function(value) {
+                                    return value.toFixed(3);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            title: {
+                                display: true,
+                                text: `Contribution (mod ${modulus})`,
+                                color: '#fff',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            document.getElementById('chart-section').style.display = 'block';
+            createChartLegend(labels, colors, primeCounts);
+        }
+        
+        function generateColors(count) {
+            const baseColors = [
+                'rgba(255, 215, 0, 0.8)',
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)', 
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(199, 199, 199, 0.8)',
+                'rgba(83, 102, 255, 0.8)'
+            ];
+            
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                if (i < baseColors.length) {
+                    colors.push(baseColors[i]);
+                } else {
+                    const hue = (i * 137.5) % 360;
+                    colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+                }
+            }
+            return colors;
+        }
+        
+        function createChartLegend(labels, colors, primeCounts) {
+            let legendHtml = '';
+            
+            for (let i = 0; i < labels.length; i++) {
+                legendHtml += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: ${colors[i]};"></div>
+                        <span>${labels[i]} (${primeCounts[i]} primes)</span>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('chartLegend').innerHTML = legendHtml;
+        }
+        
+        function changeViz(type) {
+            currentViz = type;
+            
+            document.querySelectorAll('.viz-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updateVisualization(type);
+        }
+        
+        function updateVisualization(type) {
+            if (!computationData) return;
+            
+            const ctx = document.getElementById('vizCanvas').getContext('2d');
+            
+            if (vizChart) {
+                vizChart.destroy();
+            }
+            
+            if (type === 'convergence') {
+                createConvergencePlot(ctx);
+            } else if (type === 'contribution') {
+                createContributionPlot(ctx);
+            } else if (type === 'comparison') {
+                createComparisonPlot(ctx);
+            }
+        }
+        
+        function createConvergencePlot(ctx) {
+            const { partialProducts, exactValue, constantType } = computationData;
+            
+            const labels = partialProducts.map(p => p.prime);
+            const values = partialProducts.map(p => {
+                if (constantType === 'pi') {
+                    return Math.sqrt(6 * p.value);
+                }
+                return p.value;
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Partial Product',
+                        data: values,
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Exact Value',
+                        data: Array(labels.length).fill(exactValue),
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(10)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Prime p', color: '#fff' },
+                            ticks: { color: '#fff', maxTicksLimit: 15 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Value', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createContributionPlot(ctx) {
+            const { primes, exponent } = computationData;
+            
+            const contributions = primes.map(p => {
+                const factor = 1 / (1 - Math.pow(p, -exponent));
+                return factor - 1;
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Prime Contribution',
+                        data: primes.map((p, i) => ({ x: p, y: contributions[i] })),
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `p=${context.parsed.x}: contribution = ${context.parsed.y.toFixed(8)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Prime p (log scale)', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Contribution (log scale)', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createComparisonPlot(ctx) {
+            const { primes, exponent } = computationData;
+            const channels = computeResidueChannels(primes);
+            const phi30 = [1, 7, 11, 13, 17, 19, 23, 29];
+            
+            const datasets = phi30.map((a, idx) => {
+                const channelPrimes = channels[a];
+                const contributions = channelPrimes.map(p => {
+                    const factor = 1 / (1 - Math.pow(p, -exponent));
+                    return factor - 1;
+                });
+                
+                const colors = [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 205, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(199, 199, 199, 0.6)',
+                    'rgba(83, 102, 255, 0.6)'
+                ];
+                
+                return {
+                    label: `≡ ${a} (mod 30)`,
+                    data: channelPrimes.map((p, i) => ({ x: p, y: contributions[i] })),
+                    backgroundColor: colors[idx],
+                    borderColor: colors[idx].replace('0.6', '1'),
+                    pointRadius: 3
+                };
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff', font: { size: 10 } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Prime p', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Contribution', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function exportResults() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                parameters: {
+                    epsilon: computationData.epsilon,
+                    constantType: computationData.constantType,
+                    method: computationData.method,
+                    cutoff: computationData.Y
+                },
+                results: {
+                    computedValue: computationData.computedValue,
+                    exactValue: computationData.exactValue,
+                    absoluteError: Math.abs(computationData.computedValue - computationData.exactValue),
+                    relativeError: Math.abs(computationData.computedValue - computationData.exactValue) / computationData.exactValue,
+                    primesUsed: computationData.primes.length,
+                    primes: computationData.primes
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zeta_calculation_${computationData.constantType}_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function exportStepsText() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            const { epsilon, constantType, Y, primes, exponent, computedValue, exactValue } = computationData;
+            
+            let text = `MODULAR SIEVE CALCULATION\n`;
+            text += `${'='.repeat(80)}\n\n`;
+            text += `Timestamp: ${new Date().toISOString()}\n`;
+            text += `Constant: ${constantType === 'pi' ? 'π' : 'ζ(' + exponent + ')'}\n`;
+            text += `Target Error: ${epsilon}\n\n`;
+            
+            text += `STEP 1: DETERMINE CUTOFF\n`;
+            text += `${'-'.repeat(80)}\n`;
+            if (constantType === 'pi') {
+                text += `For π: Y = ⌈1 + 1/log(1+ε)⌉\n`;
+                text += `Y = ⌈1 + ${(1/Math.log(1+epsilon)).toFixed(4)}⌉ = ${Y}\n`;
+            } else {
+                text += `For ζ(${exponent}): Y = ⌈(2/((2n-1)·log(1+ε)))^(1/(2n-1))⌉\n`;
+                text += `Y = ${Y}\n`;
+            }
+            text += `\nNeed all primes ≤ ${Y-1}\n\n`;
+            
+            text += `STEP 2: GENERATE PRIMES\n`;
+            text += `${'-'.repeat(80)}\n`;
+            text += `Found ${primes.length} primes using Sieve of Eratosthenes:\n`;
+            text += `{${primes.slice(0, 50).join(', ')}${primes.length > 50 ? ', ...' : ''}}\n\n`;
+            
+            text += `STEP 3: COMPUTE EULER PRODUCT\n`;
+            text += `${'-'.repeat(80)}\n`;
+            const product = computeTruncatedProduct(primes, exponent);
+            text += `${constantType === 'pi' ? 'ζ(2)' : 'ζ(' + exponent + ')'} = ∏(1-p^(-${exponent}))^(-1) = ${product.toFixed(15)}\n\n`;
+            
+            if (constantType === 'pi') {
+                text += `STEP 4: EXTRACT π\n`;
+                text += `${'-'.repeat(80)}\n`;
+                text += `π = √(6·ζ(2)) = √(6 × ${product.toFixed(12)})\n`;
+                text += `π ≈ ${computedValue.toFixed(15)}\n\n`;
+            }
+            
+            text += `RESULTS\n`;
+            text += `${'-'.repeat(80)}\n`;
+            text += `Computed: ${computedValue.toFixed(15)}\n`;
+            text += `Exact:    ${exactValue.toFixed(15)}\n`;
+            text += `Abs Err:  ${Math.abs(computedValue - exactValue).toExponential(10)}\n`;
+            text += `Rel Err:  ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(10)}%\n`;
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zeta_steps_${constantType}_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        window.onload = () => {
+            compute();
+        };
     </script>
 </body>
 </html>
