@@ -19,235 +19,17 @@
             padding: 20px;
         }
         
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-            color: #ffd700;
-            margin-left: 5px;
-            font-weight: bold;
-        }
-        
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 300px;
-            background-color: rgba(0, 0, 0, 0.95);
-            color: #fff;
-            text-align: left;
-            border-radius: 8px;
-            padding: 15px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -150px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.9em;
-            line-height: 1.4;
-            border: 1px solid #ffd700;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        
-        .progress-container {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-            display: none;
-        }
-        
-        .progress-bar {
-            height: 25px;
-            background: linear-gradient(90deg, #4ecdc4, #44a08d);
-            width: 0%;
-            transition: width 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-        
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .export-btn {
-            padding: 8px 15px;
-            background: linear-gradient(45deg, #44a08d, #4ecdc4);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        .export-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.4);
-        }
-        
-        .presets {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .preset-btn {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: all 0.3s;
-        }
-        
-        .preset-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-        
-        .formula-display {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-            text-align: center;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-        
-        .comparison-table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        
-        .comparison-table th,
-        .comparison-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .comparison-table th {
-            background: rgba(255, 215, 0, 0.2);
-            font-weight: bold;
-        }
-        
-        .convergence-chart {
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-        }
-        
-        .convergence-chart h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.1em;
-        }
-        
-        .tour-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .tour-content {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 600px;
-            border: 2px solid #ffd700;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-        
-        .tour-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .tour-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .help-icon {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e3c72;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-            transition: transform 0.3s;
-            z-index: 1000;
-        }
-        
-        .help-icon:hover {
-            transform: scale(1.1);
-        }
-        
-        .keyboard-shortcuts {
-            font-size: 0.85em;
-            opacity: 0.7;
-            margin-top: 10px;
-        }
-        
-        .error-message {
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid #ff6b6b;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: none;
-        }
-        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+        }
+        
+        .header {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
         
@@ -265,12 +47,48 @@
             text-align: center;
             font-size: 1.1em;
             opacity: 0.9;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .info-section h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .info-section p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .formula {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
         
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -291,6 +109,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
+            font-size: 0.9em;
         }
         
         input, select, button {
@@ -315,6 +134,15 @@
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(238, 90, 82, 0.3);
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a8a3);
+            margin-top: 10px;
+        }
+        
+        .export-btn:hover {
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
         }
         
         .results {
@@ -353,17 +181,66 @@
             margin-top: 10px;
         }
         
-        .gap-analysis {
-            margin-top: 20px;
+        .step-by-step {
+            margin-top: 30px;
             background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .step-by-step h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            background: rgba(255, 255, 255, 0.08);
             padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #4ecdc4;
+            color: #1e3c72;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .step-content {
+            margin-left: 40px;
+            line-height: 1.6;
+        }
+        
+        .step-formula {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .gap-analysis {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
             border-radius: 15px;
         }
         
         .gap-analysis h3 {
             color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+            margin-bottom: 20px;
         }
         
         .gap-grid {
@@ -386,62 +263,221 @@
         }
         
         .channel-analysis {
-            margin-top: 20px;
+            margin-top: 30px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
-        }
-        
-        .channel-analysis h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.1em;
         }
         
         .channel-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         
         .channel-item {
             background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .channel-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #4ecdc4;
+            transform: translateY(-2px);
+        }
+        
+        .channel-item.expanded {
+            grid-column: 1 / -1;
+            background: rgba(78, 205, 196, 0.1);
+            border-color: #4ecdc4;
+        }
+        
+        .channel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .channel-residue {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        
+        .channel-count {
+            background: rgba(78, 205, 196, 0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
             font-size: 0.9em;
         }
         
-        .loading {
+        .channel-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+        
+        .stat-value {
+            font-size: 1em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .primes-list {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+        
+        .primes-list.visible {
+            display: block;
+        }
+        
+        .primes-list h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .primes-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .primes-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .primes-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .primes-container::-webkit-scrollbar-thumb {
+            background: #4ecdc4;
+            border-radius: 4px;
+        }
+        
+        .expand-indicator {
+            color: #4ecdc4;
+            font-size: 0.8em;
+            margin-top: 8px;
             text-align: center;
-            font-style: italic;
             opacity: 0.7;
         }
         
-        .chart-container {
+        .view-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .view-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .view-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #1e3c72;
+        }
+        
+        .view-btn:hover {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: #4ecdc4;
+        }
+        
+        .distribution-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .distribution-table th {
+            background: rgba(78, 205, 196, 0.3);
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .distribution-table td {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .distribution-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a8a3);
+            transition: width 0.3s ease;
+        }
+        
+        .chart-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
             border-radius: 15px;
         }
         
         .chart-container h3 {
             color: #ffd700;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
-            font-size: 1.1em;
         }
         
         #channelChart {
             width: 100%;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        #convergenceChart {
-            width: 100%;
-            height: 280px;
+            height: 400px;
+            max-height: 400px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -450,325 +486,287 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 12px;
-            font-size: 0.8em;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
         
         .legend-color {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 2px;
+        }
+        
+        .visualization-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .visualization-container h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+        
+        .viz-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .viz-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .viz-btn.active {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: #1e3c72;
+        }
+        
+        .viz-btn:hover {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: #4ecdc4;
+        }
+        
+        #vizCanvas {
+            width: 100%;
+            height: 500px;
+            max-height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.7;
+        }
+        
+        .toggle-section {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.open {
+            max-height: 5000px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Modular Sieve Calculator</h1>
-        <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
-        
-        <div class="error-message" id="error-message"></div>
-        
-        <div class="presets">
-            <button class="preset-btn" onclick="loadPreset('quick')">Quick Demo<br>(ε=0.01)</button>
-            <button class="preset-btn" onclick="loadPreset('accurate')">High Accuracy<br>(ε=0.0001)</button>
-            <button class="preset-btn" onclick="loadPreset('ultra')">Ultra Precise<br>(ε=0.00001)</button>
-            <button class="preset-btn" onclick="loadPreset('compare')">Compare All<br>Methods</button>
-        </div>
-        
-        <div class="keyboard-shortcuts">
-            ⌨️ Shortcuts: <strong>Ctrl+Enter</strong> Calculate | <strong>Ctrl+E</strong> Export | <strong>Ctrl+H</strong> Help
-        </div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <h3>Target Accuracy</h3>
-                <label for="epsilon">Relative Error (ε):</label>
-                <input type="number" id="epsilon" value="0.001" step="0.0001" min="0.0001" max="0.1">
-                
-                <label for="constant">Constant to Compute:</label>
-                <select id="constant">
-                    <option value="pi">π (from ζ(2))</option>
-                    <option value="zeta4">ζ(4)</option>
-                    <option value="zeta6">ζ(6)</option>
-                    <option value="zeta8">ζ(8)</option>
-                    <option value="zeta10">ζ(10)</option>
-                </select>
-            </div>
+        <div class="header">
+            <h1>Modular Sieve Calculator</h1>
+            <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
             
-            <div class="control-group">
-                <h3>Computation Method
-                    <span class="tooltip">ℹ️
-                        <span class="tooltiptext">
-                            <strong>Standard:</strong> Classic Euler product<br>
-                            <strong>Gap-Class:</strong> Group primes by gap sizes (p_{n+1} - p_n)<br>
-                            <strong>Residue Channels:</strong> Group primes by residue mod N<br>
-                            <strong>Combined:</strong> Both decompositions
-                        </span>
-                    </span>
-                </h3>
-                <label for="method">Decomposition:</label>
-                <select id="method">
-                    <option value="standard">Standard Euler Product</option>
-                    <option value="gap">Gap-Class Analysis</option>
-                    <option value="residue">Residue Channels (mod N)</option>
-                    <option value="both">Gap + Residue Combined</option>
-                </select>
-                
-                <label for="modulus">Modulus for Residue Channels:
-                    <span class="tooltip">ℹ️
-                        <span class="tooltiptext">
-                            <strong>Choose any modulus N:</strong><br>
-                            Primes will be grouped by their remainder mod N.<br><br>
-                            <strong>Common choices:</strong><br>
-                            • 6: {1, 5} (all primes > 3)<br>
-                            • 12: {1, 5, 7, 11}<br>
-                            • 30: {1, 7, 11, 13, 17, 19, 23, 29}<br>
-                            • 210: 48 residue classes<br><br>
-                            Larger moduli show finer structure but more channels.
-                        </span>
-                    </span>
-                </label>
-                <input type="number" id="modulus" value="30" min="2" max="210" step="1">
-                
-                <div class="progress-container" id="progress-container">
-                    <div class="progress-bar" id="progress-bar">0%</div>
+            <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('theory')">
+                    <h3>Mathematical Framework</h3>
+                    <span class="toggle-icon" id="theory-icon">▼</span>
                 </div>
-                
-                <button onclick="compute()">Calculate</button>
-                
-                <div class="export-buttons">
-                    <button class="export-btn" onclick="exportCSV()">📊 Export CSV</button>
-                    <button class="export-btn" onclick="exportJSON()">📄 Export JSON</button>
-                    <button class="export-btn" onclick="exportImage()">🖼️ Save Chart</button>
+                <div id="theory-content" class="collapsible-content">
+                    <p>This calculator implements the rigorous framework for computing π and ζ(2n) using Euler product decompositions.</p>
+                    
+                    <p><strong>Key Identity:</strong> For ℜ(s) > 1, the Riemann zeta function has the Euler product:</p>
+                    <div class="formula">ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup></div>
+                    
+                    <p><strong>Recovering π:</strong> Since ζ(2) = π²/6, we have:</p>
+                    <div class="formula">π = √6 · ∏<sub>p prime</sub> (1 - p<sup>-2</sup>)<sup>-1/2</sup></div>
+                    
+                    <p><strong>Two Decomposition Methods:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Gap-Class:</strong> Groups primes by their gaps g(p) = p - p<sub>prev</sub></li>
+                        <li><strong>Residue Channels:</strong> Splits primes by residue classes mod 30, giving 8 independent channels for gcd(a,30)=1</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Error Control:</strong> For target error ε, include primes up to:</p>
+                    <div class="formula">
+                        Y ≈ 1 + 1/ε  (for π)<br>
+                        Y ≈ (2/((2n-1)·ε))<sup>1/(2n-1)</sup>  (for ζ(2n))
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div id="results" class="results" style="display: none;">
-            <div class="result-card">
-                <h4>Computed Value</h4>
-                <div id="computed-value" class="value"></div>
-                <div id="error-bound" class="error-info"></div>
-                <div id="prime-count" class="error-info"></div>
+        <div class="main-content">
+            <div class="controls">
+                <div class="control-group">
+                    <h3>Target Accuracy</h3>
+                    <label for="epsilon">Relative Error (ε):</label>
+                    <input type="number" id="epsilon" value="0.001" step="0.0001" min="0.0001" max="0.1">
+                    
+                    <label for="constant">Constant to Compute:</label>
+                    <select id="constant">
+                        <option value="pi">π (from ζ(2))</option>
+                        <option value="zeta4">ζ(4)</option>
+                        <option value="zeta6">ζ(6)</option>
+                        <option value="zeta8">ζ(8)</option>
+                        <option value="zeta10">ζ(10)</option>
+                    </select>
+                    
+                    <label for="modulus">Modulus for Residue Channels:</label>
+                    <input type="number" id="modulus" value="30" min="2" max="210" step="1">
+                </div>
+                
+                <div class="control-group">
+                    <h3>Computation Method</h3>
+                    <label for="method">Decomposition:</label>
+                    <select id="method">
+                        <option value="standard">Standard Euler Product</option>
+                        <option value="gap">Gap-Class Analysis</option>
+                        <option value="residue">Residue Channels (Custom Mod)</option>
+                        <option value="both">Gap + Residue Combined</option>
+                    </select>
+                    
+                    <label>
+                        <input type="checkbox" id="showSteps" checked style="width: auto; margin-right: 10px;">
+                        Show Step-by-Step Work
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Actions</h3>
+                    <button onclick="compute()">Calculate</button>
+                    <button class="export-btn" onclick="exportResults()">Export Results (JSON)</button>
+                    <button class="export-btn" onclick="exportStepsText()">Export Steps (TXT)</button>
+                    <button class="export-btn" onclick="exportChartImage()">Export Chart (4K/8K JPEG)</button>
+                </div>
             </div>
             
-            <div class="result-card">
-                <h4>Exact Reference</h4>
-                <div id="exact-value" class="value"></div>
-                <div id="actual-error" class="error-info"></div>
+            <div id="results" class="results" style="display: none;">
+                <div class="result-card">
+                    <h4>Computed Value</h4>
+                    <div id="computed-value" class="value"></div>
+                    <div id="error-bound" class="error-info"></div>
+                    <div id="prime-count" class="error-info"></div>
+                </div>
+                
+                <div class="result-card">
+                    <h4>Exact Reference</h4>
+                    <div id="exact-value" class="value"></div>
+                    <div id="actual-error" class="error-info"></div>
+                </div>
             </div>
-        </div>
-        
-        <div id="gap-analysis" class="gap-analysis" style="display: none;">
-            <h3>Gap-Class Decomposition</h3>
-            <div id="gap-grid" class="gap-grid"></div>
-        </div>
-        
-        <div id="channel-analysis" class="channel-analysis" style="display: none;">
-            <h3>Residue Channels (mod 30)</h3>
-            <div id="channel-grid" class="channel-grid"></div>
-        </div>
-        
-        <div id="chart-section" class="chart-container" style="display: none;">
-            <h3>Residue Channel Contributions (ℤ_a(s;30))</h3>
-            <canvas id="channelChart"></canvas>
-            <div class="chart-legend" id="chartLegend"></div>
-        </div>
-        
-        <div id="convergence-section" class="convergence-chart" style="display: none;">
-            <h3>Convergence Analysis</h3>
-            <canvas id="convergenceChart"></canvas>
-        </div>
-        
-        <div id="comparison-section" class="gap-analysis" style="display: none;">
-            <h3>Method Comparison</h3>
-            <table class="comparison-table" id="comparison-table"></table>
-        </div>
-    </div>
-    
-    <div class="help-icon" onclick="showTour()" aria-label="Help and Tutorial">?</div>
-    
-    <div class="tour-overlay" id="tour-overlay">
-        <div class="tour-content">
-            <h2 style="color: #ffd700; margin-bottom: 15px;">Welcome to Modular Sieve Calculator!</h2>
-            <div id="tour-text"></div>
-            <div class="tour-buttons">
-                <button class="tour-btn" style="background: #666; color: white;" onclick="closeTour()">Skip</button>
-                <button class="tour-btn" style="background: #ffd700; color: #1e3c72;" onclick="nextTourStep()">Next</button>
+            
+            <div id="step-by-step" class="step-by-step" style="display: none;"></div>
+            
+            <div id="gap-analysis" class="gap-analysis" style="display: none;">
+                <h3>Gap-Class Decomposition</h3>
+                <div id="gap-grid" class="gap-grid"></div>
+            </div>
+            
+            <div id="channel-analysis" class="channel-analysis" style="display: none;">
+                <h3>Residue Channel Analysis</h3>
+                <div class="view-options">
+                    <button class="view-btn active" onclick="changeChannelView('cards')">Card View</button>
+                    <button class="view-btn" onclick="changeChannelView('table')">Table View</button>
+                    <button class="view-btn" onclick="changeChannelView('distribution')">Distribution Chart</button>
+                    <button class="view-btn" onclick="expandAllChannels()">Expand All</button>
+                    <button class="view-btn" onclick="collapseAllChannels()">Collapse All</button>
+                </div>
+                <div id="channel-content"></div>
+            </div>
+            
+            <div id="chart-section" class="chart-container" style="display: none;">
+                <h3>Residue Channel Contributions (ℤ<sub>a</sub>(s;30))</h3>
+                <canvas id="channelChart"></canvas>
+                <div class="chart-legend" id="chartLegend"></div>
+            </div>
+            
+            <div id="visualization-section" class="visualization-container" style="display: none;">
+                <h3>Interactive Visualization</h3>
+                <div class="viz-options">
+                    <button class="viz-btn active" onclick="changeViz('convergence')">Convergence Plot</button>
+                    <button class="viz-btn" onclick="changeViz('contribution')">Prime Contributions</button>
+                    <button class="viz-btn" onclick="changeViz('comparison')">Channel Comparison</button>
+                </div>
+                <canvas id="vizCanvas"></canvas>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Global state
-        let computationCache = {};
-        let currentResults = null;
-        let tourStep = 0;
-        
-        const tourSteps = [
-            {
-                title: "Mathematical Foundation",
-                text: "This calculator uses the <strong>Euler Product Formula</strong> to compute mathematical constants:<br><br>ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup><br><br>We can compute π and ζ(2n) by truncating this infinite product."
-            },
-            {
-                title: "Accuracy Control",
-                text: "Set your desired <strong>relative error (ε)</strong> to control accuracy. The calculator automatically determines how many primes are needed to guarantee this error bound."
-            },
-            {
-                title: "Decomposition Methods",
-                text: "<strong>Gap-Class:</strong> Groups primes by their spacing<br><strong>Residue Channels:</strong> Groups primes by their remainder mod 30<br><br>These reveal hidden structure in prime distribution!"
-            },
-            {
-                title: "Export & Analysis",
-                text: "Export your results as CSV or JSON, save charts as images, and compare different methods side-by-side. Use keyboard shortcuts for faster workflow!"
-            }
-        ];
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    compute();
-                } else if (e.key === 'e') {
-                    e.preventDefault();
-                    exportJSON();
-                } else if (e.key === 'h') {
-                    e.preventDefault();
-                    showTour();
+        // Compute Euler's totient function
+        function eulerPhi(n) {
+            let result = n;
+            for (let p = 2; p * p <= n; p++) {
+                if (n % p === 0) {
+                    while (n % p === 0) n /= p;
+                    result -= result / p;
                 }
             }
-        });
-        
-        // Tour functions
-        function showTour() {
-            tourStep = 0;
-            document.getElementById('tour-overlay').style.display = 'flex';
-            updateTourContent();
+            if (n > 1) result -= result / n;
+            return result;
         }
         
-        function closeTour() {
-            document.getElementById('tour-overlay').style.display = 'none';
-        }
-        
-        function nextTourStep() {
-            tourStep++;
-            if (tourStep >= tourSteps.length) {
-                closeTour();
-            } else {
-                updateTourContent();
+        // Get coprime residues mod m
+        function getCoprimeResidues(m) {
+            const residues = [];
+            for (let a = 1; a < m; a++) {
+                if (gcd(a, m) === 1) {
+                    residues.push(a);
+                }
             }
+            return residues;
         }
         
-        function updateTourContent() {
-            const step = tourSteps[tourStep];
-            document.getElementById('tour-text').innerHTML = `
-                <h3 style="color: #4ecdc4; margin-bottom: 10px;">${step.title}</h3>
-                <p style="line-height: 1.6;">${step.text}</p>
-                <p style="margin-top: 15px; opacity: 0.7; font-size: 0.9em;">Step ${tourStep + 1} of ${tourSteps.length}</p>
-            `;
-        }
-        
-        // Preset configurations
-        function loadPreset(type) {
-            const epsilonInput = document.getElementById('epsilon');
-            const methodSelect = document.getElementById('method');
-            
-            switch(type) {
-                case 'quick':
-                    epsilonInput.value = 0.01;
-                    methodSelect.value = 'standard';
-                    break;
-                case 'accurate':
-                    epsilonInput.value = 0.0001;
-                    methodSelect.value = 'residue';
-                    break;
-                case 'ultra':
-                    epsilonInput.value = 0.00001;
-                    methodSelect.value = 'both';
-                    break;
-                case 'compare':
-                    epsilonInput.value = 0.001;
-                    compareAllMethods();
-                    return;
+        // GCD helper
+        function gcd(a, b) {
+            while (b !== 0) {
+                const temp = b;
+                b = a % b;
+                a = temp;
             }
-            compute();
+            return a;
         }
         
-        // Input validation
-        function validateInputs() {
-            const epsilon = parseFloat(document.getElementById('epsilon').value);
-            const errors = [];
-            
-            if (isNaN(epsilon) || epsilon <= 0) {
-                errors.push('Epsilon must be a positive number');
-            }
-            if (epsilon > 0.1) {
-                errors.push('Epsilon too large (max 0.1) - results may be inaccurate');
-            }
-            if (epsilon < 0.00001) {
-                errors.push('Epsilon too small (min 0.00001) - computation may take very long');
-            }
-            
-            if (errors.length > 0) {
-                showError(errors.join('<br>'));
-                return false;
-            }
-            
-            hideError();
-            return true;
+        let computationData = null;
+        let channelChart = null;
+        let vizChart = null;
+        let currentViz = 'convergence';
+        let currentChannelView = 'cards';
+        let channelDataGlobal = null;
+        
+        function toggleSection(id) {
+            const content = document.getElementById(id + '-content');
+            const icon = document.getElementById(id + '-icon');
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
         }
         
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.innerHTML = `<strong>⚠️ Error:</strong> ${message}`;
-            errorDiv.style.display = 'block';
-        }
-        
-        function hideError() {
-            document.getElementById('error-message').style.display = 'none';
-        }
-        
-        // Progress indicator
-        function updateProgress(percent, message = '') {
-            const container = document.getElementById('progress-container');
-            const bar = document.getElementById('progress-bar');
-            container.style.display = 'block';
-            bar.style.width = percent + '%';
-            bar.textContent = message || percent + '%';
-        }
-        
-        function hideProgress() {
-            document.getElementById('progress-container').style.display = 'none';
-        }
-        
-        // Update formula display
-        function updateFormulaDisplay() {
-            const constantType = document.getElementById('constant').value;
-            const formulaDiv = document.getElementById('formula-display');
-            
-            let formula = '';
-            if (constantType === 'pi') {
-                formula = 'π = √(6 · ∏<sub>p</sub>(1-p<sup>-2</sup>)<sup>-1</sup>)';
-            } else {
-                const n = parseInt(constantType.replace('zeta', '')) / 2;
-                formula = `ζ(${2*n}) = ∏<sub>p</sub>(1-p<sup>-${2*n}</sup>)<sup>-1</sup>`;
-            }
-            
-            formulaDiv.innerHTML = formula;
-        }
-        
-        // Listen for constant change
-        document.getElementById('constant').addEventListener('change', updateFormulaDisplay);
-        // Sieve of Eratosthenes optimized for our needs
+        // Sieve of Eratosthenes
         function sieveOfEratosthenes(limit) {
             if (limit < 2) return [];
             
@@ -805,24 +803,13 @@
         
         // Compute residue channels for any modulus
         function computeResidueChannels(primes, modulus) {
-            // Get Euler's totient function φ(n) - coprime residues
-            const coprimeResidues = [];
-            for (let a = 1; a < modulus; a++) {
-                if (gcd(a, modulus) === 1) {
-                    coprimeResidues.push(a);
-                }
-            }
-            
+            const coprimeResidues = getCoprimeResidues(modulus);
             const channels = {};
+            
             coprimeResidues.forEach(a => channels[a] = []);
             
-            // Collect primes that divide the modulus
-            const smallPrimes = [];
-            
             primes.forEach(p => {
-                if (p < modulus && modulus % p === 0) {
-                    smallPrimes.push(p);
-                } else if (p >= modulus || modulus % p !== 0) {
+                if (p >= modulus) {
                     const residue = p % modulus;
                     if (coprimeResidues.includes(residue)) {
                         channels[residue].push(p);
@@ -830,20 +817,10 @@
                 }
             });
             
-            return { channels, coprimeResidues, smallPrimes };
+            return channels;
         }
         
-        // Greatest common divisor
-        function gcd(a, b) {
-            while (b !== 0) {
-                const temp = b;
-                b = a % b;
-                a = temp;
-            }
-            return a;
-        }
-        
-        // Compute Y cutoff for given epsilon and constant type
+        // Compute Y cutoff
         function computeCutoff(epsilon, constantType) {
             if (constantType === 'pi') {
                 return Math.ceil(1 + 1 / Math.log(1 + epsilon));
@@ -863,7 +840,20 @@
             return product;
         }
         
-        // Exact values for reference
+        // Compute partial products (for convergence visualization)
+        function computePartialProducts(primes, exponent) {
+            const partials = [];
+            let product = 1;
+            
+            for (const p of primes) {
+                product *= 1 / (1 - Math.pow(p, -exponent));
+                partials.push({ prime: p, value: product });
+            }
+            
+            return partials;
+        }
+        
+        // Exact values
         const exactValues = {
             'pi': Math.PI,
             'zeta4': Math.PI ** 4 / 90,
@@ -876,38 +866,57 @@
             const epsilon = parseFloat(document.getElementById('epsilon').value);
             const constantType = document.getElementById('constant').value;
             const method = document.getElementById('method').value;
+            const showSteps = document.getElementById('showSteps').checked;
+            const modulus = parseInt(document.getElementById('modulus').value);
             
-            // Show loading
             document.getElementById('results').style.display = 'block';
             document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...</div>';
             
             setTimeout(() => {
                 try {
-                    // Compute required cutoff
                     const Y = computeCutoff(epsilon, constantType);
                     const primes = sieveOfEratosthenes(Y - 1);
                     
                     let computedValue;
-                    let analysisHtml = '';
+                    const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
                     
                     if (constantType === 'pi') {
-                        // π = √6 * ∏(1-p^-2)^-1/2
                         const zetaProduct = computeTruncatedProduct(primes, 2);
                         computedValue = Math.sqrt(6 * zetaProduct);
                     } else {
-                        // ζ(2n) = ∏(1-p^-2n)^-1
                         const n = parseInt(constantType.replace('zeta', '')) / 2;
                         computedValue = computeTruncatedProduct(primes, 2 * n);
                     }
                     
+                    // Store computation data
+                    computationData = {
+                        epsilon,
+                        constantType,
+                        method,
+                        modulus,
+                        Y,
+                        primes,
+                        exponent,
+                        computedValue,
+                        exactValue: exactValues[constantType],
+                        partialProducts: computePartialProducts(primes, constantType === 'pi' ? 2 : exponent)
+                    };
+                    
                     // Display results
-                    document.getElementById('computed-value').textContent = computedValue.toFixed(12);
-                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(12);
+                    document.getElementById('computed-value').textContent = computedValue.toFixed(15);
+                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(15);
                     
                     const actualError = Math.abs(computedValue - exactValues[constantType]) / exactValues[constantType];
-                    document.getElementById('actual-error').innerHTML = `Actual relative error: ${(actualError * 100).toFixed(6)}%`;
-                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ ${(epsilon * 100).toFixed(4)}%`;
-                    document.getElementById('prime-count').innerHTML = `Using ${primes.length} primes up to ${Y-1}`;
+                    document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(8)}%</strong>`;
+                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
+                    document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong>`;
+                    
+                    // Show step-by-step
+                    if (showSteps) {
+                        showStepByStep(computationData);
+                    } else {
+                        document.getElementById('step-by-step').style.display = 'none';
+                    }
                     
                     // Method-specific analysis
                     if (method === 'gap' || method === 'both') {
@@ -917,16 +926,136 @@
                     }
                     
                     if (method === 'residue' || method === 'both') {
-                        showResidueAnalysis(primes, constantType);
+                        showResidueAnalysis(primes, constantType, modulus);
                     } else {
                         document.getElementById('channel-analysis').style.display = 'none';
                         document.getElementById('chart-section').style.display = 'none';
                     }
                     
+                    // Show visualization
+                    document.getElementById('visualization-section').style.display = 'block';
+                    updateVisualization(currentViz);
+                    
                 } catch (error) {
                     document.getElementById('computed-value').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
                 }
             }, 100);
+        }
+        
+        function showStepByStep(data) {
+            const { epsilon, constantType, Y, primes, exponent, computedValue, exactValue } = data;
+            
+            let html = '<h3>Step-by-Step Calculation</h3>';
+            
+            // Step 1: Determine cutoff
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">1</span>Determine Required Cutoff Y</div>
+                    <div class="step-content">
+                        <p>Given target relative error ε = ${epsilon}</p>
+                        ${constantType === 'pi' ? `
+                            <p>For π, we use: Y = ⌈1 + 1/log(1+ε)⌉</p>
+                            <div class="step-formula">
+                                Y = ⌈1 + 1/log(1+${epsilon})⌉<br>
+                                Y = ⌈1 + ${(1/Math.log(1+epsilon)).toFixed(4)}⌉<br>
+                                Y = ${Y}
+                            </div>
+                        ` : `
+                            <p>For ζ(${exponent}), we use: Y = ⌈(2/((2n-1)·log(1+ε)))<sup>1/(2n-1)</sup>⌉ where n = ${exponent/2}</p>
+                            <div class="step-formula">
+                                Y = ⌈(2/(${exponent-1}·log(1+${epsilon})))<sup>1/${exponent-1}</sup>⌉<br>
+                                Y = ${Y}
+                            </div>
+                        `}
+                        <p>Therefore, we need all primes up to ${Y-1}.</p>
+                    </div>
+                </div>
+            `;
+            
+            // Step 2: Generate primes
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">2</span>Generate Primes Using Sieve</div>
+                    <div class="step-content">
+                        <p>Using the Sieve of Eratosthenes to find all primes ≤ ${Y-1}:</p>
+                        <p><strong>Found ${primes.length} primes:</strong></p>
+                        <div class="step-formula">
+                            {${primes.slice(0, 20).join(', ')}${primes.length > 20 ? ', ..., ' + primes[primes.length-1] : ''}}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Step 3: Compute Euler product
+            const firstFewFactors = primes.slice(0, 5).map(p => {
+                const factor = 1 / (1 - Math.pow(p, -exponent));
+                return `(1 - ${p}<sup>-${exponent}</sup>)<sup>-1</sup> = ${factor.toFixed(6)}`;
+            }).join('<br>');
+            
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">3</span>Compute Euler Product</div>
+                    <div class="step-content">
+                        <p>${constantType === 'pi' ? 'For π, compute ζ(2) = ∏(1-p<sup>-2</sup>)<sup>-1</sup>' : `Compute ζ(${exponent}) = ∏(1-p<sup>-${exponent}</sup>)<sup>-1</sup>`}</p>
+                        <p><strong>First few factors:</strong></p>
+                        <div class="step-formula">${firstFewFactors}</div>
+                        <p><strong>Product of all ${primes.length} factors:</strong></p>
+                        <div class="step-formula">
+                            ${constantType === 'pi' ? 'ζ(2) = ' : `ζ(${exponent}) = `}${computeTruncatedProduct(primes, exponent).toFixed(12)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Step 4: Final computation
+            if (constantType === 'pi') {
+                const zeta2 = computeTruncatedProduct(primes, 2);
+                html += `
+                    <div class="step">
+                        <div class="step-title"><span class="step-number">4</span>Extract π from ζ(2)</div>
+                        <div class="step-content">
+                            <p>Using the identity ζ(2) = π²/6, we have π = √(6·ζ(2))</p>
+                            <div class="step-formula">
+                                π = √(6 × ${zeta2.toFixed(12)})<br>
+                                π = √${(6 * zeta2).toFixed(12)}<br>
+                                π ≈ ${computedValue.toFixed(15)}
+                            </div>
+                            <p><strong>Exact value:</strong> π = ${exactValue.toFixed(15)}</p>
+                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="step">
+                        <div class="step-title"><span class="step-number">4</span>Compare with Exact Value</div>
+                        <div class="step-content">
+                            <p><strong>Computed:</strong> ζ(${exponent}) ≈ ${computedValue.toFixed(15)}</p>
+                            <p><strong>Exact:</strong> ζ(${exponent}) = ${exactValue.toFixed(15)}</p>
+                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
+                            <p><strong>Relative error:</strong> ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(8)}%</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Step 5: Error verification
+            const actualError = Math.abs(computedValue - exactValue) / exactValue;
+            html += `
+                <div class="step">
+                    <div class="step-title"><span class="step-number">5</span>Verify Error Bound</div>
+                    <div class="step-content">
+                        <p><strong>Guaranteed bound:</strong> relative error ≤ ${(epsilon * 100).toFixed(4)}%</p>
+                        <p><strong>Actual error:</strong> ${(actualError * 100).toFixed(8)}%</p>
+                        <p style="color: ${actualError <= epsilon ? '#4ecdc4' : '#ff6b6b'}; font-weight: bold;">
+                            ${actualError <= epsilon ? '✓ Error bound satisfied!' : '⚠ Note: Actual error slightly exceeds theoretical bound (due to finite precision)'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('step-by-step').innerHTML = html;
+            document.getElementById('step-by-step').style.display = 'block';
         }
         
         function showGapAnalysis(primes, constantType) {
@@ -936,7 +1065,7 @@
             let html = '';
             const sortedGaps = Object.keys(gapClasses).map(Number).sort((a, b) => a - b);
             
-            for (const gap of sortedGaps.slice(0, 12)) { // Show first 12 gap classes
+            for (const gap of sortedGaps.slice(0, 12)) {
                 const gapPrimes = gapClasses[gap];
                 const contribution = computeTruncatedProduct(gapPrimes, exponent);
                 const logContrib = Math.log(contribution);
@@ -955,103 +1084,352 @@
             document.getElementById('gap-analysis').style.display = 'block';
         }
         
-        function showResidueAnalysis(primes, constantType) {
-            const modulus = parseInt(document.getElementById('modulus').value);
-            const { channels, coprimeResidues, smallPrimes } = computeResidueChannels(primes, modulus);
+        function showResidueAnalysis(primes, constantType, modulus) {
+            const channels = computeResidueChannels(primes, modulus);
             const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+            const coprimeResidues = getCoprimeResidues(modulus);
             
-            let html = '';
-            const channelData = [];
+            const smallPrimes = primes.filter(p => p < modulus);
+            const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
             
-            // Handle small primes that divide the modulus
-            if (smallPrimes.length > 0) {
-                const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+            channelDataGlobal = {
+                channels,
+                coprimeResidues,
+                smallPrimes,
+                smallProduct,
+                exponent,
+                modulus,
+                allPrimes: primes
+            };
+            
+            document.getElementById('channel-analysis').style.display = 'block';
+            renderChannelView(currentChannelView);
+            
+            createChannelChart(coprimeResidues, channels, exponent, smallProduct, modulus);
+        }
+        
+        function changeChannelView(viewType) {
+            currentChannelView = viewType;
+            
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(viewType.split(/(?=[A-Z])/).join(' ').toLowerCase())) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            renderChannelView(viewType);
+        }
+        
+        function renderChannelView(viewType) {
+            if (!channelDataGlobal) return;
+            
+            const { channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus } = channelDataGlobal;
+            
+            if (viewType === 'cards') {
+                renderCardView(channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus);
+            } else if (viewType === 'table') {
+                renderTableView(channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus);
+            } else if (viewType === 'distribution') {
+                renderDistributionView(channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus);
+            }
+        }
+        
+        function renderCardView(channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus) {
+            let html = '<div class="channel-grid">';
+            
+            // Small primes card
+            html += `
+                <div class="channel-item" onclick="toggleChannel('small-primes')">
+                    <div class="channel-header">
+                        <div class="channel-residue">Small Primes (< ${modulus})</div>
+                        <div class="channel-count">${smallPrimes.length}</div>
+                    </div>
+                    <div class="channel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Contribution</div>
+                            <div class="stat-value">${smallProduct.toFixed(6)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">log(Contrib)</div>
+                            <div class="stat-value">${Math.log(smallProduct).toFixed(4)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg Prime</div>
+                            <div class="stat-value">${(smallPrimes.reduce((a,b)=>a+b,0)/smallPrimes.length).toFixed(1)}</div>
+                        </div>
+                    </div>
+                    <div class="expand-indicator">Click to view primes</div>
+                    <div class="primes-list" id="primes-small-primes">
+                        <h4>All ${smallPrimes.length} Primes:</h4>
+                        <div class="primes-container">${smallPrimes.join(', ')}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Channel cards
+            for (const a of coprimeResidues) {
+                const channelPrimes = channels[a];
+                const contribution = channelPrimes.length > 0 ? computeTruncatedProduct(channelPrimes, exponent) : 1;
+                const logContrib = Math.log(contribution);
+                const avgPrime = channelPrimes.length > 0 ? channelPrimes.reduce((sum, p) => sum + p, 0) / channelPrimes.length : 0;
+                const minPrime = channelPrimes.length > 0 ? Math.min(...channelPrimes) : 0;
+                const maxPrime = channelPrimes.length > 0 ? Math.max(...channelPrimes) : 0;
+                
                 html += `
-                    <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
-                        <div>Primes dividing ${modulus}</div>
-                        <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
-                        <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
+                    <div class="channel-item" onclick="toggleChannel('${a}')">
+                        <div class="channel-header">
+                            <div class="channel-residue">≡ ${a} (mod ${modulus})</div>
+                            <div class="channel-count">${channelPrimes.length}</div>
+                        </div>
+                        <div class="channel-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Contribution</div>
+                                <div class="stat-value">${contribution.toFixed(6)}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">log(Contrib)</div>
+                                <div class="stat-value">${logContrib.toFixed(4)}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Avg Prime</div>
+                                <div class="stat-value">${avgPrime > 0 ? avgPrime.toFixed(1) : 'N/A'}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Range</div>
+                                <div class="stat-value">${minPrime > 0 ? `${minPrime} - ${maxPrime}` : 'N/A'}</div>
+                            </div>
+                        </div>
+                        ${channelPrimes.length > 0 ? '<div class="expand-indicator">Click to view primes</div>' : ''}
+                        <div class="primes-list" id="primes-${a}">
+                            <h4>All ${channelPrimes.length} Primes in Channel ${a}:</h4>
+                            <div class="primes-container">${channelPrimes.join(', ')}</div>
+                        </div>
                     </div>
                 `;
             }
             
-            // Sort residues for consistent display
-            const sortedResidues = coprimeResidues.sort((a, b) => a - b);
-            
-            for (const a of sortedResidues) {
-                const channelPrimes = channels[a];
-                let contribution = 1;
-                
-                if (channelPrimes.length > 0) {
-                    contribution = computeTruncatedProduct(channelPrimes, exponent);
-                    
-                    html += `
-                        <div class="channel-item">
-                            <div>≡ ${a} (mod ${modulus})</div>
-                            <div style="font-weight: bold; color: #4ecdc4;">${contribution.toFixed(4)}</div>
-                            <div style="font-size: 0.8em;">${channelPrimes.length} primes</div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="channel-item" style="opacity: 0.5;">
-                            <div>≡ ${a} (mod ${modulus})</div>
-                            <div>1.0000</div>
-                            <div style="font-size: 0.8em;">0 primes</div>
-                        </div>
-                    `;
-                }
-                
-                channelData.push({
-                    residue: a,
-                    contribution: contribution,
-                    primeCount: channelPrimes.length,
-                    logContribution: Math.log(contribution)
-                });
-            }
-            
-            document.getElementById('channel-grid').innerHTML = html;
-            document.getElementById('channel-analysis').style.display = 'block';
-            
-            // Update the heading
-            document.querySelector('#channel-analysis h3').textContent = `Residue Channels (mod ${modulus})`;
-            
-            // Create chart
-            const smallProduct = smallPrimes.length > 0 ? computeTruncatedProduct(smallPrimes, exponent) : null;
-            createChannelChart(channelData, smallProduct, modulus, smallPrimes);
+            html += '</div>';
+            document.getElementById('channel-content').innerHTML = html;
         }
         
-        let channelChart = null;
+        function renderTableView(channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus) {
+            let html = '<table class="distribution-table">';
+            html += `
+                <thead>
+                    <tr>
+                        <th>Residue Class</th>
+                        <th>Prime Count</th>
+                        <th>Contribution</th>
+                        <th>log(Contribution)</th>
+                        <th>Avg Prime</th>
+                        <th>Min Prime</th>
+                        <th>Max Prime</th>
+                        <th>% of Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            const totalPrimes = smallPrimes.length + coprimeResidues.reduce((sum, a) => sum + channels[a].length, 0);
+            
+            // Small primes row
+            html += `
+                <tr>
+                    <td><strong>Small (< ${modulus})</strong></td>
+                    <td>${smallPrimes.length}</td>
+                    <td>${smallProduct.toFixed(6)}</td>
+                    <td>${Math.log(smallProduct).toFixed(4)}</td>
+                    <td>${(smallPrimes.reduce((a,b)=>a+b,0)/smallPrimes.length).toFixed(1)}</td>
+                    <td>${Math.min(...smallPrimes)}</td>
+                    <td>${Math.max(...smallPrimes)}</td>
+                    <td>${((smallPrimes.length / totalPrimes) * 100).toFixed(2)}%</td>
+                    <td><button class="view-btn" style="padding: 4px 8px; font-size: 0.8em;" onclick="showPrimesModal('small-primes', ${JSON.stringify(smallPrimes).replace(/"/g, '&quot;')})">View Primes</button></td>
+                </tr>
+            `;
+            
+            // Channel rows
+            for (const a of coprimeResidues) {
+                const channelPrimes = channels[a];
+                const contribution = channelPrimes.length > 0 ? computeTruncatedProduct(channelPrimes, exponent) : 1;
+                const logContrib = Math.log(contribution);
+                const avgPrime = channelPrimes.length > 0 ? channelPrimes.reduce((sum, p) => sum + p, 0) / channelPrimes.length : 0;
+                const minPrime = channelPrimes.length > 0 ? Math.min(...channelPrimes) : 0;
+                const maxPrime = channelPrimes.length > 0 ? Math.max(...channelPrimes) : 0;
+                const percentage = (channelPrimes.length / totalPrimes) * 100;
+                
+                html += `
+                    <tr>
+                        <td><strong>≡ ${a} (mod ${modulus})</strong></td>
+                        <td>${channelPrimes.length}</td>
+                        <td>${contribution.toFixed(6)}</td>
+                        <td>${logContrib.toFixed(4)}</td>
+                        <td>${avgPrime > 0 ? avgPrime.toFixed(1) : 'N/A'}</td>
+                        <td>${minPrime > 0 ? minPrime : 'N/A'}</td>
+                        <td>${maxPrime > 0 ? maxPrime : 'N/A'}</td>
+                        <td>${percentage.toFixed(2)}%</td>
+                        <td>${channelPrimes.length > 0 ? `<button class="view-btn" style="padding: 4px 8px; font-size: 0.8em;" onclick='showPrimesModal("${a}", ${JSON.stringify(channelPrimes)})'>View Primes</button>` : 'N/A'}</td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody></table>';
+            document.getElementById('channel-content').innerHTML = html;
+        }
         
-        function createChannelChart(channelData, smallPrimesContrib, modulus, smallPrimes) {
+        function renderDistributionView(channels, coprimeResidues, smallPrimes, smallProduct, exponent, modulus) {
+            const totalPrimes = smallPrimes.length + coprimeResidues.reduce((sum, a) => sum + channels[a].length, 0);
+            
+            let html = '<div style="margin-top: 20px;">';
+            html += '<h4 style="color: #ffd700; margin-bottom: 15px;">Prime Distribution by Residue Class</h4>';
+            
+            // Small primes
+            const smallPercent = (smallPrimes.length / totalPrimes) * 100;
+            html += `
+                <div style="margin-bottom: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span><strong>Small Primes (< ${modulus})</strong></span>
+                        <span><strong>${smallPrimes.length} primes (${smallPercent.toFixed(2)}%)</strong></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${smallPercent}%;"></div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.9em; opacity: 0.8;">
+                        Contribution: ${smallProduct.toFixed(6)} | log: ${Math.log(smallProduct).toFixed(4)}
+                    </div>
+                </div>
+            `;
+            
+            // Channels
+            for (const a of coprimeResidues) {
+                const channelPrimes = channels[a];
+                const contribution = channelPrimes.length > 0 ? computeTruncatedProduct(channelPrimes, exponent) : 1;
+                const logContrib = Math.log(contribution);
+                const percent = (channelPrimes.length / totalPrimes) * 100;
+                
+                html += `
+                    <div style="margin-bottom: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span><strong>≡ ${a} (mod ${modulus})</strong></span>
+                            <span><strong>${channelPrimes.length} primes (${percent.toFixed(2)}%)</strong></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percent}%;"></div>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.9em; opacity: 0.8;">
+                            Contribution: ${contribution.toFixed(6)} | log: ${logContrib.toFixed(4)}
+                            ${channelPrimes.length > 0 ? ` | <button class="view-btn" style="padding: 2px 8px; font-size: 0.8em;" onclick='showPrimesModal("${a}", ${JSON.stringify(channelPrimes)})'>View Primes</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            document.getElementById('channel-content').innerHTML = html;
+        }
+        
+        function toggleChannel(id) {
+            const primesList = document.getElementById(`primes-${id}`);
+            if (!primesList) return;
+            
+            primesList.classList.toggle('visible');
+            
+            const channelItem = primesList.closest('.channel-item');
+            channelItem.classList.toggle('expanded');
+        }
+        
+        function expandAllChannels() {
+            document.querySelectorAll('.primes-list').forEach(list => {
+                list.classList.add('visible');
+                list.closest('.channel-item').classList.add('expanded');
+            });
+        }
+        
+        function collapseAllChannels() {
+            document.querySelectorAll('.primes-list').forEach(list => {
+                list.classList.remove('visible');
+                list.closest('.channel-item').classList.remove('expanded');
+            });
+        }
+        
+        function showPrimesModal(channelId, primes) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 40px;
+                border-radius: 20px;
+                max-width: 800px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            `;
+            
+            const primesArray = Array.isArray(primes) ? primes : JSON.parse(primes);
+            
+            content.innerHTML = `
+                <h2 style="color: #ffd700; margin-bottom: 20px;">Channel ${channelId} - ${primesArray.length} Primes</h2>
+                <div style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace; line-height: 1.8; margin-bottom: 20px;">
+                    ${primesArray.join(', ')}
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="copyPrimes" style="flex: 1; padding: 12px; background: #4ecdc4; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Copy to Clipboard</button>
+                    <button id="closeModal" style="flex: 1; padding: 12px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Close</button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            document.getElementById('closeModal').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            document.getElementById('copyPrimes').onclick = () => {
+                navigator.clipboard.writeText(primesArray.join(', ')).then(() => {
+                    const btn = document.getElementById('copyPrimes');
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        btn.textContent = 'Copy to Clipboard';
+                    }, 2000);
+                });
+            };
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            };
+        }
+        
+        function createChannelChart(channelData, smallPrimesContrib, modulus) {
             const ctx = document.getElementById('channelChart').getContext('2d');
             
-            // Destroy existing chart if it exists
             if (channelChart) {
                 channelChart.destroy();
             }
             
-            // Prepare data for chart
-            const labels = [];
-            const contributions = [];
-            const logContributions = [];
-            const primeCounts = [];
+            const labels = [`Small Primes (< ${modulus})`, ...channelData.map(d => `≡ ${d.residue} (mod ${modulus})`)];
+            const contributions = [smallPrimesContrib, ...channelData.map(d => d.contribution)];
+            const logContributions = [Math.log(smallPrimesContrib), ...channelData.map(d => d.logContribution)];
+            const primeCounts = [computationData.primes.filter(p => p < modulus).length, ...channelData.map(d => d.primeCount)];
             
-            if (smallPrimesContrib !== null && smallPrimes.length > 0) {
-                labels.push(`Primes dividing ${modulus}`);
-                contributions.push(smallPrimesContrib);
-                logContributions.push(Math.log(smallPrimesContrib));
-                primeCounts.push(smallPrimes.length);
-            }
-            
-            channelData.forEach(d => {
-                labels.push(`≡ ${d.residue} (mod ${modulus})`);
-                contributions.push(d.contribution);
-                logContributions.push(d.logContribution);
-                primeCounts.push(d.primeCount);
-            });
-            
-            // Create gradient colors - use more colors for larger moduli
             const colors = generateColors(labels.length);
             
             channelChart = new Chart(ctx, {
@@ -1103,7 +1481,7 @@
                                 color: '#fff',
                                 maxRotation: 45,
                                 font: {
-                                    size: modulus > 50 ? 8 : 10
+                                    size: 10
                                 }
                             },
                             grid: {
@@ -1122,7 +1500,7 @@
                             },
                             title: {
                                 display: true,
-                                text: `ℤₐ(s;${modulus}) Contribution`,
+                                text: `Contribution (mod ${modulus})`,
                                 color: '#fff',
                                 font: {
                                     size: 14,
@@ -1138,20 +1516,13 @@
                 }
             });
             
-            // Show chart section
             document.getElementById('chart-section').style.display = 'block';
-            
-            // Update the heading
-            document.querySelector('#chart-section h3').textContent = `Residue Channel Contributions (ℤ_a(s;${modulus}))`;
-            
-            // Create legend (limit to first 20 items for readability)
-            createChartLegend(labels.slice(0, 20), colors.slice(0, 20), primeCounts.slice(0, 20), modulus > 50);
+            createChartLegend(labels, colors, primeCounts);
         }
         
-        // Generate colors for any number of channels
         function generateColors(count) {
             const baseColors = [
-                'rgba(255, 215, 0, 0.8)', // Gold for first (small primes)
+                'rgba(255, 215, 0, 0.8)',
                 'rgba(255, 99, 132, 0.8)',
                 'rgba(54, 162, 235, 0.8)', 
                 'rgba(255, 205, 86, 0.8)',
@@ -1159,49 +1530,814 @@
                 'rgba(153, 102, 255, 0.8)',
                 'rgba(255, 159, 64, 0.8)',
                 'rgba(199, 199, 199, 0.8)',
-                'rgba(83, 102, 255, 0.8)',
-                'rgba(255, 105, 180, 0.8)',
-                'rgba(64, 224, 208, 0.8)',
-                'rgba(255, 140, 0, 0.8)'
+                'rgba(83, 102, 255, 0.8)'
             ];
             
-            if (count <= baseColors.length) {
-                return baseColors.slice(0, count);
-            }
-            
-            // Generate more colors using HSL
-            const colors = [baseColors[0]]; // Keep gold for first
-            for (let i = 1; i < count; i++) {
-                const hue = (i * 360 / (count - 1)) % 360;
-                const saturation = 70 + (i % 3) * 10;
-                const lightness = 55 + (i % 2) * 10;
-                colors.push(`hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`);
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                if (i < baseColors.length) {
+                    colors.push(baseColors[i]);
+                } else {
+                    const hue = (i * 137.5) % 360;
+                    colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+                }
             }
             return colors;
         }
         
-        function createChartLegend(labels, colors, primeCounts, compact = false) {
+        function createChartLegend(labels, colors, primeCounts) {
             let legendHtml = '';
             
-            if (compact) {
-                legendHtml = `<div style="text-align: center; opacity: 0.7; font-size: 0.85em;">
-                    Showing ${labels.length} of ${primeCounts.length} channels (hover bars for details)
-                </div>`;
-            } else {
-                for (let i = 0; i < labels.length; i++) {
-                    legendHtml += `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: ${colors[i]};"></div>
-                            <span>${labels[i]} (${primeCounts[i]} primes)</span>
-                        </div>
-                    `;
-                }
+            for (let i = 0; i < labels.length; i++) {
+                legendHtml += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: ${colors[i]};"></div>
+                        <span>${labels[i]} (${primeCounts[i]} primes)</span>
+                    </div>
+                `;
             }
             
             document.getElementById('chartLegend').innerHTML = legendHtml;
         }
         
-        // Initialize with default computation
+        function changeViz(type) {
+            currentViz = type;
+            
+            document.querySelectorAll('.viz-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updateVisualization(type);
+        }
+        
+        function updateVisualization(type) {
+            if (!computationData) return;
+            
+            const ctx = document.getElementById('vizCanvas').getContext('2d');
+            
+            if (vizChart) {
+                vizChart.destroy();
+            }
+            
+            if (type === 'convergence') {
+                createConvergencePlot(ctx);
+            } else if (type === 'contribution') {
+                createContributionPlot(ctx);
+            } else if (type === 'comparison') {
+                createComparisonPlot(ctx);
+            }
+        }
+        
+        function createConvergencePlot(ctx) {
+            const { partialProducts, exactValue, constantType } = computationData;
+            
+            const labels = partialProducts.map(p => p.prime);
+            const values = partialProducts.map(p => {
+                if (constantType === 'pi') {
+                    return Math.sqrt(6 * p.value);
+                }
+                return p.value;
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Partial Product',
+                        data: values,
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Exact Value',
+                        data: Array(labels.length).fill(exactValue),
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(10)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Prime p', color: '#fff' },
+                            ticks: { color: '#fff', maxTicksLimit: 15 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Value', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createContributionPlot(ctx) {
+            const { primes, exponent } = computationData;
+            
+            const contributions = primes.map(p => {
+                const factor = 1 / (1 - Math.pow(p, -exponent));
+                return factor - 1;
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Prime Contribution',
+                        data: primes.map((p, i) => ({ x: p, y: contributions[i] })),
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `p=${context.parsed.x}: contribution = ${context.parsed.y.toFixed(8)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Prime p (log scale)', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Contribution (log scale)', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createComparisonPlot(ctx) {
+            const { primes, exponent } = computationData;
+            const channels = computeResidueChannels(primes);
+            const phi30 = [1, 7, 11, 13, 17, 19, 23, 29];
+            
+            const datasets = phi30.map((a, idx) => {
+                const channelPrimes = channels[a];
+                const contributions = channelPrimes.map(p => {
+                    const factor = 1 / (1 - Math.pow(p, -exponent));
+                    return factor - 1;
+                });
+                
+                const colors = [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 205, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(199, 199, 199, 0.6)',
+                    'rgba(83, 102, 255, 0.6)'
+                ];
+                
+                return {
+                    label: `≡ ${a} (mod 30)`,
+                    data: channelPrimes.map((p, i) => ({ x: p, y: contributions[i] })),
+                    backgroundColor: colors[idx],
+                    borderColor: colors[idx].replace('0.6', '1'),
+                    pointRadius: 3
+                };
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff', font: { size: 10 } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Prime p', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Contribution', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function exportChartImage() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            // Create modal for export options
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 40px;
+                border-radius: 20px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            `;
+            
+            content.innerHTML = `
+                <h2 style="color: #ffd700; margin-bottom: 25px; text-align: center;">Export Chart Options</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Resolution:</label>
+                    <select id="exportResolution" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="4k">4K (3840 x 2160)</option>
+                        <option value="8k">8K (7680 x 4320)</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Background:</label>
+                    <select id="exportBackground" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="black">Black</option>
+                        <option value="white">White</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Chart Type:</label>
+                    <select id="exportChartType" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="channel">Residue Channel Contributions</option>
+                        <option value="convergence">Convergence Plot</option>
+                        <option value="contribution">Prime Contributions</option>
+                        <option value="comparison">Channel Comparison</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                        <input type="checkbox" id="exportWatermark" checked style="width: auto; margin-right: 10px;">
+                        <span>Include watermark by Wessen Getachew</span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button id="exportBtn" style="flex: 1; padding: 15px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">Export</button>
+                    <button id="cancelBtn" style="flex: 1; padding: 15px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">Cancel</button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            document.getElementById('cancelBtn').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            document.getElementById('exportBtn').onclick = () => {
+                const resolution = document.getElementById('exportResolution').value;
+                const background = document.getElementById('exportBackground').value;
+                const chartType = document.getElementById('exportChartType').value;
+                const includeWatermark = document.getElementById('exportWatermark').checked;
+                
+                document.body.removeChild(modal);
+                
+                performExport(resolution, background, chartType, includeWatermark);
+            };
+        }
+        
+        function performExport(resolution, background, chartType, includeWatermark) {
+            const { epsilon, constantType, modulus, primes, computedValue, exactValue } = computationData;
+            
+            const width = resolution === '4k' ? 3840 : 7680;
+            const height = resolution === '4k' ? 2160 : 4320;
+            
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = width;
+            exportCanvas.height = height;
+            const ctx = exportCanvas.getContext('2d');
+            
+            // Set background
+            ctx.fillStyle = background === 'white' ? '#ffffff' : '#000000';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Calculate dimensions
+            const padding = width * 0.05;
+            const titleHeight = height * 0.12;
+            const chartHeight = height * 0.65;
+            const legendHeight = height * 0.15;
+            const watermarkHeight = height * 0.08;
+            
+            // Text color based on background
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            const accentColor = background === 'white' ? '#1e3c72' : '#ffd700';
+            
+            // Draw title
+            ctx.fillStyle = accentColor;
+            ctx.font = `bold ${height * 0.04}px Arial`;
+            ctx.textAlign = 'center';
+            const title = chartType === 'channel' ? `Residue Channel Contributions (mod ${modulus})` :
+                         chartType === 'convergence' ? 'Convergence to Exact Value' :
+                         chartType === 'contribution' ? 'Individual Prime Contributions' :
+                         'Channel Comparison by Residue Class';
+            ctx.fillText(title, width / 2, padding + height * 0.04);
+            
+            // Draw subtitle
+            ctx.fillStyle = textColor;
+            ctx.font = `${height * 0.025}px Arial`;
+            const subtitle = `Computing ${constantType === 'pi' ? 'π' : 'ζ(' + computationData.exponent + ')'} using ${primes.length} primes (ε = ${epsilon})`;
+            ctx.fillText(subtitle, width / 2, padding + height * 0.08);
+            
+            // Draw computed vs exact values
+            ctx.font = `${height * 0.02}px Arial`;
+            ctx.textAlign = 'left';
+            const statsY = padding + height * 0.11;
+            ctx.fillText(`Computed: ${computedValue.toFixed(15)}`, padding, statsY);
+            ctx.fillText(`Exact: ${exactValue.toFixed(15)}`, width / 2, statsY);
+            const relError = Math.abs(computedValue - exactValue) / exactValue;
+            ctx.fillText(`Relative Error: ${(relError * 100).toFixed(8)}%`, padding, statsY + height * 0.025);
+            ctx.fillText(`Primes Used: ${primes.length}`, width / 2, statsY + height * 0.025);
+            
+            // Create temporary canvas for chart
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = width - 2 * padding;
+            tempCanvas.height = chartHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Generate chart based on type
+            let chartInstance;
+            
+            if (chartType === 'channel') {
+                chartInstance = generateChannelChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'convergence') {
+                chartInstance = generateConvergenceChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'contribution') {
+                chartInstance = generateContributionChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'comparison') {
+                chartInstance = generateComparisonChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            }
+            
+            // Wait for chart to render
+            setTimeout(() => {
+                // Draw chart to main canvas
+                ctx.drawImage(tempCanvas, padding, titleHeight + padding, tempCanvas.width, tempCanvas.height);
+                
+                // Draw legend
+                const legendY = titleHeight + padding + chartHeight + padding * 0.5;
+                ctx.fillStyle = textColor;
+                ctx.font = `bold ${height * 0.022}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText('Legend', width / 2, legendY);
+                
+                // Draw watermark if enabled
+                if (includeWatermark) {
+                    const watermarkY = height - watermarkHeight / 2;
+                    ctx.fillStyle = background === 'white' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+                    ctx.font = `italic ${height * 0.025}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Generated by Wessen Getachew - Modular Sieve Calculator', width / 2, watermarkY);
+                    
+                    ctx.font = `${height * 0.018}px Arial`;
+                    ctx.fillText(new Date().toISOString().split('T')[0], width / 2, watermarkY + height * 0.03);
+                }
+                
+                // Convert to JPEG and download
+                exportCanvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `zeta_chart_${chartType}_${resolution}_${Date.now()}.jpg`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    chartInstance.destroy();
+                }, 'image/jpeg', 0.95);
+            }, 500);
+        }
+        
+        function generateChannelChartForExport(ctx, width, height, background) {
+            const { primes, exponent, modulus } = computationData;
+            const channels = computeResidueChannels(primes, modulus);
+            const coprimeResidues = getCoprimeResidues(modulus);
+            
+            const smallPrimes = primes.filter(p => p < modulus);
+            const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+            
+            const labels = [`Small Primes`, ...coprimeResidues.map(a => `≡ ${a} (mod ${modulus})`)];
+            const contributions = [smallProduct, ...coprimeResidues.map(a => {
+                const channelPrimes = channels[a];
+                return channelPrimes.length > 0 ? computeTruncatedProduct(channelPrimes, exponent) : 1;
+            })];
+            
+            const colors = generateColors(labels.length);
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Contribution',
+                        data: contributions,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Contribution',
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateConvergenceChartForExport(ctx, width, height, background) {
+            const { partialProducts, exactValue, constantType } = computationData;
+            
+            const labels = partialProducts.map(p => p.prime);
+            const values = partialProducts.map(p => {
+                if (constantType === 'pi') {
+                    return Math.sqrt(6 * p.value);
+                }
+                return p.value;
+            });
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Partial Product',
+                        data: values,
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(30, 60, 114, 0.1)' : 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Exact Value',
+                        data: Array(labels.length).fill(exactValue),
+                        borderColor: background === 'white' ? 'rgba(255, 99, 71, 1)' : 'rgba(255, 215, 0, 1)',
+                        borderWidth: 3,
+                        borderDash: [10, 10],
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Prime p', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) },
+                                maxTicksLimit: 20
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Value', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateContributionChartForExport(ctx, width, height, background) {
+            const { primes, exponent } = computationData;
+            
+            const contributions = primes.map(p => {
+                const factor = 1 / (1 - Math.pow(p, -exponent));
+                return factor - 1;
+            });
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Prime Contribution',
+                        data: primes.map((p, i) => ({ x: p, y: contributions[i] })),
+                        backgroundColor: background === 'white' ? 'rgba(30, 60, 114, 0.6)' : 'rgba(255, 99, 132, 0.6)',
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(255, 99, 132, 1)',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { 
+                                display: true, 
+                                text: 'Prime p (log scale)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { 
+                                display: true, 
+                                text: 'Contribution (log scale)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateComparisonChartForExport(ctx, width, height, background) {
+            const { primes, exponent, modulus } = computationData;
+            const channels = computeResidueChannels(primes, modulus);
+            const coprimeResidues = getCoprimeResidues(modulus);
+            
+            const colors = generateColors(coprimeResidues.length);
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            const datasets = coprimeResidues.map((a, idx) => {
+                const channelPrimes = channels[a];
+                const contributions = channelPrimes.map(p => {
+                    const factor = 1 / (1 - Math.pow(p, -exponent));
+                    return factor - 1;
+                });
+                
+                return {
+                    label: `≡ ${a} (mod ${modulus})`,
+                    data: channelPrimes.map((p, i) => ({ x: p, y: contributions[i] })),
+                    backgroundColor: colors[idx],
+                    borderColor: colors[idx].replace('0.8', '1'),
+                    pointRadius: 4
+                };
+            });
+            
+            return new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor, 
+                                font: { size: Math.floor(height * 0.02) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { 
+                                display: true, 
+                                text: 'Prime p', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { 
+                                display: true, 
+                                text: 'Contribution', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function exportResults() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                parameters: {
+                    epsilon: computationData.epsilon,
+                    constantType: computationData.constantType,
+                    method: computationData.method,
+                    cutoff: computationData.Y
+                },
+                results: {
+                    computedValue: computationData.computedValue,
+                    exactValue: computationData.exactValue,
+                    absoluteError: Math.abs(computationData.computedValue - computationData.exactValue),
+                    relativeError: Math.abs(computationData.computedValue - computationData.exactValue) / computationData.exactValue,
+                    primesUsed: computationData.primes.length,
+                    primes: computationData.primes
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zeta_calculation_${computationData.constantType}_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function exportStepsText() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            const { epsilon, constantType, Y, primes, exponent, computedValue, exactValue } = computationData;
+            
+            let text = `MODULAR SIEVE CALCULATION\n`;
+            text += `${'='.repeat(80)}\n\n`;
+            text += `Timestamp: ${new Date().toISOString()}\n`;
+            text += `Constant: ${constantType === 'pi' ? 'π' : 'ζ(' + exponent + ')'}\n`;
+            text += `Target Error: ${epsilon}\n\n`;
+            
+            text += `STEP 1: DETERMINE CUTOFF\n`;
+            text += `${'-'.repeat(80)}\n`;
+            if (constantType === 'pi') {
+                text += `For π: Y = ⌈1 + 1/log(1+ε)⌉\n`;
+                text += `Y = ⌈1 + ${(1/Math.log(1+epsilon)).toFixed(4)}⌉ = ${Y}\n`;
+            } else {
+                text += `For ζ(${exponent}): Y = ⌈(2/((2n-1)·log(1+ε)))^(1/(2n-1))⌉\n`;
+                text += `Y = ${Y}\n`;
+            }
+            text += `\nNeed all primes ≤ ${Y-1}\n\n`;
+            
+            text += `STEP 2: GENERATE PRIMES\n`;
+            text += `${'-'.repeat(80)}\n`;
+            text += `Found ${primes.length} primes using Sieve of Eratosthenes:\n`;
+            text += `{${primes.slice(0, 50).join(', ')}${primes.length > 50 ? ', ...' : ''}}\n\n`;
+            
+            text += `STEP 3: COMPUTE EULER PRODUCT\n`;
+            text += `${'-'.repeat(80)}\n`;
+            const product = computeTruncatedProduct(primes, exponent);
+            text += `${constantType === 'pi' ? 'ζ(2)' : 'ζ(' + exponent + ')'} = ∏(1-p^(-${exponent}))^(-1) = ${product.toFixed(15)}\n\n`;
+            
+            if (constantType === 'pi') {
+                text += `STEP 4: EXTRACT π\n`;
+                text += `${'-'.repeat(80)}\n`;
+                text += `π = √(6·ζ(2)) = √(6 × ${product.toFixed(12)})\n`;
+                text += `π ≈ ${computedValue.toFixed(15)}\n\n`;
+            }
+            
+            text += `RESULTS\n`;
+            text += `${'-'.repeat(80)}\n`;
+            text += `Computed: ${computedValue.toFixed(15)}\n`;
+            text += `Exact:    ${exactValue.toFixed(15)}\n`;
+            text += `Abs Err:  ${Math.abs(computedValue - exactValue).toExponential(10)}\n`;
+            text += `Rel Err:  ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(10)}%\n`;
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zeta_steps_${constantType}_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
         window.onload = () => {
             compute();
         };
