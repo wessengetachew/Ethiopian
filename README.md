@@ -19,17 +19,235 @@
             padding: 20px;
         }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            color: #ffd700;
+            margin-left: 5px;
+            font-weight: bold;
         }
         
-        .header {
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 15px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            line-height: 1.4;
+            border: 1px solid #ffd700;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 25px;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            padding: 8px 15px;
+            background: linear-gradient(45deg, #44a08d, #4ecdc4);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(68, 160, 141, 0.4);
+        }
+        
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .preset-btn {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .formula-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            font-weight: bold;
+        }
+        
+        .convergence-chart {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .convergence-chart h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        
+        .tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tour-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            border: 2px solid #ffd700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .tour-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tour-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .help-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3c72;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .help-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .keyboard-shortcuts {
+            font-size: 0.85em;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+        
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 30px;
-            margin-bottom: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
         
@@ -47,48 +265,12 @@
             text-align: center;
             font-size: 1.1em;
             opacity: 0.9;
-            margin-bottom: 20px;
-        }
-        
-        .info-section {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border-left: 4px solid #ffd700;
-        }
-        
-        .info-section h3 {
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
-        
-        .info-section p {
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-        
-        .formula {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-        
-        .main-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
         }
         
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -109,7 +291,6 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
-            font-size: 0.9em;
         }
         
         input, select, button {
@@ -134,15 +315,6 @@
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(238, 90, 82, 0.3);
-        }
-        
-        .export-btn {
-            background: linear-gradient(45deg, #4ecdc4, #44a8a3);
-            margin-top: 10px;
-        }
-        
-        .export-btn:hover {
-            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
         }
         
         .results {
@@ -181,66 +353,17 @@
             margin-top: 10px;
         }
         
-        .step-by-step {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-        }
-        
-        .step-by-step h3 {
-            color: #ffd700;
-            margin-bottom: 20px;
-        }
-        
-        .step {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #4ecdc4;
-        }
-        
-        .step-number {
-            display: inline-block;
-            background: #4ecdc4;
-            color: #1e3c72;
-            font-weight: bold;
-            padding: 5px 12px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        
-        .step-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .step-content {
-            margin-left: 40px;
-            line-height: 1.6;
-        }
-        
-        .step-formula {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-        
         .gap-analysis {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
         }
         
         .gap-analysis h3 {
             color: #ffd700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
         
         .gap-grid {
@@ -263,10 +386,16 @@
         }
         
         .channel-analysis {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
+        }
+        
+        .channel-analysis h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
         
         .channel-grid {
@@ -283,23 +412,36 @@
             font-size: 0.9em;
         }
         
+        .loading {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.7;
+        }
+        
         .chart-container {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
         }
         
         .chart-container h3 {
             color: #ffd700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
+            font-size: 1.1em;
         }
         
         #channelChart {
             width: 100%;
-            height: 400px;
-            max-height: 400px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        #convergenceChart {
+            width: 100%;
+            height: 280px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
@@ -308,278 +450,325 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-            font-size: 0.9em;
+            gap: 10px;
+            margin-top: 12px;
+            font-size: 0.8em;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
         
         .legend-color {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 2px;
-        }
-        
-        .visualization-container {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 15px;
-        }
-        
-        .visualization-container h3 {
-            color: #ffd700;
-            margin-bottom: 20px;
-        }
-        
-        .viz-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .viz-btn {
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .viz-btn.active {
-            background: #4ecdc4;
-            border-color: #4ecdc4;
-            color: #1e3c72;
-        }
-        
-        .viz-btn:hover {
-            background: rgba(78, 205, 196, 0.3);
-            border-color: #4ecdc4;
-        }
-        
-        #vizCanvas {
-            width: 100%;
-            height: 500px;
-            max-height: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        .loading {
-            text-align: center;
-            font-style: italic;
-            opacity: 0.7;
-        }
-        
-        .toggle-section {
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .toggle-icon {
-            transition: transform 0.3s ease;
-        }
-        
-        .toggle-icon.open {
-            transform: rotate(180deg);
-        }
-        
-        .collapsible-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        
-        .collapsible-content.open {
-            max-height: 5000px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Modular Sieve Calculator</h1>
-            <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
+        <h1>Modular Sieve Calculator</h1>
+        <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
+        
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="presets">
+            <button class="preset-btn" onclick="loadPreset('quick')">Quick Demo<br>(ε=0.01)</button>
+            <button class="preset-btn" onclick="loadPreset('accurate')">High Accuracy<br>(ε=0.0001)</button>
+            <button class="preset-btn" onclick="loadPreset('ultra')">Ultra Precise<br>(ε=0.00001)</button>
+            <button class="preset-btn" onclick="loadPreset('compare')">Compare All<br>Methods</button>
+        </div>
+        
+        <div class="keyboard-shortcuts">
+            ⌨️ Shortcuts: <strong>Ctrl+Enter</strong> Calculate | <strong>Ctrl+E</strong> Export | <strong>Ctrl+H</strong> Help
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>Target Accuracy</h3>
+                <label for="epsilon">Relative Error (ε):</label>
+                <input type="number" id="epsilon" value="0.001" step="0.0001" min="0.0001" max="0.1">
+                
+                <label for="constant">Constant to Compute:</label>
+                <select id="constant">
+                    <option value="pi">π (from ζ(2))</option>
+                    <option value="zeta4">ζ(4)</option>
+                    <option value="zeta6">ζ(6)</option>
+                    <option value="zeta8">ζ(8)</option>
+                    <option value="zeta10">ζ(10)</option>
+                </select>
+            </div>
             
-            <div class="info-section">
-                <div class="toggle-section" onclick="toggleSection('theory')">
-                    <h3>Mathematical Framework</h3>
-                    <span class="toggle-icon" id="theory-icon">▼</span>
+            <div class="control-group">
+                <h3>Computation Method
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">
+                            <strong>Standard:</strong> Classic Euler product<br>
+                            <strong>Gap-Class:</strong> Group primes by gap sizes (p_{n+1} - p_n)<br>
+                            <strong>Residue Channels:</strong> Group primes by residue mod N<br>
+                            <strong>Combined:</strong> Both decompositions
+                        </span>
+                    </span>
+                </h3>
+                <label for="method">Decomposition:</label>
+                <select id="method">
+                    <option value="standard">Standard Euler Product</option>
+                    <option value="gap">Gap-Class Analysis</option>
+                    <option value="residue">Residue Channels (mod N)</option>
+                    <option value="both">Gap + Residue Combined</option>
+                </select>
+                
+                <label for="modulus">Modulus for Residue Channels:
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">
+                            <strong>Choose any modulus N:</strong><br>
+                            Primes will be grouped by their remainder mod N.<br><br>
+                            <strong>Common choices:</strong><br>
+                            • 6: {1, 5} (all primes > 3)<br>
+                            • 12: {1, 5, 7, 11}<br>
+                            • 30: {1, 7, 11, 13, 17, 19, 23, 29}<br>
+                            • 210: 48 residue classes<br><br>
+                            Larger moduli show finer structure but more channels.
+                        </span>
+                    </span>
+                </label>
+                <input type="number" id="modulus" value="30" min="2" max="210" step="1">
+                
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar">0%</div>
                 </div>
-                <div id="theory-content" class="collapsible-content">
-                    <p>This calculator implements the rigorous framework for computing π and ζ(2n) using Euler product decompositions.</p>
-                    
-                    <p><strong>Key Identity:</strong> For ℜ(s) > 1, the Riemann zeta function has the Euler product:</p>
-                    <div class="formula">ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup></div>
-                    
-                    <p><strong>Recovering π:</strong> Since ζ(2) = π²/6, we have:</p>
-                    <div class="formula">π = √6 · ∏<sub>p prime</sub> (1 - p<sup>-2</sup>)<sup>-1/2</sup></div>
-                    
-                    <p><strong>Two Decomposition Methods:</strong></p>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li><strong>Gap-Class:</strong> Groups primes by their gaps g(p) = p - p<sub>prev</sub></li>
-                        <li><strong>Residue Channels:</strong> Splits primes by residue classes mod 30, giving 8 independent channels for gcd(a,30)=1</li>
-                    </ul>
-                    
-                    <p style="margin-top: 15px;"><strong>Error Control:</strong> For target error ε, include primes up to:</p>
-                    <div class="formula">
-                        Y ≈ 1 + 1/ε  (for π)<br>
-                        Y ≈ (2/((2n-1)·ε))<sup>1/(2n-1)</sup>  (for ζ(2n))
-                    </div>
+                
+                <button onclick="compute()">Calculate</button>
+                
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportCSV()">📊 Export CSV</button>
+                    <button class="export-btn" onclick="exportJSON()">📄 Export JSON</button>
+                    <button class="export-btn" onclick="exportImage()">🖼️ Save Chart</button>
                 </div>
             </div>
         </div>
         
-        <div class="main-content">
-            <div class="controls">
-                <div class="control-group">
-                    <h3>Target Accuracy</h3>
-                    <label for="epsilon">Relative Error (ε):</label>
-                    <input type="number" id="epsilon" value="0.001" step="0.0001" min="0.0001" max="0.1">
-                    
-                    <label for="constant">Constant to Compute:</label>
-                    <select id="constant">
-                        <option value="pi">π (from ζ(2))</option>
-                        <option value="zeta4">ζ(4)</option>
-                        <option value="zeta6">ζ(6)</option>
-                        <option value="zeta8">ζ(8)</option>
-                        <option value="zeta10">ζ(10)</option>
-                    </select>
-                    
-                    <label for="modulus">Modulus for Residue Channels:</label>
-                    <input type="number" id="modulus" value="30" min="2" max="210" step="1">
-                </div>
-                
-                <div class="control-group">
-                    <h3>Computation Method</h3>
-                    <label for="method">Decomposition:</label>
-                    <select id="method">
-                        <option value="standard">Standard Euler Product</option>
-                        <option value="gap">Gap-Class Analysis</option>
-                        <option value="residue">Residue Channels (mod 30)</option>
-                        <option value="both">Gap + Residue Combined</option>
-                    </select>
-                    
-                    <label>
-                        <input type="checkbox" id="showSteps" checked style="width: auto; margin-right: 10px;">
-                        Show Step-by-Step Work
-                    </label>
-                </div>
-                
-                <div class="control-group">
-                    <h3>Actions</h3>
-                    <button onclick="compute()">Calculate</button>
-                    <button class="export-btn" onclick="exportResults()">Export Results (JSON)</button>
-                    <button class="export-btn" onclick="exportStepsText()">Export Steps (TXT)</button>
-                    <button class="export-btn" onclick="exportChartImage()">Export Chart (4K/8K JPEG)</button>
-                </div>
+        <div id="results" class="results" style="display: none;">
+            <div class="result-card">
+                <h4>Computed Value</h4>
+                <div id="computed-value" class="value"></div>
+                <div id="error-bound" class="error-info"></div>
+                <div id="prime-count" class="error-info"></div>
             </div>
             
-            <div id="results" class="results" style="display: none;">
-                <div class="result-card">
-                    <h4>Computed Value</h4>
-                    <div id="computed-value" class="value"></div>
-                    <div id="error-bound" class="error-info"></div>
-                    <div id="prime-count" class="error-info"></div>
-                </div>
-                
-                <div class="result-card">
-                    <h4>Exact Reference</h4>
-                    <div id="exact-value" class="value"></div>
-                    <div id="actual-error" class="error-info"></div>
-                </div>
+            <div class="result-card">
+                <h4>Exact Reference</h4>
+                <div id="exact-value" class="value"></div>
+                <div id="actual-error" class="error-info"></div>
             </div>
-            
-            <div id="step-by-step" class="step-by-step" style="display: none;"></div>
-            
-            <div id="gap-analysis" class="gap-analysis" style="display: none;">
-                <h3>Gap-Class Decomposition</h3>
-                <div id="gap-grid" class="gap-grid"></div>
-            </div>
-            
-            <div id="channel-analysis" class="channel-analysis" style="display: none;">
-                <h3>Residue Channels (mod 30)</h3>
-                <div id="channel-grid" class="channel-grid"></div>
-            </div>
-            
-            <div id="chart-section" class="chart-container" style="display: none;">
-                <h3>Residue Channel Contributions (ℤ<sub>a</sub>(s;30))</h3>
-                <canvas id="channelChart"></canvas>
-                <div class="chart-legend" id="chartLegend"></div>
-            </div>
-            
-            <div id="visualization-section" class="visualization-container" style="display: none;">
-                <h3>Interactive Visualization</h3>
-                <div class="viz-options">
-                    <button class="viz-btn active" onclick="changeViz('convergence')">Convergence Plot</button>
-                    <button class="viz-btn" onclick="changeViz('contribution')">Prime Contributions</button>
-                    <button class="viz-btn" onclick="changeViz('comparison')">Channel Comparison</button>
-                </div>
-                <canvas id="vizCanvas"></canvas>
+        </div>
+        
+        <div id="gap-analysis" class="gap-analysis" style="display: none;">
+            <h3>Gap-Class Decomposition</h3>
+            <div id="gap-grid" class="gap-grid"></div>
+        </div>
+        
+        <div id="channel-analysis" class="channel-analysis" style="display: none;">
+            <h3>Residue Channels (mod 30)</h3>
+            <div id="channel-grid" class="channel-grid"></div>
+        </div>
+        
+        <div id="chart-section" class="chart-container" style="display: none;">
+            <h3>Residue Channel Contributions (ℤ_a(s;30))</h3>
+            <canvas id="channelChart"></canvas>
+            <div class="chart-legend" id="chartLegend"></div>
+        </div>
+        
+        <div id="convergence-section" class="convergence-chart" style="display: none;">
+            <h3>Convergence Analysis</h3>
+            <canvas id="convergenceChart"></canvas>
+        </div>
+        
+        <div id="comparison-section" class="gap-analysis" style="display: none;">
+            <h3>Method Comparison</h3>
+            <table class="comparison-table" id="comparison-table"></table>
+        </div>
+    </div>
+    
+    <div class="help-icon" onclick="showTour()" aria-label="Help and Tutorial">?</div>
+    
+    <div class="tour-overlay" id="tour-overlay">
+        <div class="tour-content">
+            <h2 style="color: #ffd700; margin-bottom: 15px;">Welcome to Modular Sieve Calculator!</h2>
+            <div id="tour-text"></div>
+            <div class="tour-buttons">
+                <button class="tour-btn" style="background: #666; color: white;" onclick="closeTour()">Skip</button>
+                <button class="tour-btn" style="background: #ffd700; color: #1e3c72;" onclick="nextTourStep()">Next</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Compute Euler's totient function
-        function eulerPhi(n) {
-            let result = n;
-            for (let p = 2; p * p <= n; p++) {
-                if (n % p === 0) {
-                    while (n % p === 0) n /= p;
-                    result -= result / p;
+        // Global state
+        let computationCache = {};
+        let currentResults = null;
+        let tourStep = 0;
+        
+        const tourSteps = [
+            {
+                title: "Mathematical Foundation",
+                text: "This calculator uses the <strong>Euler Product Formula</strong> to compute mathematical constants:<br><br>ζ(s) = ∏<sub>p prime</sub> (1 - p<sup>-s</sup>)<sup>-1</sup><br><br>We can compute π and ζ(2n) by truncating this infinite product."
+            },
+            {
+                title: "Accuracy Control",
+                text: "Set your desired <strong>relative error (ε)</strong> to control accuracy. The calculator automatically determines how many primes are needed to guarantee this error bound."
+            },
+            {
+                title: "Decomposition Methods",
+                text: "<strong>Gap-Class:</strong> Groups primes by their spacing<br><strong>Residue Channels:</strong> Groups primes by their remainder mod 30<br><br>These reveal hidden structure in prime distribution!"
+            },
+            {
+                title: "Export & Analysis",
+                text: "Export your results as CSV or JSON, save charts as images, and compare different methods side-by-side. Use keyboard shortcuts for faster workflow!"
+            }
+        ];
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    compute();
+                } else if (e.key === 'e') {
+                    e.preventDefault();
+                    exportJSON();
+                } else if (e.key === 'h') {
+                    e.preventDefault();
+                    showTour();
                 }
             }
-            if (n > 1) result -= result / n;
-            return result;
+        });
+        
+        // Tour functions
+        function showTour() {
+            tourStep = 0;
+            document.getElementById('tour-overlay').style.display = 'flex';
+            updateTourContent();
         }
         
-        // Get coprime residues mod m
-        function getCoprimeResidues(m) {
-            const residues = [];
-            for (let a = 1; a < m; a++) {
-                if (gcd(a, m) === 1) {
-                    residues.push(a);
-                }
+        function closeTour() {
+            document.getElementById('tour-overlay').style.display = 'none';
+        }
+        
+        function nextTourStep() {
+            tourStep++;
+            if (tourStep >= tourSteps.length) {
+                closeTour();
+            } else {
+                updateTourContent();
             }
-            return residues;
         }
         
-        // GCD helper
-        function gcd(a, b) {
-            while (b !== 0) {
-                const temp = b;
-                b = a % b;
-                a = temp;
+        function updateTourContent() {
+            const step = tourSteps[tourStep];
+            document.getElementById('tour-text').innerHTML = `
+                <h3 style="color: #4ecdc4; margin-bottom: 10px;">${step.title}</h3>
+                <p style="line-height: 1.6;">${step.text}</p>
+                <p style="margin-top: 15px; opacity: 0.7; font-size: 0.9em;">Step ${tourStep + 1} of ${tourSteps.length}</p>
+            `;
+        }
+        
+        // Preset configurations
+        function loadPreset(type) {
+            const epsilonInput = document.getElementById('epsilon');
+            const methodSelect = document.getElementById('method');
+            
+            switch(type) {
+                case 'quick':
+                    epsilonInput.value = 0.01;
+                    methodSelect.value = 'standard';
+                    break;
+                case 'accurate':
+                    epsilonInput.value = 0.0001;
+                    methodSelect.value = 'residue';
+                    break;
+                case 'ultra':
+                    epsilonInput.value = 0.00001;
+                    methodSelect.value = 'both';
+                    break;
+                case 'compare':
+                    epsilonInput.value = 0.001;
+                    compareAllMethods();
+                    return;
             }
-            return a;
+            compute();
         }
         
-        let computationData = null;
-        let channelChart = null;
-        let vizChart = null;
-        let currentViz = 'convergence';
-        
-        function toggleSection(id) {
-            const content = document.getElementById(id + '-content');
-            const icon = document.getElementById(id + '-icon');
-            content.classList.toggle('open');
-            icon.classList.toggle('open');
+        // Input validation
+        function validateInputs() {
+            const epsilon = parseFloat(document.getElementById('epsilon').value);
+            const errors = [];
+            
+            if (isNaN(epsilon) || epsilon <= 0) {
+                errors.push('Epsilon must be a positive number');
+            }
+            if (epsilon > 0.1) {
+                errors.push('Epsilon too large (max 0.1) - results may be inaccurate');
+            }
+            if (epsilon < 0.00001) {
+                errors.push('Epsilon too small (min 0.00001) - computation may take very long');
+            }
+            
+            if (errors.length > 0) {
+                showError(errors.join('<br>'));
+                return false;
+            }
+            
+            hideError();
+            return true;
         }
         
-        // Sieve of Eratosthenes
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = `<strong>⚠️ Error:</strong> ${message}`;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+        
+        // Progress indicator
+        function updateProgress(percent, message = '') {
+            const container = document.getElementById('progress-container');
+            const bar = document.getElementById('progress-bar');
+            container.style.display = 'block';
+            bar.style.width = percent + '%';
+            bar.textContent = message || percent + '%';
+        }
+        
+        function hideProgress() {
+            document.getElementById('progress-container').style.display = 'none';
+        }
+        
+        // Update formula display
+        function updateFormulaDisplay() {
+            const constantType = document.getElementById('constant').value;
+            const formulaDiv = document.getElementById('formula-display');
+            
+            let formula = '';
+            if (constantType === 'pi') {
+                formula = 'π = √(6 · ∏<sub>p</sub>(1-p<sup>-2</sup>)<sup>-1</sup>)';
+            } else {
+                const n = parseInt(constantType.replace('zeta', '')) / 2;
+                formula = `ζ(${2*n}) = ∏<sub>p</sub>(1-p<sup>-${2*n}</sup>)<sup>-1</sup>`;
+            }
+            
+            formulaDiv.innerHTML = formula;
+        }
+        
+        // Listen for constant change
+        document.getElementById('constant').addEventListener('change', updateFormulaDisplay);
+        // Sieve of Eratosthenes optimized for our needs
         function sieveOfEratosthenes(limit) {
             if (limit < 2) return [];
             
@@ -616,13 +805,24 @@
         
         // Compute residue channels for any modulus
         function computeResidueChannels(primes, modulus) {
-            const coprimeResidues = getCoprimeResidues(modulus);
-            const channels = {};
+            // Get Euler's totient function φ(n) - coprime residues
+            const coprimeResidues = [];
+            for (let a = 1; a < modulus; a++) {
+                if (gcd(a, modulus) === 1) {
+                    coprimeResidues.push(a);
+                }
+            }
             
+            const channels = {};
             coprimeResidues.forEach(a => channels[a] = []);
             
+            // Collect primes that divide the modulus
+            const smallPrimes = [];
+            
             primes.forEach(p => {
-                if (p >= modulus) {
+                if (p < modulus && modulus % p === 0) {
+                    smallPrimes.push(p);
+                } else if (p >= modulus || modulus % p !== 0) {
                     const residue = p % modulus;
                     if (coprimeResidues.includes(residue)) {
                         channels[residue].push(p);
@@ -630,10 +830,20 @@
                 }
             });
             
-            return channels;
+            return { channels, coprimeResidues, smallPrimes };
         }
         
-        // Compute Y cutoff
+        // Greatest common divisor
+        function gcd(a, b) {
+            while (b !== 0) {
+                const temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+        
+        // Compute Y cutoff for given epsilon and constant type
         function computeCutoff(epsilon, constantType) {
             if (constantType === 'pi') {
                 return Math.ceil(1 + 1 / Math.log(1 + epsilon));
@@ -653,20 +863,7 @@
             return product;
         }
         
-        // Compute partial products (for convergence visualization)
-        function computePartialProducts(primes, exponent) {
-            const partials = [];
-            let product = 1;
-            
-            for (const p of primes) {
-                product *= 1 / (1 - Math.pow(p, -exponent));
-                partials.push({ prime: p, value: product });
-            }
-            
-            return partials;
-        }
-        
-        // Exact values
+        // Exact values for reference
         const exactValues = {
             'pi': Math.PI,
             'zeta4': Math.PI ** 4 / 90,
@@ -679,57 +876,38 @@
             const epsilon = parseFloat(document.getElementById('epsilon').value);
             const constantType = document.getElementById('constant').value;
             const method = document.getElementById('method').value;
-            const showSteps = document.getElementById('showSteps').checked;
-            const modulus = parseInt(document.getElementById('modulus').value);
             
+            // Show loading
             document.getElementById('results').style.display = 'block';
             document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...</div>';
             
             setTimeout(() => {
                 try {
+                    // Compute required cutoff
                     const Y = computeCutoff(epsilon, constantType);
                     const primes = sieveOfEratosthenes(Y - 1);
                     
                     let computedValue;
-                    const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+                    let analysisHtml = '';
                     
                     if (constantType === 'pi') {
+                        // π = √6 * ∏(1-p^-2)^-1/2
                         const zetaProduct = computeTruncatedProduct(primes, 2);
                         computedValue = Math.sqrt(6 * zetaProduct);
                     } else {
+                        // ζ(2n) = ∏(1-p^-2n)^-1
                         const n = parseInt(constantType.replace('zeta', '')) / 2;
                         computedValue = computeTruncatedProduct(primes, 2 * n);
                     }
                     
-                    // Store computation data
-                    computationData = {
-                        epsilon,
-                        constantType,
-                        method,
-                        modulus,
-                        Y,
-                        primes,
-                        exponent,
-                        computedValue,
-                        exactValue: exactValues[constantType],
-                        partialProducts: computePartialProducts(primes, constantType === 'pi' ? 2 : exponent)
-                    };
-                    
                     // Display results
-                    document.getElementById('computed-value').textContent = computedValue.toFixed(15);
-                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(15);
+                    document.getElementById('computed-value').textContent = computedValue.toFixed(12);
+                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(12);
                     
                     const actualError = Math.abs(computedValue - exactValues[constantType]) / exactValues[constantType];
-                    document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(8)}%</strong>`;
-                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
-                    document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong>`;
-                    
-                    // Show step-by-step
-                    if (showSteps) {
-                        showStepByStep(computationData);
-                    } else {
-                        document.getElementById('step-by-step').style.display = 'none';
-                    }
+                    document.getElementById('actual-error').innerHTML = `Actual relative error: ${(actualError * 100).toFixed(6)}%`;
+                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ ${(epsilon * 100).toFixed(4)}%`;
+                    document.getElementById('prime-count').innerHTML = `Using ${primes.length} primes up to ${Y-1}`;
                     
                     // Method-specific analysis
                     if (method === 'gap' || method === 'both') {
@@ -739,136 +917,16 @@
                     }
                     
                     if (method === 'residue' || method === 'both') {
-                        showResidueAnalysis(primes, constantType, modulus);
+                        showResidueAnalysis(primes, constantType);
                     } else {
                         document.getElementById('channel-analysis').style.display = 'none';
                         document.getElementById('chart-section').style.display = 'none';
                     }
                     
-                    // Show visualization
-                    document.getElementById('visualization-section').style.display = 'block';
-                    updateVisualization(currentViz);
-                    
                 } catch (error) {
                     document.getElementById('computed-value').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
                 }
             }, 100);
-        }
-        
-        function showStepByStep(data) {
-            const { epsilon, constantType, Y, primes, exponent, computedValue, exactValue } = data;
-            
-            let html = '<h3>Step-by-Step Calculation</h3>';
-            
-            // Step 1: Determine cutoff
-            html += `
-                <div class="step">
-                    <div class="step-title"><span class="step-number">1</span>Determine Required Cutoff Y</div>
-                    <div class="step-content">
-                        <p>Given target relative error ε = ${epsilon}</p>
-                        ${constantType === 'pi' ? `
-                            <p>For π, we use: Y = ⌈1 + 1/log(1+ε)⌉</p>
-                            <div class="step-formula">
-                                Y = ⌈1 + 1/log(1+${epsilon})⌉<br>
-                                Y = ⌈1 + ${(1/Math.log(1+epsilon)).toFixed(4)}⌉<br>
-                                Y = ${Y}
-                            </div>
-                        ` : `
-                            <p>For ζ(${exponent}), we use: Y = ⌈(2/((2n-1)·log(1+ε)))<sup>1/(2n-1)</sup>⌉ where n = ${exponent/2}</p>
-                            <div class="step-formula">
-                                Y = ⌈(2/(${exponent-1}·log(1+${epsilon})))<sup>1/${exponent-1}</sup>⌉<br>
-                                Y = ${Y}
-                            </div>
-                        `}
-                        <p>Therefore, we need all primes up to ${Y-1}.</p>
-                    </div>
-                </div>
-            `;
-            
-            // Step 2: Generate primes
-            html += `
-                <div class="step">
-                    <div class="step-title"><span class="step-number">2</span>Generate Primes Using Sieve</div>
-                    <div class="step-content">
-                        <p>Using the Sieve of Eratosthenes to find all primes ≤ ${Y-1}:</p>
-                        <p><strong>Found ${primes.length} primes:</strong></p>
-                        <div class="step-formula">
-                            {${primes.slice(0, 20).join(', ')}${primes.length > 20 ? ', ..., ' + primes[primes.length-1] : ''}}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Step 3: Compute Euler product
-            const firstFewFactors = primes.slice(0, 5).map(p => {
-                const factor = 1 / (1 - Math.pow(p, -exponent));
-                return `(1 - ${p}<sup>-${exponent}</sup>)<sup>-1</sup> = ${factor.toFixed(6)}`;
-            }).join('<br>');
-            
-            html += `
-                <div class="step">
-                    <div class="step-title"><span class="step-number">3</span>Compute Euler Product</div>
-                    <div class="step-content">
-                        <p>${constantType === 'pi' ? 'For π, compute ζ(2) = ∏(1-p<sup>-2</sup>)<sup>-1</sup>' : `Compute ζ(${exponent}) = ∏(1-p<sup>-${exponent}</sup>)<sup>-1</sup>`}</p>
-                        <p><strong>First few factors:</strong></p>
-                        <div class="step-formula">${firstFewFactors}</div>
-                        <p><strong>Product of all ${primes.length} factors:</strong></p>
-                        <div class="step-formula">
-                            ${constantType === 'pi' ? 'ζ(2) = ' : `ζ(${exponent}) = `}${computeTruncatedProduct(primes, exponent).toFixed(12)}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Step 4: Final computation
-            if (constantType === 'pi') {
-                const zeta2 = computeTruncatedProduct(primes, 2);
-                html += `
-                    <div class="step">
-                        <div class="step-title"><span class="step-number">4</span>Extract π from ζ(2)</div>
-                        <div class="step-content">
-                            <p>Using the identity ζ(2) = π²/6, we have π = √(6·ζ(2))</p>
-                            <div class="step-formula">
-                                π = √(6 × ${zeta2.toFixed(12)})<br>
-                                π = √${(6 * zeta2).toFixed(12)}<br>
-                                π ≈ ${computedValue.toFixed(15)}
-                            </div>
-                            <p><strong>Exact value:</strong> π = ${exactValue.toFixed(15)}</p>
-                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div class="step">
-                        <div class="step-title"><span class="step-number">4</span>Compare with Exact Value</div>
-                        <div class="step-content">
-                            <p><strong>Computed:</strong> ζ(${exponent}) ≈ ${computedValue.toFixed(15)}</p>
-                            <p><strong>Exact:</strong> ζ(${exponent}) = ${exactValue.toFixed(15)}</p>
-                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
-                            <p><strong>Relative error:</strong> ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(8)}%</p>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Step 5: Error verification
-            const actualError = Math.abs(computedValue - exactValue) / exactValue;
-            html += `
-                <div class="step">
-                    <div class="step-title"><span class="step-number">5</span>Verify Error Bound</div>
-                    <div class="step-content">
-                        <p><strong>Guaranteed bound:</strong> relative error ≤ ${(epsilon * 100).toFixed(4)}%</p>
-                        <p><strong>Actual error:</strong> ${(actualError * 100).toFixed(8)}%</p>
-                        <p style="color: ${actualError <= epsilon ? '#4ecdc4' : '#ff6b6b'}; font-weight: bold;">
-                            ${actualError <= epsilon ? '✓ Error bound satisfied!' : '⚠ Note: Actual error slightly exceeds theoretical bound (due to finite precision)'}
-                        </p>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('step-by-step').innerHTML = html;
-            document.getElementById('step-by-step').style.display = 'block';
         }
         
         function showGapAnalysis(primes, constantType) {
@@ -878,7 +936,7 @@
             let html = '';
             const sortedGaps = Object.keys(gapClasses).map(Number).sort((a, b) => a - b);
             
-            for (const gap of sortedGaps.slice(0, 12)) {
+            for (const gap of sortedGaps.slice(0, 12)) { // Show first 12 gap classes
                 const gapPrimes = gapClasses[gap];
                 const contribution = computeTruncatedProduct(gapPrimes, exponent);
                 const logContrib = Math.log(contribution);
@@ -897,26 +955,30 @@
             document.getElementById('gap-analysis').style.display = 'block';
         }
         
-        function showResidueAnalysis(primes, constantType, modulus) {
-            const channels = computeResidueChannels(primes, modulus);
+        function showResidueAnalysis(primes, constantType) {
+            const modulus = parseInt(document.getElementById('modulus').value);
+            const { channels, coprimeResidues, smallPrimes } = computeResidueChannels(primes, modulus);
             const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
-            const coprimeResidues = getCoprimeResidues(modulus);
             
             let html = '';
             const channelData = [];
             
-            const smallPrimes = primes.filter(p => p < modulus);
-            const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+            // Handle small primes that divide the modulus
+            if (smallPrimes.length > 0) {
+                const smallProduct = computeTruncatedProduct(smallPrimes, exponent);
+                html += `
+                    <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
+                        <div>Primes dividing ${modulus}</div>
+                        <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
+                        <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
+                    </div>
+                `;
+            }
             
-            html += `
-                <div class="channel-item" style="grid-column: span 2; background: rgba(255, 215, 0, 0.2);">
-                    <div>Small Primes</div>
-                    <div style="font-weight: bold;">${smallProduct.toFixed(4)}</div>
-                    <div style="font-size: 0.8em;">{${smallPrimes.join(', ')}}</div>
-                </div>
-            `;
+            // Sort residues for consistent display
+            const sortedResidues = coprimeResidues.sort((a, b) => a - b);
             
-            for (const a of coprimeResidues) {
+            for (const a of sortedResidues) {
                 const channelPrimes = channels[a];
                 let contribution = 1;
                 
@@ -951,21 +1013,45 @@
             document.getElementById('channel-grid').innerHTML = html;
             document.getElementById('channel-analysis').style.display = 'block';
             
-            createChannelChart(channelData, smallPrimesContrib, modulus);
+            // Update the heading
+            document.querySelector('#channel-analysis h3').textContent = `Residue Channels (mod ${modulus})`;
+            
+            // Create chart
+            const smallProduct = smallPrimes.length > 0 ? computeTruncatedProduct(smallPrimes, exponent) : null;
+            createChannelChart(channelData, smallProduct, modulus, smallPrimes);
         }
         
-        function createChannelChart(channelData, smallPrimesContrib, modulus) {
+        let channelChart = null;
+        
+        function createChannelChart(channelData, smallPrimesContrib, modulus, smallPrimes) {
             const ctx = document.getElementById('channelChart').getContext('2d');
             
+            // Destroy existing chart if it exists
             if (channelChart) {
                 channelChart.destroy();
             }
             
-            const labels = [`Small Primes (< ${modulus})`, ...channelData.map(d => `≡ ${d.residue} (mod ${modulus})`)];
-            const contributions = [smallPrimesContrib, ...channelData.map(d => d.contribution)];
-            const logContributions = [Math.log(smallPrimesContrib), ...channelData.map(d => d.logContribution)];
-            const primeCounts = [computationData.primes.filter(p => p < modulus).length, ...channelData.map(d => d.primeCount)];
+            // Prepare data for chart
+            const labels = [];
+            const contributions = [];
+            const logContributions = [];
+            const primeCounts = [];
             
+            if (smallPrimesContrib !== null && smallPrimes.length > 0) {
+                labels.push(`Primes dividing ${modulus}`);
+                contributions.push(smallPrimesContrib);
+                logContributions.push(Math.log(smallPrimesContrib));
+                primeCounts.push(smallPrimes.length);
+            }
+            
+            channelData.forEach(d => {
+                labels.push(`≡ ${d.residue} (mod ${modulus})`);
+                contributions.push(d.contribution);
+                logContributions.push(d.logContribution);
+                primeCounts.push(d.primeCount);
+            });
+            
+            // Create gradient colors - use more colors for larger moduli
             const colors = generateColors(labels.length);
             
             channelChart = new Chart(ctx, {
@@ -1017,7 +1103,7 @@
                                 color: '#fff',
                                 maxRotation: 45,
                                 font: {
-                                    size: 10
+                                    size: modulus > 50 ? 8 : 10
                                 }
                             },
                             grid: {
@@ -1036,7 +1122,7 @@
                             },
                             title: {
                                 display: true,
-                                text: `Contribution (mod ${modulus})`,
+                                text: `ℤₐ(s;${modulus}) Contribution`,
                                 color: '#fff',
                                 font: {
                                     size: 14,
@@ -1052,13 +1138,20 @@
                 }
             });
             
+            // Show chart section
             document.getElementById('chart-section').style.display = 'block';
-            createChartLegend(labels, colors, primeCounts);
+            
+            // Update the heading
+            document.querySelector('#chart-section h3').textContent = `Residue Channel Contributions (ℤ_a(s;${modulus}))`;
+            
+            // Create legend (limit to first 20 items for readability)
+            createChartLegend(labels.slice(0, 20), colors.slice(0, 20), primeCounts.slice(0, 20), modulus > 50);
         }
         
+        // Generate colors for any number of channels
         function generateColors(count) {
             const baseColors = [
-                'rgba(255, 215, 0, 0.8)',
+                'rgba(255, 215, 0, 0.8)', // Gold for first (small primes)
                 'rgba(255, 99, 132, 0.8)',
                 'rgba(54, 162, 235, 0.8)', 
                 'rgba(255, 205, 86, 0.8)',
@@ -1066,335 +1159,49 @@
                 'rgba(153, 102, 255, 0.8)',
                 'rgba(255, 159, 64, 0.8)',
                 'rgba(199, 199, 199, 0.8)',
-                'rgba(83, 102, 255, 0.8)'
+                'rgba(83, 102, 255, 0.8)',
+                'rgba(255, 105, 180, 0.8)',
+                'rgba(64, 224, 208, 0.8)',
+                'rgba(255, 140, 0, 0.8)'
             ];
             
-            const colors = [];
-            for (let i = 0; i < count; i++) {
-                if (i < baseColors.length) {
-                    colors.push(baseColors[i]);
-                } else {
-                    const hue = (i * 137.5) % 360;
-                    colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
-                }
+            if (count <= baseColors.length) {
+                return baseColors.slice(0, count);
+            }
+            
+            // Generate more colors using HSL
+            const colors = [baseColors[0]]; // Keep gold for first
+            for (let i = 1; i < count; i++) {
+                const hue = (i * 360 / (count - 1)) % 360;
+                const saturation = 70 + (i % 3) * 10;
+                const lightness = 55 + (i % 2) * 10;
+                colors.push(`hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`);
             }
             return colors;
         }
         
-        function createChartLegend(labels, colors, primeCounts) {
+        function createChartLegend(labels, colors, primeCounts, compact = false) {
             let legendHtml = '';
             
-            for (let i = 0; i < labels.length; i++) {
-                legendHtml += `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background-color: ${colors[i]};"></div>
-                        <span>${labels[i]} (${primeCounts[i]} primes)</span>
-                    </div>
-                `;
+            if (compact) {
+                legendHtml = `<div style="text-align: center; opacity: 0.7; font-size: 0.85em;">
+                    Showing ${labels.length} of ${primeCounts.length} channels (hover bars for details)
+                </div>`;
+            } else {
+                for (let i = 0; i < labels.length; i++) {
+                    legendHtml += `
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: ${colors[i]};"></div>
+                            <span>${labels[i]} (${primeCounts[i]} primes)</span>
+                        </div>
+                    `;
+                }
             }
             
             document.getElementById('chartLegend').innerHTML = legendHtml;
         }
         
-        function changeViz(type) {
-            currentViz = type;
-            
-            document.querySelectorAll('.viz-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            updateVisualization(type);
-        }
-        
-        function updateVisualization(type) {
-            if (!computationData) return;
-            
-            const ctx = document.getElementById('vizCanvas').getContext('2d');
-            
-            if (vizChart) {
-                vizChart.destroy();
-            }
-            
-            if (type === 'convergence') {
-                createConvergencePlot(ctx);
-            } else if (type === 'contribution') {
-                createContributionPlot(ctx);
-            } else if (type === 'comparison') {
-                createComparisonPlot(ctx);
-            }
-        }
-        
-        function createConvergencePlot(ctx) {
-            const { partialProducts, exactValue, constantType } = computationData;
-            
-            const labels = partialProducts.map(p => p.prime);
-            const values = partialProducts.map(p => {
-                if (constantType === 'pi') {
-                    return Math.sqrt(6 * p.value);
-                }
-                return p.value;
-            });
-            
-            vizChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Partial Product',
-                        data: values,
-                        borderColor: 'rgba(78, 205, 196, 1)',
-                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Exact Value',
-                        data: Array(labels.length).fill(exactValue),
-                        borderColor: 'rgba(255, 215, 0, 1)',
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#fff' }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(10)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: { display: true, text: 'Prime p', color: '#fff' },
-                            ticks: { color: '#fff', maxTicksLimit: 15 },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            title: { display: true, text: 'Value', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createContributionPlot(ctx) {
-            const { primes, exponent } = computationData;
-            
-            const contributions = primes.map(p => {
-                const factor = 1 / (1 - Math.pow(p, -exponent));
-                return factor - 1;
-            });
-            
-            vizChart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Prime Contribution',
-                        data: primes.map((p, i) => ({ x: p, y: contributions[i] })),
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#fff' }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            callbacks: {
-                                label: function(context) {
-                                    return `p=${context.parsed.x}: contribution = ${context.parsed.y.toFixed(8)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'logarithmic',
-                            title: { display: true, text: 'Prime p (log scale)', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            type: 'logarithmic',
-                            title: { display: true, text: 'Contribution (log scale)', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createComparisonPlot(ctx) {
-            const { primes, exponent } = computationData;
-            const channels = computeResidueChannels(primes);
-            const phi30 = [1, 7, 11, 13, 17, 19, 23, 29];
-            
-            const datasets = phi30.map((a, idx) => {
-                const channelPrimes = channels[a];
-                const contributions = channelPrimes.map(p => {
-                    const factor = 1 / (1 - Math.pow(p, -exponent));
-                    return factor - 1;
-                });
-                
-                const colors = [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 205, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(255, 159, 64, 0.6)',
-                    'rgba(199, 199, 199, 0.6)',
-                    'rgba(83, 102, 255, 0.6)'
-                ];
-                
-                return {
-                    label: `≡ ${a} (mod 30)`,
-                    data: channelPrimes.map((p, i) => ({ x: p, y: contributions[i] })),
-                    backgroundColor: colors[idx],
-                    borderColor: colors[idx].replace('0.6', '1'),
-                    pointRadius: 3
-                };
-            });
-            
-            vizChart = new Chart(ctx, {
-                type: 'scatter',
-                data: { datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#fff', font: { size: 10 } }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'logarithmic',
-                            title: { display: true, text: 'Prime p', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            type: 'logarithmic',
-                            title: { display: true, text: 'Contribution', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function exportResults() {
-            if (!computationData) {
-                alert('Please compute a value first!');
-                return;
-            }
-            
-            const exportData = {
-                timestamp: new Date().toISOString(),
-                parameters: {
-                    epsilon: computationData.epsilon,
-                    constantType: computationData.constantType,
-                    method: computationData.method,
-                    cutoff: computationData.Y
-                },
-                results: {
-                    computedValue: computationData.computedValue,
-                    exactValue: computationData.exactValue,
-                    absoluteError: Math.abs(computationData.computedValue - computationData.exactValue),
-                    relativeError: Math.abs(computationData.computedValue - computationData.exactValue) / computationData.exactValue,
-                    primesUsed: computationData.primes.length,
-                    primes: computationData.primes
-                }
-            };
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `zeta_calculation_${computationData.constantType}_${Date.now()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        
-        function exportStepsText() {
-            if (!computationData) {
-                alert('Please compute a value first!');
-                return;
-            }
-            
-            const { epsilon, constantType, Y, primes, exponent, computedValue, exactValue } = computationData;
-            
-            let text = `MODULAR SIEVE CALCULATION\n`;
-            text += `${'='.repeat(80)}\n\n`;
-            text += `Timestamp: ${new Date().toISOString()}\n`;
-            text += `Constant: ${constantType === 'pi' ? 'π' : 'ζ(' + exponent + ')'}\n`;
-            text += `Target Error: ${epsilon}\n\n`;
-            
-            text += `STEP 1: DETERMINE CUTOFF\n`;
-            text += `${'-'.repeat(80)}\n`;
-            if (constantType === 'pi') {
-                text += `For π: Y = ⌈1 + 1/log(1+ε)⌉\n`;
-                text += `Y = ⌈1 + ${(1/Math.log(1+epsilon)).toFixed(4)}⌉ = ${Y}\n`;
-            } else {
-                text += `For ζ(${exponent}): Y = ⌈(2/((2n-1)·log(1+ε)))^(1/(2n-1))⌉\n`;
-                text += `Y = ${Y}\n`;
-            }
-            text += `\nNeed all primes ≤ ${Y-1}\n\n`;
-            
-            text += `STEP 2: GENERATE PRIMES\n`;
-            text += `${'-'.repeat(80)}\n`;
-            text += `Found ${primes.length} primes using Sieve of Eratosthenes:\n`;
-            text += `{${primes.slice(0, 50).join(', ')}${primes.length > 50 ? ', ...' : ''}}\n\n`;
-            
-            text += `STEP 3: COMPUTE EULER PRODUCT\n`;
-            text += `${'-'.repeat(80)}\n`;
-            const product = computeTruncatedProduct(primes, exponent);
-            text += `${constantType === 'pi' ? 'ζ(2)' : 'ζ(' + exponent + ')'} = ∏(1-p^(-${exponent}))^(-1) = ${product.toFixed(15)}\n\n`;
-            
-            if (constantType === 'pi') {
-                text += `STEP 4: EXTRACT π\n`;
-                text += `${'-'.repeat(80)}\n`;
-                text += `π = √(6·ζ(2)) = √(6 × ${product.toFixed(12)})\n`;
-                text += `π ≈ ${computedValue.toFixed(15)}\n\n`;
-            }
-            
-            text += `RESULTS\n`;
-            text += `${'-'.repeat(80)}\n`;
-            text += `Computed: ${computedValue.toFixed(15)}\n`;
-            text += `Exact:    ${exactValue.toFixed(15)}\n`;
-            text += `Abs Err:  ${Math.abs(computedValue - exactValue).toExponential(10)}\n`;
-            text += `Rel Err:  ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(10)}%\n`;
-            
-            const blob = new Blob([text], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `zeta_steps_${constantType}_${Date.now()}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        
+        // Initialize with default computation
         window.onload = () => {
             compute();
         };
