@@ -578,6 +578,92 @@
             margin-bottom: 20px;
         }
         
+        .prime-ring-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .prime-ring-container h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .ring-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ring-controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            font-size: 0.9em;
+        }
+        
+        .ring-controls input[type="number"],
+        .ring-controls select {
+            width: 80px;
+            padding: 6px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .ring-controls input[type="checkbox"] {
+            width: auto;
+        }
+        
+        #primeRingCanvas {
+            width: 100%;
+            height: 700px;
+            max-height: 700px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+        
+        .ring-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .ring-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+            font-size: 0.85em;
+        }
+        
+        .ring-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        
+        .ring-legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+        
         .viz-options {
             display: flex;
             gap: 10px;
@@ -847,6 +933,44 @@
                 </div>
                 <canvas id="vizCanvas"></canvas>
             </div>
+            
+            <div id="prime-ring-section" class="prime-ring-container" style="display: none;">
+                <h3>Prime Residue Visualization: Concentric Rings (mod m)</h3>
+                <div class="ring-controls">
+                    <label>
+                        Max Modulus:
+                        <input type="number" id="maxModulus" value="30" min="2" max="100" step="1">
+                    </label>
+                    <label>
+                        Point Size:
+                        <input type="number" id="pointSize" value="4" min="2" max="10" step="1">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showLabels" checked>
+                        Show Prime Labels
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showModLines" checked>
+                        Show Mod Lines
+                    </label>
+                    <label>
+                        Color By:
+                        <select id="colorMode">
+                            <option value="residue">Residue Class</option>
+                            <option value="modulus">Modulus Level</option>
+                            <option value="size">Prime Size</option>
+                        </select>
+                    </label>
+                    <button onclick="updatePrimeRing()" style="padding: 6px 16px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update</button>
+                </div>
+                <canvas id="primeRingCanvas"></canvas>
+                <div class="ring-info">
+                    <strong>Visualization:</strong> Each prime p is plotted on concentric rings where ring m represents residues mod m (m = 1 to max).
+                    Position on ring: angle θ = 2π·(p mod m)/m for primes with gcd(p mod m, m) = 1.
+                    Hover over points to see prime details.
+                </div>
+                <div id="ringLegend" class="ring-legend"></div>
+            </div>
         </div>
     </div>
 
@@ -1085,6 +1209,10 @@
                     // Show visualization
                     document.getElementById('visualization-section').style.display = 'block';
                     updateVisualization(currentViz);
+                    
+                    // Show prime ring visualization
+                    document.getElementById('prime-ring-section').style.display = 'block';
+                    updatePrimeRing();
                     
                 } catch (error) {
                     document.getElementById('computed-value').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
@@ -2806,6 +2934,193 @@
             a.download = `zeta_steps_${constantType}_${Date.now()}.txt`;
             a.click();
             URL.revokeObjectURL(url);
+        }
+        
+        // Prime Ring Visualization
+        function updatePrimeRing() {
+            if (!computationData) return;
+            
+            const canvas = document.getElementById('primeRingCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            
+            // Set canvas size with device pixel ratio for crisp rendering
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            const width = rect.width;
+            const height = rect.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            const maxModulus = parseInt(document.getElementById('maxModulus').value);
+            const pointSize = parseInt(document.getElementById('pointSize').value);
+            const showLabels = document.getElementById('showLabels').checked;
+            const showModLines = document.getElementById('showModLines').checked;
+            const colorMode = document.getElementById('colorMode').value;
+            
+            const primes = computationData.primes;
+            const maxRadius = Math.min(width, height) * 0.45;
+            const radiusStep = maxRadius / (maxModulus + 1);
+            
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw modulus rings
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let m = 1; m <= maxModulus; m++) {
+                const radius = m * radiusStep;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Draw modulus label
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`m=${m}`, centerX + radius + 5, centerY);
+            }
+            
+            // Generate colors based on mode
+            const getColor = (prime, residue, modulus) => {
+                if (colorMode === 'residue') {
+                    const hue = (residue / modulus) * 360;
+                    return `hsla(${hue}, 80%, 60%, 0.8)`;
+                } else if (colorMode === 'modulus') {
+                    const hue = (modulus / maxModulus) * 280;
+                    return `hsla(${hue}, 70%, 60%, 0.8)`;
+                } else { // size
+                    const maxPrime = Math.max(...primes);
+                    const ratio = prime / maxPrime;
+                    const hue = ratio * 120; // green to red
+                    return `hsla(${hue}, 80%, 60%, 0.8)`;
+                }
+            };
+            
+            // Store points for hover detection
+            const points = [];
+            
+            // Draw primes on each ring
+            for (let m = 1; m <= maxModulus; m++) {
+                const radius = m * radiusStep;
+                
+                for (const p of primes) {
+                    const residue = p % m;
+                    
+                    // Only plot if gcd(residue, m) = 1
+                    if (gcd(residue, m) !== 1) continue;
+                    
+                    // Calculate angle: θ = 2π * residue / m
+                    const angle = (2 * Math.PI * residue) / m;
+                    
+                    // Convert to Cartesian coordinates
+                    const x = centerX + radius * Math.cos(angle - Math.PI / 2); // Start from top
+                    const y = centerY + radius * Math.sin(angle - Math.PI / 2);
+                    
+                    // Draw point
+                    const color = getColor(p, residue, m);
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pointSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Store for hover
+                    points.push({ x, y, p, residue, modulus: m, color });
+                    
+                    // Draw lines from center to show mod structure
+                    if (showModLines && m === maxModulus && residue < m) {
+                        ctx.strokeStyle = 'rgba(78, 205, 196, 0.1)';
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Add hover interaction
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // Find closest point
+                let closestPoint = null;
+                let minDist = pointSize + 5;
+                
+                for (const point of points) {
+                    const dist = Math.sqrt((mouseX - point.x) ** 2 + (mouseY - point.y) ** 2);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestPoint = point;
+                    }
+                }
+                
+                if (closestPoint) {
+                    // Draw tooltip
+                    ctx.save();
+                    
+                    const tooltipX = mouseX + 15;
+                    const tooltipY = mouseY - 15;
+                    const text = `p=${closestPoint.p}, r=${closestPoint.residue}, m=${closestPoint.modulus}`;
+                    
+                    ctx.font = '12px Arial';
+                    const textWidth = ctx.measureText(text).width;
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                    ctx.fillRect(tooltipX - 5, tooltipY - 15, textWidth + 10, 22);
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(text, tooltipX, tooltipY);
+                    
+                    // Highlight point
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(closestPoint.x, closestPoint.y, pointSize + 2, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    ctx.restore();
+                    
+                    canvas.style.cursor = 'pointer';
+                } else {
+                    canvas.style.cursor = 'crosshair';
+                }
+            };
+            
+            // Update legend
+            updateRingLegend(colorMode, maxModulus, primes);
+        }
+        
+        function updateRingLegend(colorMode, maxModulus, primes) {
+            const legend = document.getElementById('ringLegend');
+            let html = '';
+            
+            if (colorMode === 'residue') {
+                html += '<div class="ring-legend-item"><strong>Color by Residue Class:</strong> Hue represents (p mod m)/m position around each ring</div>';
+            } else if (colorMode === 'modulus') {
+                const colors = [];
+                for (let m = 1; m <= Math.min(maxModulus, 10); m++) {
+                    const hue = (m / maxModulus) * 280;
+                    const color = `hsla(${hue}, 70%, 60%, 0.8)`;
+                    colors.push({ label: `m=${m}`, color });
+                }
+                colors.forEach(c => {
+                    html += `<div class="ring-legend-item"><div class="ring-legend-color" style="background: ${c.color};"></div><span>${c.label}</span></div>`;
+                });
+                if (maxModulus > 10) {
+                    html += '<div class="ring-legend-item"><span>... (gradient continues)</span></div>';
+                }
+            } else {
+                html += '<div class="ring-legend-item"><strong>Color by Prime Size:</strong> Green (small) → Yellow → Red (large)</div>';
+            }
+            
+            legend.innerHTML = html;
         }
         
         window.onload = () => {
