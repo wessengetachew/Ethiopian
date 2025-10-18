@@ -686,6 +686,45 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('credits')">
+                    <h3>Credits & Acknowledgments</h3>
+                    <span class="toggle-icon" id="credits-icon">▼</span>
+                </div>
+                <div id="credits-content" class="collapsible-content">
+                    <p style="margin-bottom: 15px;"><strong>Creator:</strong> Wessen Getachew (<a href="https://twitter.com/7Dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7Dview</a>)</p>
+                    
+                    <p style="margin-bottom: 15px;"><strong>Mathematical Foundations:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Leonhard Euler (1707-1783)</strong> - Pioneer of the Euler product formula for the Riemann zeta function, discovered the beautiful identity ζ(2) = π²/6, and laid the groundwork for analytic number theory</li>
+                        <li><strong>Bernhard Riemann (1826-1866)</strong> - Extended Euler's work to the complex plane with the Riemann zeta function</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px; margin-bottom: 15px;"><strong>Educational Inspiration:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>3Blue1Brown (Grant Sanderson)</strong> - For exceptional mathematical visualizations and making complex concepts accessible through elegant visual storytelling. His videos on the Basel problem, prime number patterns, and the Riemann zeta function inspired the interactive visualization approach in this calculator.</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px; margin-bottom: 15px;"><strong>Technologies Used:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Chart.js</strong> - Interactive charting library for data visualization</li>
+                        <li><strong>HTML5 Canvas</strong> - For high-resolution chart exports</li>
+                        <li><strong>JavaScript</strong> - Core computation engine and user interface</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Special Thanks:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>The mathematical community for centuries of insights into prime numbers and the zeta function</li>
+                        <li>Open-source developers who created the libraries that power this calculator</li>
+                        <li>Everyone who uses this tool to explore the beauty of mathematics</li>
+                    </ul>
+                    
+                    <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        <strong>💡 Note:</strong> This calculator is an educational tool designed to demonstrate the power of Euler products and modular arithmetic in computing fundamental mathematical constants. It combines classical number theory with modern computational methods and interactive visualization.
+                    </p>
+                </div>
+            </div>
         </div>
         
         <div class="main-content">
