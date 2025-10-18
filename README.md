@@ -3213,19 +3213,45 @@
                     
                     const tooltipX = mouseX + 15;
                     const tooltipY = mouseY - 15;
-                    const text = `p=${closestPoint.p}, r=${closestPoint.residue}, m=${closestPoint.modulus}`;
+                    
+                    // Calculate angle in degrees and radians
+                    const angleRad = (2 * Math.PI * closestPoint.residue) / closestPoint.modulus;
+                    const angleDeg = (angleRad * 180 / Math.PI).toFixed(1);
+                    const angleRadStr = (angleRad / Math.PI).toFixed(3);
+                    
+                    // Create detailed tooltip
+                    const lines = [
+                        `Prime: p = ${closestPoint.p}`,
+                        `Residue: r = ${closestPoint.residue} (mod ${closestPoint.modulus})`,
+                        `Fraction: r/m = ${closestPoint.residue}/${closestPoint.modulus} = ${(closestPoint.residue / closestPoint.modulus).toFixed(4)}`,
+                        `Angle: θ = ${angleRadStr}π rad = ${angleDeg}°`,
+                        `Position: (${Math.cos(angleRad).toFixed(3)}, ${Math.sin(angleRad).toFixed(3)})`
+                    ];
                     
                     ctx.font = '12px Arial';
-                    const textWidth = ctx.measureText(text).width;
+                    const lineHeight = 16;
+                    const padding = 8;
+                    const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                    const boxWidth = maxWidth + padding * 2;
+                    const boxHeight = lines.length * lineHeight + padding * 2;
                     
-                    ctx.fillStyle = invertColors ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.9)';
-                    ctx.fillRect(tooltipX - 5, tooltipY - 15, textWidth + 10, 22);
+                    // Adjust tooltip position if it goes off screen
+                    let finalX = tooltipX;
+                    let finalY = tooltipY;
+                    if (tooltipX + boxWidth > width) finalX = mouseX - boxWidth - 15;
+                    if (tooltipY + boxHeight > height) finalY = mouseY - boxHeight - 15;
                     
-                    ctx.strokeStyle = invertColors ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)';
-                    ctx.strokeRect(tooltipX - 5, tooltipY - 15, textWidth + 10, 22);
+                    ctx.fillStyle = invertColors ? 'rgba(255, 255, 255, 0.98)' : 'rgba(0, 0, 0, 0.95)';
+                    ctx.fillRect(finalX - padding, finalY - padding, boxWidth, boxHeight);
+                    
+                    ctx.strokeStyle = invertColors ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(finalX - padding, finalY - padding, boxWidth, boxHeight);
                     
                     ctx.fillStyle = invertColors ? '#000' : '#fff';
-                    ctx.fillText(text, tooltipX, tooltipY);
+                    lines.forEach((line, idx) => {
+                        ctx.fillText(line, finalX, finalY + idx * lineHeight + 12);
+                    });
                     
                     // Highlight point
                     ctx.strokeStyle = '#ffd700';
