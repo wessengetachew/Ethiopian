@@ -658,6 +658,12 @@
             <div style="text-align: center; margin-top: 5px; font-size: 0.9em; opacity: 0.75;">
                 Inspired by Leonhard Euler's pioneering work and 3Blue1Brown's mathematical visualizations
             </div>
+            <div style="text-align: center; margin-top: 12px; font-size: 0.9em;">
+                <span style="opacity: 0.8;">Explore more prime visualizations:</span>
+                <a href="https://wessengetachew.github.io/GCD/" target="_blank" style="color: #4ecdc4; text-decoration: none; margin: 0 8px; font-weight: 500;">GCD Patterns</a>
+                <span style="opacity: 0.5;">|</span>
+                <a href="https://wessengetachew.github.io/Primes/" target="_blank" style="color: #4ecdc4; text-decoration: none; margin: 0 8px; font-weight: 500;">Prime Spirals</a>
+            </div>
             
             <div class="info-section">
                 <div class="toggle-section" onclick="toggleSection('theory')">
@@ -760,9 +766,12 @@
                     </div>
                     
                     <label for="decimalPlaces">Decimal Places to Display:</label>
-                    <input type="number" id="decimalPlaces" value="15" min="1" max="30" step="1">
+                    <input type="number" id="decimalPlaces" value="15" min="1" max="20" step="1" onchange="validateDecimalPlaces()">
                     <div style="font-size: 0.85em; opacity: 0.8; margin-top: -10px;">
-                        Controls precision for all numerical outputs
+                        Max 20 digits (JavaScript precision limit ≈15-17 digits)
+                    </div>
+                    <div id="precision-warning" style="display: none; font-size: 0.85em; color: #ff6b6b; margin-top: 5px; padding: 8px; background: rgba(255, 107, 107, 0.1); border-radius: 5px;">
+                        ⚠️ Digits beyond 15-17 may not be accurate due to floating-point precision limits
                     </div>
                 </div>
                 
@@ -1046,6 +1055,11 @@
                     document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(Math.min(decimalPlaces - 5, 8))}%</strong>`;
                     document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
                     document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong>`;
+                    
+                    // Add precision info
+                    const precisionNote = decimalPlaces > 15 ? 
+                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">⚠️ Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
+                    document.getElementById('prime-count').innerHTML += precisionNote;
                     
                     // Show step-by-step
                     if (showSteps) {
@@ -1571,6 +1585,24 @@
         
         let channelSortOrder = 'residue';
         let decimalPlaces = 15; // Global decimal places setting
+        
+        function validateDecimalPlaces() {
+            const input = document.getElementById('decimalPlaces');
+            const warning = document.getElementById('precision-warning');
+            const value = parseInt(input.value);
+            
+            // Cap at 20
+            if (value > 20) {
+                input.value = 20;
+            }
+            
+            // Show warning if > 17
+            if (value > 17) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+        }
         
         function updateChannelViewButtons() {
             document.querySelectorAll('.view-options .view-btn').forEach(btn => {
