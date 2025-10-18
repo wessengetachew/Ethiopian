@@ -652,6 +652,12 @@
         <div class="header">
             <h1>Modular Sieve Calculator</h1>
             <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
+            <div style="text-align: center; margin-top: 15px; font-size: 0.95em; font-style: italic; opacity: 0.85;">
+                By Wessen Getachew (<a href="https://twitter.com/7Dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7Dview</a>)
+            </div>
+            <div style="text-align: center; margin-top: 5px; font-size: 0.9em; opacity: 0.75;">
+                Inspired by Leonhard Euler's pioneering work and 3Blue1Brown's mathematical visualizations
+            </div>
             
             <div class="info-section">
                 <div class="toggle-section" onclick="toggleSection('theory')">
@@ -712,6 +718,12 @@
                     <input type="number" id="modulus" value="30" min="2" max="210" step="1">
                     <div style="font-size: 0.85em; opacity: 0.8; margin-top: -10px;">
                         φ(m) channels for gcd(a,m)=1. Try: 6, 12, 30, 60, 210
+                    </div>
+                    
+                    <label for="decimalPlaces">Decimal Places to Display:</label>
+                    <input type="number" id="decimalPlaces" value="15" min="1" max="30" step="1">
+                    <div style="font-size: 0.85em; opacity: 0.8; margin-top: -10px;">
+                        Controls precision for all numerical outputs
                     </div>
                 </div>
                 
@@ -952,6 +964,7 @@
             const method = document.getElementById('method').value;
             const showSteps = document.getElementById('showSteps').checked;
             const modulus = parseInt(document.getElementById('modulus').value);
+            decimalPlaces = parseInt(document.getElementById('decimalPlaces').value);
             
             document.getElementById('results').style.display = 'block';
             document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...</div>';
@@ -987,11 +1000,11 @@
                     };
                     
                     // Display results
-                    document.getElementById('computed-value').textContent = computedValue.toFixed(15);
-                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(15);
+                    document.getElementById('computed-value').textContent = computedValue.toFixed(decimalPlaces);
+                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(decimalPlaces);
                     
                     const actualError = Math.abs(computedValue - exactValues[constantType]) / exactValues[constantType];
-                    document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(8)}%</strong>`;
+                    document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(Math.min(decimalPlaces - 5, 8))}%</strong>`;
                     document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
                     document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong>`;
                     
@@ -1073,7 +1086,7 @@
             // Step 3: Compute Euler product
             const firstFewFactors = primes.slice(0, 5).map(p => {
                 const factor = 1 / (1 - Math.pow(p, -exponent));
-                return `(1 - ${p}<sup>-${exponent}</sup>)<sup>-1</sup> = ${factor.toFixed(6)}`;
+                return `(1 - ${p}<sup>-${exponent}</sup>)<sup>-1</sup> = ${factor.toFixed(Math.min(decimalPlaces, 10))}`;
             }).join('<br>');
             
             html += `
@@ -1085,7 +1098,7 @@
                         <div class="step-formula">${firstFewFactors}</div>
                         <p><strong>Product of all ${primes.length} factors:</strong></p>
                         <div class="step-formula">
-                            ${constantType === 'pi' ? 'ζ(2) = ' : `ζ(${exponent}) = `}${computeTruncatedProduct(primes, exponent).toFixed(12)}
+                            ${constantType === 'pi' ? 'ζ(2) = ' : `ζ(${exponent}) = `}${computeTruncatedProduct(primes, exponent).toFixed(Math.min(decimalPlaces, 12))}
                         </div>
                     </div>
                 </div>
@@ -1100,12 +1113,12 @@
                         <div class="step-content">
                             <p>Using the identity ζ(2) = π²/6, we have π = √(6·ζ(2))</p>
                             <div class="step-formula">
-                                π = √(6 × ${zeta2.toFixed(12)})<br>
-                                π = √${(6 * zeta2).toFixed(12)}<br>
-                                π ≈ ${computedValue.toFixed(15)}
+                                π = √(6 × ${zeta2.toFixed(Math.min(decimalPlaces, 12))})<br>
+                                π = √${(6 * zeta2).toFixed(Math.min(decimalPlaces, 12))}<br>
+                                π ≈ ${computedValue.toFixed(decimalPlaces)}
                             </div>
-                            <p><strong>Exact value:</strong> π = ${exactValue.toFixed(15)}</p>
-                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
+                            <p><strong>Exact value:</strong> π = ${exactValue.toFixed(decimalPlaces)}</p>
+                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(Math.min(decimalPlaces - 9, 6))}</p>
                         </div>
                     </div>
                 `;
@@ -1114,10 +1127,10 @@
                     <div class="step">
                         <div class="step-title"><span class="step-number">4</span>Compare with Exact Value</div>
                         <div class="step-content">
-                            <p><strong>Computed:</strong> ζ(${exponent}) ≈ ${computedValue.toFixed(15)}</p>
-                            <p><strong>Exact:</strong> ζ(${exponent}) = ${exactValue.toFixed(15)}</p>
-                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(6)}</p>
-                            <p><strong>Relative error:</strong> ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(8)}%</p>
+                            <p><strong>Computed:</strong> ζ(${exponent}) ≈ ${computedValue.toFixed(decimalPlaces)}</p>
+                            <p><strong>Exact:</strong> ζ(${exponent}) = ${exactValue.toFixed(decimalPlaces)}</p>
+                            <p><strong>Absolute error:</strong> ${Math.abs(computedValue - exactValue).toExponential(Math.min(decimalPlaces - 9, 6))}</p>
+                            <p><strong>Relative error:</strong> ${(Math.abs(computedValue - exactValue) / exactValue * 100).toFixed(Math.min(decimalPlaces - 7, 8))}%</p>
                         </div>
                     </div>
                 `;
@@ -1178,8 +1191,8 @@
                             <div class="gap-value">${gapPrimes.length} primes</div>
                         </div>
                         <div style="margin-top: 10px; font-size: 0.9em;">
-                            <div>Contribution: ${contribution.toFixed(6)}</div>
-                            <div>log(R_${gap}) = ${logContrib.toFixed(4)}</div>
+                            <div>Contribution: ${contribution.toFixed(Math.min(decimalPlaces - 9, 6))}</div>
+                            <div>log(R_${gap}) = ${logContrib.toFixed(Math.min(decimalPlaces - 11, 4))}</div>
                         </div>
                         <div style="margin-top: 8px; font-size: 0.85em; opacity: 0.8;">
                             Range: ${Math.min(...gapPrimes)} - ${Math.max(...gapPrimes)}
@@ -1199,12 +1212,12 @@
                                 ${cumulativeSteps.map((step, idx) => `
                                     <div class="cumulative-step">
                                         <strong>Step ${idx + 1}:</strong> p = ${step.prime}<br>
-                                        Factor: (1 - ${step.prime}^(-${exponent}))^(-1) = ${step.factor.toFixed(8)}<br>
-                                        Cumulative: ${step.cumulative.toFixed(10)}
+                                        Factor: (1 - ${step.prime}^(-${exponent}))^(-1) = ${step.factor.toFixed(Math.min(decimalPlaces - 7, 8))}<br>
+                                        Cumulative: ${step.cumulative.toFixed(Math.min(decimalPlaces - 5, 10))}
                                     </div>
                                 `).join('')}
                                 <div style="margin-top: 15px; padding: 10px; background: rgba(78, 205, 196, 0.2); border-radius: 5px;">
-                                    <strong>Final Contribution for Gap ${gap}:</strong> ${contribution.toFixed(12)}
+                                    <strong>Final Contribution for Gap ${gap}:</strong> ${contribution.toFixed(Math.min(decimalPlaces, 12))}
                                 </div>
                             </div>
                         </div>
@@ -1363,11 +1376,11 @@
                         <div class="channel-stats">
                             <div class="stat-item">
                                 <div class="stat-label">Contribution</div>
-                                <div class="stat-value">${contribution.toFixed(6)}</div>
+                                <div class="stat-value">${contribution.toFixed(Math.min(decimalPlaces - 9, 6))}</div>
                             </div>
                             <div class="stat-item">
                                 <div class="stat-label">log(Contrib)</div>
-                                <div class="stat-value">${logContrib.toFixed(4)}</div>
+                                <div class="stat-value">${logContrib.toFixed(Math.min(decimalPlaces - 11, 4))}</div>
                             </div>
                             <div class="stat-item">
                                 <div class="stat-label">Avg Prime</div>
@@ -1441,8 +1454,8 @@
                     <tr>
                         <td><strong>≡ ${a} (mod ${modulus})</strong></td>
                         <td>${channelPrimes.length}</td>
-                        <td>${contribution.toFixed(6)}</td>
-                        <td>${logContrib.toFixed(4)}</td>
+                        <td>${contribution.toFixed(Math.min(decimalPlaces - 9, 6))}</td>
+                        <td>${logContrib.toFixed(Math.min(decimalPlaces - 11, 4))}</td>
                         <td>${avgPrime > 0 ? avgPrime.toFixed(1) : 'N/A'}</td>
                         <td>${minPrime > 0 ? minPrime : 'N/A'}</td>
                         <td>${maxPrime > 0 ? maxPrime : 'N/A'}</td>
@@ -1474,7 +1487,7 @@
                         <div class="progress-fill" style="width: ${smallPercent}%;"></div>
                     </div>
                     <div style="margin-top: 8px; font-size: 0.9em; opacity: 0.8;">
-                        Contribution: ${smallProduct.toFixed(6)} | log: ${Math.log(smallProduct).toFixed(4)}
+                        Contribution: ${smallProduct.toFixed(Math.min(decimalPlaces - 9, 6))} | log: ${Math.log(smallProduct).toFixed(Math.min(decimalPlaces - 11, 4))}
                     </div>
                 </div>
             `;
@@ -1518,6 +1531,7 @@
         }
         
         let channelSortOrder = 'residue';
+        let decimalPlaces = 15; // Global decimal places setting
         
         function updateChannelViewButtons() {
             document.querySelectorAll('.view-options .view-btn').forEach(btn => {
@@ -2165,8 +2179,10 @@
             // Create temporary canvas for chart with proper sizing
             const tempCanvas = document.createElement('canvas');
             const chartPadding = padding * 2;
+            
+            // Make temp canvas larger to capture full chart
             tempCanvas.width = width - chartPadding;
-            tempCanvas.height = chartHeight;
+            tempCanvas.height = chartHeight * 1.2; // Increased to capture full chart
             const tempCtx = tempCanvas.getContext('2d');
             
             // Generate chart based on type
@@ -2182,14 +2198,30 @@
                 chartInstance = generateGapDistChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
-            // Wait for chart to render
+            // Wait for chart to render with longer delay
             setTimeout(() => {
                 // Calculate proper position to center the chart
                 const chartX = chartPadding / 2;
                 const chartY = titleHeight + padding;
                 
-                // Draw chart to main canvas without stretching
-                ctx.drawImage(tempCanvas, chartX, chartY, tempCanvas.width, tempCanvas.height);
+                // Calculate available space
+                const availableHeight = height - chartY - watermarkHeight - padding;
+                
+                // Scale chart to fit if needed, maintaining aspect ratio
+                let drawWidth = tempCanvas.width;
+                let drawHeight = tempCanvas.height;
+                
+                if (drawHeight > availableHeight) {
+                    const scale = availableHeight / drawHeight;
+                    drawHeight = availableHeight;
+                    drawWidth = tempCanvas.width * scale;
+                }
+                
+                // Center horizontally if scaled
+                const finalX = (width - drawWidth) / 2;
+                
+                // Draw chart to main canvas with proper scaling
+                ctx.drawImage(tempCanvas, finalX, chartY, drawWidth, drawHeight);
                 
                 // Draw watermark if enabled
                 if (includeWatermark) {
@@ -2208,13 +2240,13 @@
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `zeta_chart_${chartType}_${resolution}_${Date.now()}.jpg`;
+                    a.download = `modular_sieve_${chartType}_${resolution}_${Date.now()}.jpg`;
                     a.click();
                     URL.revokeObjectURL(url);
                     
                     chartInstance.destroy();
                 }, 'image/jpeg', 0.95);
-            }, 500);
+            }, 1000); // Increased delay to ensure full chart renders
         }
         
         function generateChannelChartForExport(ctx, width, height, background) {
