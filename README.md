@@ -954,6 +954,10 @@
                         Show Mod Lines
                     </label>
                     <label>
+                        <input type="checkbox" id="invertColors">
+                        Invert Colors
+                    </label>
+                    <label>
                         Color By:
                         <select id="colorMode">
                             <option value="residue">Residue Class</option>
@@ -962,6 +966,22 @@
                         </select>
                     </label>
                     <button onclick="updatePrimeRing()" style="padding: 6px 16px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update</button>
+                </div>
+                <div class="ring-controls" style="margin-top: 10px;">
+                    <label>
+                        Rotation Mode:
+                        <select id="rotationMode">
+                            <option value="none">No Rotation</option>
+                            <option value="global">Global Rotation</option>
+                            <option value="local">Local Rotation (by ring)</option>
+                        </select>
+                    </label>
+                    <label>
+                        Speed:
+                        <input type="number" id="rotationSpeed" value="0.5" min="0.1" max="5" step="0.1">
+                    </label>
+                    <button onclick="toggleRotation()" id="rotationToggle" style="padding: 6px 16px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Start Rotation</button>
+                    <button onclick="exportPrimeRing()" style="padding: 6px 16px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Export Ring (PNG)</button>
                 </div>
                 <canvas id="primeRingCanvas"></canvas>
                 <div class="ring-info">
@@ -2937,6 +2957,38 @@
         }
         
         // Prime Ring Visualization
+        let rotationAnimationId = null;
+        let globalRotationAngle = 0;
+        let isRotating = false;
+        
+        function toggleRotation() {
+            isRotating = !isRotating;
+            const btn = document.getElementById('rotationToggle');
+            
+            if (isRotating) {
+                btn.textContent = 'Stop Rotation';
+                btn.style.background = '#4ecdc4';
+                startRotation();
+            } else {
+                btn.textContent = 'Start Rotation';
+                btn.style.background = '#ff6b6b';
+                if (rotationAnimationId) {
+                    cancelAnimationFrame(rotationAnimationId);
+                    rotationAnimationId = null;
+                }
+            }
+        }
+        
+        function startRotation() {
+            if (!isRotating) return;
+            
+            const speed = parseFloat(document.getElementById('rotationSpeed').value);
+            globalRotationAngle += 0.01 * speed;
+            
+            updatePrimeRing();
+            rotationAnimationId = requestAnimationFrame(startRotation);
+        }
+        
         function updatePrimeRing() {
             if (!computationData) return;
             
@@ -2960,45 +3012,52 @@
             const showLabels = document.getElementById('showLabels').checked;
             const showModLines = document.getElementById('showModLines').checked;
             const colorMode = document.getElementById('colorMode').value;
+            const invertColors = document.getElementById('invertColors').checked;
+            const rotationMode = document.getElementById('rotationMode').value;
             
             const primes = computationData.primes;
             const maxRadius = Math.min(width, height) * 0.45;
             const radiusStep = maxRadius / (maxModulus + 1);
             
             // Clear canvas
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            if (invertColors) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            } else {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            }
             ctx.fillRect(0, 0, width, height);
             
             // Draw modulus rings
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.strokeStyle = invertColors ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 1;
             for (let m = 1; m <= maxModulus; m++) {
                 const radius = m * radiusStep;
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
                 ctx.stroke();
-                
-                // Draw modulus label
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.font = '10px Arial';
-                ctx.textAlign = 'left';
-                ctx.fillText(`m=${m}`, centerX + radius + 5, centerY);
             }
             
             // Generate colors based on mode
             const getColor = (prime, residue, modulus) => {
+                let hue, saturation = 80, lightness = 60;
+                
                 if (colorMode === 'residue') {
-                    const hue = (residue / modulus) * 360;
-                    return `hsla(${hue}, 80%, 60%, 0.8)`;
+                    hue = (residue / modulus) * 360;
                 } else if (colorMode === 'modulus') {
-                    const hue = (modulus / maxModulus) * 280;
-                    return `hsla(${hue}, 70%, 60%, 0.8)`;
+                    hue = (modulus / maxModulus) * 280;
+                    saturation = 70;
                 } else { // size
                     const maxPrime = Math.max(...primes);
                     const ratio = prime / maxPrime;
-                    const hue = ratio * 120; // green to red
-                    return `hsla(${hue}, 80%, 60%, 0.8)`;
+                    hue = ratio * 120; // green to red
                 }
+                
+                if (invertColors) {
+                    saturation = Math.min(saturation + 10, 100);
+                    lightness = 40; // darker colors on white background
+                }
+                
+                return `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`;
             };
             
             // Store points for hover detection
@@ -3033,7 +3092,7 @@
                     
                     // Draw lines from center to show mod structure
                     if (showModLines && m === maxModulus && residue < m) {
-                        ctx.strokeStyle = 'rgba(78, 205, 196, 0.1)';
+                        ctx.strokeStyle = invertColors ? 'rgba(78, 205, 196, 0.2)' : 'rgba(78, 205, 196, 0.1)';
                         ctx.lineWidth = 0.5;
                         ctx.beginPath();
                         ctx.moveTo(centerX, centerY);
@@ -3072,10 +3131,13 @@
                     ctx.font = '12px Arial';
                     const textWidth = ctx.measureText(text).width;
                     
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                    ctx.fillStyle = invertColors ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.9)';
                     ctx.fillRect(tooltipX - 5, tooltipY - 15, textWidth + 10, 22);
                     
-                    ctx.fillStyle = '#fff';
+                    ctx.strokeStyle = invertColors ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)';
+                    ctx.strokeRect(tooltipX - 5, tooltipY - 15, textWidth + 10, 22);
+                    
+                    ctx.fillStyle = invertColors ? '#000' : '#fff';
                     ctx.fillText(text, tooltipX, tooltipY);
                     
                     // Highlight point
@@ -3121,6 +3183,200 @@
             }
             
             legend.innerHTML = html;
+        }
+        
+        function exportPrimeRing() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            // Create modal for export options
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 40px;
+                border-radius: 20px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            `;
+            
+            content.innerHTML = `
+                <h2 style="color: #ffd700; margin-bottom: 25px; text-align: center;">Export Prime Ring</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Resolution:</label>
+                    <select id="ringExportResolution" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="1080">1080p (1920 x 1080)</option>
+                        <option value="2160">4K (3840 x 2160)</option>
+                        <option value="4320">8K (7680 x 4320)</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Format:</label>
+                    <select id="ringExportFormat" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="png">PNG (Lossless)</option>
+                        <option value="jpg">JPEG (Smaller file)</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                        <input type="checkbox" id="ringExportWatermark" checked style="width: auto; margin-right: 10px;">
+                        <span>Include watermark</span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button id="ringExportBtn" style="flex: 1; padding: 15px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">Export</button>
+                    <button id="ringCancelBtn" style="flex: 1; padding: 15px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">Cancel</button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            document.getElementById('ringCancelBtn').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            document.getElementById('ringExportBtn').onclick = () => {
+                const resolution = parseInt(document.getElementById('ringExportResolution').value);
+                const format = document.getElementById('ringExportFormat').value;
+                const includeWatermark = document.getElementById('ringExportWatermark').checked;
+                
+                document.body.removeChild(modal);
+                
+                performRingExport(resolution, format, includeWatermark);
+            };
+        }
+        
+        function performRingExport(height, format, includeWatermark) {
+            const width = height * 16 / 9; // 16:9 aspect ratio
+            
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = width;
+            exportCanvas.height = height;
+            const ctx = exportCanvas.getContext('2d');
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            const maxModulus = parseInt(document.getElementById('maxModulus').value);
+            const pointSize = parseInt(document.getElementById('pointSize').value) * (height / 1080);
+            const colorMode = document.getElementById('colorMode').value;
+            const invertColors = document.getElementById('invertColors').checked;
+            const rotationMode = document.getElementById('rotationMode').value;
+            
+            const primes = computationData.primes;
+            const maxRadius = Math.min(width, height) * 0.45;
+            const radiusStep = maxRadius / (maxModulus + 1);
+            
+            // Clear canvas
+            if (invertColors) {
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#000000';
+            }
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw modulus rings
+            ctx.strokeStyle = invertColors ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)';
+            ctx.lineWidth = 2;
+            for (let m = 1; m <= maxModulus; m++) {
+                const radius = m * radiusStep;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Generate colors
+            const getColor = (prime, residue, modulus) => {
+                let hue, saturation = 80, lightness = 60;
+                
+                if (colorMode === 'residue') {
+                    hue = (residue / modulus) * 360;
+                } else if (colorMode === 'modulus') {
+                    hue = (modulus / maxModulus) * 280;
+                    saturation = 70;
+                } else {
+                    const maxPrime = Math.max(...primes);
+                    const ratio = prime / maxPrime;
+                    hue = ratio * 120;
+                }
+                
+                if (invertColors) {
+                    saturation = Math.min(saturation + 10, 100);
+                    lightness = 40;
+                }
+                
+                return `hsla(${hue}, ${saturation}%, ${lightness}%, 0.9)`;
+            };
+            
+            // Draw primes
+            for (let m = 1; m <= maxModulus; m++) {
+                const radius = m * radiusStep;
+                
+                for (const p of primes) {
+                    const residue = p % m;
+                    if (gcd(residue, m) !== 1) continue;
+                    
+                    let angle = (2 * Math.PI * residue) / m;
+                    
+                    if (rotationMode === 'global') {
+                        angle += globalRotationAngle;
+                    } else if (rotationMode === 'local') {
+                        angle += globalRotationAngle * m / maxModulus;
+                    }
+                    
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    
+                    const color = getColor(p, residue, m);
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pointSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Add watermark
+            if (includeWatermark) {
+                const watermarkY = height - height * 0.03;
+                ctx.fillStyle = invertColors ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+                ctx.font = `${height * 0.02}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText('Modular Sieve Calculator - Prime Residue Rings', centerX, watermarkY);
+                ctx.font = `italic ${height * 0.015}px Arial`;
+                ctx.fillText('By Wessen Getachew (@7Dview)', centerX, watermarkY + height * 0.025);
+            }
+            
+            // Export
+            const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+            exportCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `prime_rings_${maxModulus}_${Date.now()}.${format}`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, mimeType, 0.95);
         }
         
         window.onload = () => {
