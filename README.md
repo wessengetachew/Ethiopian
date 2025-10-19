@@ -2850,8 +2850,8 @@
                 
                 <div style="margin-bottom: 25px;">
                     <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
-                        <input type="checkbox" id="exportWatermark" checked style="width: auto; margin-right: 10px;">
-                        <span>Include watermark by Wessen Getachew</span>
+                        <input type="checkbox" id="exportLegend" checked style="width: auto; margin-right: 10px;">
+                        <span>Include detailed legend</span>
                     </label>
                 </div>
                 
@@ -2872,11 +2872,11 @@
                 const resolution = document.getElementById('exportResolution').value;
                 const background = document.getElementById('exportBackground').value;
                 const chartType = document.getElementById('exportChartType').value;
-                const includeWatermark = document.getElementById('exportWatermark').checked;
+                const includeLegend = document.getElementById('exportLegend').checked;
                 
                 document.body.removeChild(modal);
                 
-                performExport(resolution, background, chartType, includeWatermark);
+                performExport(resolution, background, chartType, includeLegend);
             };
         }
         
