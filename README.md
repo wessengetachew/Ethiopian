@@ -2484,6 +2484,8 @@
                 border-radius: 20px;
                 max-width: 500px;
                 width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             `;
             
@@ -2521,13 +2523,20 @@
                         <option value="sacksSpiral">Sacks Spiral</option>
                         <option value="zetaZeros">Riemann Zeta Zeros</option>
                         <option value="errorAnalysis">Error Analysis</option>
+                        <option value="primeRaces">Prime Races</option>
+                        <option value="goldbachComet">Goldbach Comet</option>
+                        <option value="modularLaplace">Modular Laplace Transform</option>
                     </select>
                 </div>
                 
-                <div style="margin-bottom: 25px;">
-                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer; margin-bottom: 10px;">
                         <input type="checkbox" id="exportWatermark" checked style="width: auto; margin-right: 10px;">
                         <span>Include watermark by Wessen Getachew</span>
+                    </label>
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                        <input type="checkbox" id="exportLegend" checked style="width: auto; margin-right: 10px;">
+                        <span>Include legend</span>
                     </label>
                 </div>
                 
@@ -2549,14 +2558,175 @@
                 const background = document.getElementById('exportBackground').value;
                 const chartType = document.getElementById('exportChartType').value;
                 const includeWatermark = document.getElementById('exportWatermark').checked;
+                const includeLegend = document.getElementById('exportLegend').checked;
                 
                 document.body.removeChild(modal);
                 
-                performExport(resolution, background, chartType, includeWatermark);
+                performExport(resolution, background, chartType, includeWatermark, includeLegend);
             };
         }
         
-        function performExport(resolution, background, chartType, includeWatermark) {
+        function drawChartLegend(ctx, chartType, legendY, width, height, background, textColor, accentColor) {
+            const { primes, modulus, exponent } = computationData;
+            
+            ctx.save();
+            
+            // Create legend box
+            const legendPadding = width * 0.02;
+            const legendBoxY = legendY;
+            const legendBoxHeight = height * 0.08;
+            
+            // Semi-transparent background for legend
+            ctx.fillStyle = background === 'white' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(legendPadding, legendBoxY, width - legendPadding * 2, legendBoxHeight);
+            
+            // Border for legend
+            ctx.strokeStyle = accentColor;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(legendPadding, legendBoxY, width - legendPadding * 2, legendBoxHeight);
+            
+            ctx.fillStyle = textColor;
+            ctx.font = `${height * 0.02}px Arial`;
+            
+            let legendText = '';
+            let itemY = legendBoxY + legendPadding * 2;
+            const itemSpacing = height * 0.025;
+            
+            if (chartType === 'channel') {
+                const channels = computeResidueChannels(primes, modulus);
+                const coprimeResidues = getCoprimeResidues(modulus);
+                
+                ctx.font = `bold ${height * 0.022}px Arial`;
+                ctx.fillText(`Residue Channels (mod ${modulus}):`, legendPadding * 2, itemY);
+                
+                ctx.font = `${height * 0.018}px Arial`;
+                itemY += itemSpacing;
+                
+                const colors = generateColors(coprimeResidues.length + 1);
+                const itemsPerRow = Math.min(8, coprimeResidues.length + 1);
+                const itemWidth = (width - legendPadding * 4) / itemsPerRow;
+                
+                // Small primes
+                ctx.fillStyle = colors[0];
+                ctx.fillRect(legendPadding * 2, itemY - height * 0.015, height * 0.02, height * 0.02);
+                ctx.fillStyle = textColor;
+                ctx.fillText(`Small (<${modulus})`, legendPadding * 2 + height * 0.025, itemY);
+                
+                // Channels
+                for (let i = 0; i < Math.min(coprimeResidues.length, itemsPerRow - 1); i++) {
+                    const x = legendPadding * 2 + (i + 1) * itemWidth;
+                    const a = coprimeResidues[i];
+                    
+                    ctx.fillStyle = colors[i + 1];
+                    ctx.fillRect(x, itemY - height * 0.015, height * 0.02, height * 0.02);
+                    ctx.fillStyle = textColor;
+                    ctx.fillText(`≡${a}`, x + height * 0.025, itemY);
+                }
+                
+            } else if (chartType === 'convergence') {
+                ctx.font = `${height * 0.02}px Arial`;
+                
+                // Partial product line
+                ctx.strokeStyle = background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(legendPadding * 2, itemY - height * 0.008);
+                ctx.lineTo(legendPadding * 2 + height * 0.04, itemY - height * 0.008);
+                ctx.stroke();
+                ctx.fillStyle = textColor;
+                ctx.fillText('Partial Product', legendPadding * 2 + height * 0.05, itemY);
+                
+                // Exact value line
+                const x2 = width * 0.4;
+                ctx.strokeStyle = background === 'white' ? 'rgba(255, 99, 71, 1)' : 'rgba(255, 215, 0, 1)';
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(x2, itemY - height * 0.008);
+                ctx.lineTo(x2 + height * 0.04, itemY - height * 0.008);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillText('Exact Value', x2 + height * 0.05, itemY);
+                
+            } else if (chartType === 'gapHistogram') {
+                ctx.font = `${height * 0.018}px Arial`;
+                
+                const legendItems = [
+                    { color: 'rgba(255, 99, 132, 0.8)', label: 'Twin Primes (gap=2)' },
+                    { color: 'rgba(255, 159, 64, 0.8)', label: 'Cousin Primes (gap=4)' },
+                    { color: 'rgba(255, 205, 86, 0.8)', label: 'Sexy Primes (gap=6)' },
+                    { color: 'rgba(153, 102, 255, 0.8)', label: 'Max Gap' }
+                ];
+                
+                const itemsPerRow = 2;
+                const itemWidth = (width - legendPadding * 4) / itemsPerRow;
+                
+                legendItems.forEach((item, idx) => {
+                    const row = Math.floor(idx / itemsPerRow);
+                    const col = idx % itemsPerRow;
+                    const x = legendPadding * 2 + col * itemWidth;
+                    const y = itemY + row * itemSpacing;
+                    
+                    ctx.fillStyle = item.color;
+                    ctx.fillRect(x, y - height * 0.015, height * 0.02, height * 0.02);
+                    ctx.fillStyle = textColor;
+                    ctx.fillText(item.label, x + height * 0.025, y);
+                });
+                
+            } else if (chartType === 'primeRaces') {
+                const userModulus = parseInt(document.getElementById('raceModulus').value) || 4;
+                const coprimeResidues = getCoprimeResidues(userModulus);
+                
+                ctx.font = `bold ${height * 0.022}px Arial`;
+                ctx.fillText(`Prime Races (mod ${userModulus}):`, legendPadding * 2, itemY);
+                
+                ctx.font = `${height * 0.018}px Arial`;
+                itemY += itemSpacing;
+                
+                const colors = ['rgba(78, 205, 196, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 205, 86, 1)', 'rgba(153, 102, 255, 1)'];
+                const itemWidth = (width - legendPadding * 4) / Math.min(coprimeResidues.length, 4);
+                
+                coprimeResidues.slice(0, 4).forEach((r, idx) => {
+                    const x = legendPadding * 2 + idx * itemWidth;
+                    
+                    ctx.strokeStyle = colors[idx];
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(x, itemY - height * 0.008);
+                    ctx.lineTo(x + height * 0.04, itemY - height * 0.008);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = textColor;
+                    ctx.fillText(`≡${r} (mod ${userModulus})`, x + height * 0.05, itemY);
+                });
+                
+            } else if (chartType === 'goldbachComet') {
+                ctx.font = `${height * 0.02}px Arial`;
+                ctx.fillText('Color intensity: Number of prime pair partitions (low → high)', legendPadding * 2, itemY);
+                
+                itemY += itemSpacing;
+                const gradientWidth = width * 0.6;
+                const gradientHeight = height * 0.02;
+                const gradient = ctx.createLinearGradient(legendPadding * 2, itemY, legendPadding * 2 + gradientWidth, itemY);
+                
+                for (let i = 0; i <= 10; i++) {
+                    const ratio = i / 10;
+                    const hue = ratio * 240;
+                    gradient.addColorStop(ratio, `hsla(${hue}, 80%, 60%, 0.8)`);
+                }
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(legendPadding * 2, itemY - gradientHeight, gradientWidth, gradientHeight);
+                
+            } else {
+                // Generic legend
+                ctx.font = `${height * 0.02}px Arial`;
+                ctx.fillText(`Chart: ${chartType} | Primes: ${primes.length} | Modulus: ${modulus}`, legendPadding * 2, itemY);
+            }
+            
+            ctx.restore();
+        }
+        
+        function performExport(resolution, background, chartType, includeWatermark, includeLegend) {
             const { epsilon, constantType, modulus, primes, computedValue, exactValue } = computationData;
             
             let width, height;
@@ -2588,6 +2758,7 @@
             const titleHeight = height * 0.15;
             const chartHeight = height * 0.70;
             const watermarkHeight = includeWatermark ? height * 0.05 : 0;
+            const legendHeight = includeLegend ? height * 0.10 : 0;
             
             // Text color based on background
             const textColor = background === 'white' ? '#000000' : '#ffffff';
@@ -2667,16 +2838,6 @@
                 chartInstance = generatePrimeRacesChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'goldbachComet') {
                 chartInstance = generateGoldbachCometChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
-            } else if (chartType === 'primeCount') {
-                chartInstance = generatePrimeCountChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
-            } else if (chartType === 'density') {
-                chartInstance = generateDensityChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
-            } else if (chartType === 'gapHistogram') {
-                chartInstance = generateGapHistogramChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
-            } else if (chartType === 'sacksSpiral') {
-                chartInstance = generateSacksSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
-            } else if (chartType === 'zetaZeros') {
-                chartInstance = generateZetaZerosChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -2686,7 +2847,7 @@
                 const chartY = titleHeight + padding;
                 
                 // Calculate available space
-                const availableHeight = height - chartY - watermarkHeight - padding;
+                const availableHeight = height - chartY - watermarkHeight - legendHeight - padding;
                 
                 // Scale chart to fit if needed, maintaining aspect ratio
                 let drawWidth = tempCanvas.width;
@@ -2703,6 +2864,12 @@
                 
                 // Draw chart to main canvas with proper scaling
                 ctx.drawImage(tempCanvas, finalX, chartY, drawWidth, drawHeight);
+                
+                // Draw legend if enabled
+                if (includeLegend) {
+                    const legendY = chartY + drawHeight + padding * 2;
+                    drawChartLegend(ctx, chartType, legendY, width, height, background, textColor, accentColor);
+                }
                 
                 // Draw watermark if enabled
                 if (includeWatermark) {
