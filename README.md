@@ -765,39 +765,17 @@
                     <p><strong>Recovering π:</strong> Since ζ(2) = π²/6, we have:</p>
                     <div class="formula">π = √6 · ∏<sub>p prime</sub> (1 - p<sup>-2</sup>)<sup>-1/2</sup></div>
                     
+                    <p><strong>Two Decomposition Methods:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Gap-Class:</strong> Groups primes by their gaps g(p) = p - p<sub>prev</sub></li>
+                        <li><strong>Residue Channels:</strong> Splits primes by residue classes mod m, giving φ(m) independent channels for gcd(a,m)=1. Default uses m=30 with 8 channels, but supports any modulus.</li>
+                    </ul>
+                    
                     <p style="margin-top: 15px;"><strong>Error Control:</strong> For target error ε, include primes up to:</p>
                     <div class="formula">
                         Y ≈ 1 + 1/ε  (for π)<br>
                         Y ≈ (2/((2n-1)·ε))<sup>1/(2n-1)</sup>  (for ζ(2n))
                     </div>
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <div class="toggle-section" onclick="toggleSection('methods')">
-                    <h3>Decomposition Methods</h3>
-                    <span class="toggle-icon" id="methods-icon">▼</span>
-                </div>
-                <div id="methods-content" class="collapsible-content">
-                    <p><strong>1. Standard Euler Product:</strong> Direct computation using all primes without decomposition.</p>
-                    
-                    <p><strong>2. Gap-Class Analysis:</strong> Groups primes by their gaps g(p) = p - p<sub>prev</sub>. Shows distribution of twin primes (gap=2), cousin primes (gap=4), etc.</p>
-                    
-                    <p><strong>3. Residue Channels (Custom Mod):</strong> Splits primes by residue classes mod m, giving φ(m) independent channels for gcd(a,m)=1. Demonstrates Dirichlet's theorem on primes in arithmetic progressions.</p>
-                    
-                    <p><strong>4. Quadratic Residue Classes:</strong> Partitions primes p by whether a fixed value a is a quadratic residue mod p (solvability of x² ≡ a mod p). Uses Legendre symbol (a/p) = ±1.</p>
-                    
-                    <p><strong>5. Arithmetic Progression Channels:</strong> Similar to residue channels but emphasizes the arithmetic progression structure p ≡ a (mod m). Visualizes Dirichlet density theorem.</p>
-                    
-                    <p><strong>6. Prime Constellations:</strong> Finds clusters of primes in admissible patterns: twin (p, p+2), triplet (p, p+2, p+6), quadruplet (p, p+2, p+6, p+8), etc. Shows rarity of higher-order k-tuples.</p>
-                    
-                    <p><strong>7. Digit Sum Partitions:</strong> Groups primes by digital root (repeated digit sum). All primes > 3 have digital roots in {1,2,4,5,7,8} mod 9, never {3,6,9}.</p>
-                    
-                    <p><strong>8. Binary Weight Classes:</strong> Partitions primes by Hamming weight (popcount) - the number of 1-bits in binary representation. Links to computational number theory.</p>
-                    
-                    <p><strong>9. Primitive Root Decomposition:</strong> Classifies primes p by their smallest primitive root g. A primitive root generates all units mod p via powers g¹, g², ..., g^(p-1).</p>
-                    
-                    <p><strong>10. Sophie Germain Chains:</strong> Tracks chains where p, 2p+1, 4p+3, ... are all prime. Prime p with 2p+1 prime is a Sophie Germain prime; 2p+1 is a safe prime. Shows chain length distribution.</p>
                 </div>
             </div>
             
@@ -835,7 +813,7 @@
                     </ul>
                     
                     <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <strong>Note:</strong> This calculator is an educational tool designed to demonstrate the power of Euler products and modular arithmetic in computing fundamental mathematical constants. It combines classical number theory with modern computational methods and interactive visualization.
+                        <strong>💡 Note:</strong> This calculator is an educational tool designed to demonstrate the power of Euler products and modular arithmetic in computing fundamental mathematical constants. It combines classical number theory with modern computational methods and interactive visualization.
                     </p>
                 </div>
             </div>
@@ -879,7 +857,7 @@
                         Max 20 digits (JavaScript precision limit ≈15-17 digits)
                     </div>
                     <div id="precision-warning" style="display: none; font-size: 0.85em; color: #ff6b6b; margin-top: 5px; padding: 8px; background: rgba(255, 107, 107, 0.1); border-radius: 5px;">
-                        WARNING: Digits beyond 15-17 may not be accurate due to floating-point precision limits
+                        ⚠️ Digits beyond 15-17 may not be accurate due to floating-point precision limits
                     </div>
                 </div>
                 
@@ -891,13 +869,6 @@
                         <option value="gap">Gap-Class Analysis</option>
                         <option value="residue">Residue Channels (Custom Mod)</option>
                         <option value="both">Gap + Residue Combined</option>
-                        <option value="quadratic">Quadratic Residue Classes</option>
-                        <option value="arithmetic">Arithmetic Progression Channels</option>
-                        <option value="constellation">Prime Constellations</option>
-                        <option value="digitsum">Digit Sum Partitions</option>
-                        <option value="binaryweight">Binary Weight Classes</option>
-                        <option value="primitiveroot">Primitive Root Decomposition</option>
-                        <option value="sophiegermain">Sophie Germain Chains</option>
                     </select>
                     
                     <label>
@@ -959,8 +930,8 @@
                     <button class="viz-btn active" onclick="changeViz('convergence')">Convergence Plot</button>
                     <button class="viz-btn" onclick="changeViz('contribution')">Prime Contributions</button>
                     <button class="viz-btn" onclick="changeViz('gapDist')">Gap Distribution</button>
-                    <button class="viz-btn" onclick="changeViz('methodComparison')">Method Comparison</button>
-                    <button class="viz-btn" onclick="changeViz('densityAnalysis')">Density Analysis</button>
+                    <button class="viz-btn" onclick="changeViz('density')">Density Analysis</button>
+                    <button class="viz-btn" onclick="changeViz('primeCount')">Prime Counting Function</button>
                 </div>
                 <canvas id="vizCanvas"></canvas>
             </div>
@@ -998,10 +969,6 @@
                         Show Prime Labels
                     </label>
                     <label>
-                        <input type="checkbox" id="showGCDLabels">
-                        Show GCD/Farey Labels
-                    </label>
-                    <label>
                         <input type="checkbox" id="showModLines" checked>
                         Show Mod Lines
                     </label>
@@ -1010,60 +977,14 @@
                         Invert Ring Order
                     </label>
                     <label>
-                        <input type="checkbox" id="showLiftConnections">
-                        Show r→r Lift Connections
-                    </label>
-                    <label>
-                        Lift Thickness:
-                        <input type="number" id="liftThickness" value="1" min="0.5" max="5" step="0.5">
-                    </label>
-                    <label>
-                        <input type="checkbox" id="showGapConnections">
-                        Show Gap Connections (r, r+2n)
-                    </label>
-                    <label>
-                        Gap Thickness:
-                        <input type="number" id="gapThickness" value="1.5" min="0.5" max="5" step="0.5">
-                    </label>
-                    <label>
                         Color By:
                         <select id="colorMode">
                             <option value="residue">Residue Class</option>
                             <option value="modulus">Modulus Level</option>
                             <option value="size">Prime Size</option>
-                            <option value="gcd">GCD (Farey)</option>
                         </select>
-                    </label>
-                    <label style="flex: 1;">
-                        Lift Color:
-                        <input type="color" id="liftColor" value="#4ecdc4">
-                    </label>
-                    <label style="flex: 1;">
-                        Gap Color (base):
-                        <input type="color" id="gapColor" value="#ff6b6b">
                     </label>
                     <button onclick="updatePrimeRing()" style="padding: 6px 16px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update</button>
-                </div>
-                <div class="ring-controls" style="margin-top: 10px;">
-                    <label>
-                        Gap Pattern:
-                        <select id="gapPattern" onchange="updateGapPatternUI()">
-                            <option value="custom">Custom Gaps</option>
-                            <option value="twin">Twin Primes (2)</option>
-                            <option value="cousin">Cousin Primes (4)</option>
-                            <option value="sexy">Sexy Primes (6)</option>
-                            <option value="tuple-3">Prime Triplet (2,6)</option>
-                            <option value="tuple-4">Prime Quadruplet (2,6,8)</option>
-                            <option value="tuple-5">Prime Quintuplet (2,6,8,12)</option>
-                            <option value="all-even">All Even Gaps (2,4,6,...)</option>
-                        </select>
-                    </label>
-                    <div id="customGapInput">
-                        <label style="flex: 1;">
-                            Custom Gaps (comma-separated):
-                            <input type="text" id="customGaps" placeholder="e.g., 2,4,6" value="2,4,6" style="width: 100%;">
-                        </label>
-                    </div>
                 </div>
                 <div class="ring-controls" style="margin-top: 10px;">
                     <label>
@@ -1089,12 +1010,9 @@
                 <div class="ring-info">
                     <strong>Visualization:</strong> Each prime p is plotted on concentric rings where ring m represents residues mod m.
                     Position on ring: angle θ = 2π·(p mod m)/m for primes with gcd(p mod m, m) = 1.
-                    <br><strong>Lift Connections (r→r):</strong> Connect primes with same residue r across consecutive modulus rings (m to m+1). Shows how residue classes "lift" through the modular hierarchy.
-                    <br><strong>Gap Connections (p, p+gap):</strong> On the largest modulus ring, connect prime p at residue r to prime p+gap at residue r' when both are prime.
-                    Visualizes prime gaps (twin primes: gap=2, cousin primes: gap=4, sexy primes: gap=6, prime k-tuples, etc.).
-                    Each gap size is shown in a different color. Statistics show the count of each gap pattern found.
+                    Use "Invert Ring Order" to show smallest modulus on outer ring.
                     <br><strong>Presets:</strong> Powers of 2 (1,2,4,8,...), Powers of 3 (1,3,9,27,...), or custom list.
-                    Hover over points to see prime details and gap connections.
+                    Hover over points to see prime details.
                 </div>
                 <div id="ringLegend" class="ring-legend"></div>
             </div>
@@ -1116,113 +1034,6 @@
             return result;
         }
         
-        // Quadratic residue check (Legendre symbol for prime modulus)
-        function isQuadraticResidue(a, p) {
-            if (p === 2) return true;
-            // Use Euler's criterion: a^((p-1)/2) ≡ 1 (mod p) for QR
-            const exp = (p - 1) / 2;
-            return modPow(a % p, exp, p) === 1;
-        }
-        
-        // Modular exponentiation
-        function modPow(base, exp, mod) {
-            let result = 1;
-            base = base % mod;
-            while (exp > 0) {
-                if (exp % 2 === 1) result = (result * base) % mod;
-                exp = Math.floor(exp / 2);
-                base = (base * base) % mod;
-            }
-            return result;
-        }
-        
-        // Find smallest primitive root of prime p
-        function smallestPrimitiveRoot(p) {
-            if (p === 2) return 1;
-            
-            const phi = p - 1;
-            const primeFactors = [];
-            let n = phi;
-            
-            // Get prime factors of phi
-            for (let i = 2; i * i <= n; i++) {
-                if (n % i === 0) {
-                    primeFactors.push(i);
-                    while (n % i === 0) n /= i;
-                }
-            }
-            if (n > 1) primeFactors.push(n);
-            
-            // Test each candidate
-            for (let g = 2; g < p; g++) {
-                let isPrimRoot = true;
-                for (const factor of primeFactors) {
-                    if (modPow(g, phi / factor, p) === 1) {
-                        isPrimRoot = false;
-                        break;
-                    }
-                }
-                if (isPrimRoot) return g;
-            }
-            return -1;
-        }
-        
-        // Check if p is Sophie Germain prime (2p+1 is also prime)
-        function isSophieGermain(p, primeSet) {
-            return primeSet.has(2 * p + 1);
-        }
-        
-        // Get Sophie Germain chain length
-        function getSophieGermainChainLength(p, primeSet) {
-            let length = 1;
-            let current = p;
-            
-            while (primeSet.has(2 * current + 1)) {
-                length++;
-                current = 2 * current + 1;
-            }
-            
-            return length;
-        }
-        
-        // Calculate digit sum
-        function digitSum(n) {
-            let sum = 0;
-            while (n > 0) {
-                sum += n % 10;
-                n = Math.floor(n / 10);
-            }
-            return sum;
-        }
-        
-        // Calculate digital root (repeated digit sum until single digit)
-        function digitalRoot(n) {
-            while (n >= 10) {
-                n = digitSum(n);
-            }
-            return n;
-        }
-        
-        // Count 1s in binary representation (Hamming weight/popcount)
-        function hammingWeight(n) {
-            let count = 0;
-            while (n > 0) {
-                count += n & 1;
-                n >>= 1;
-            }
-            return count;
-        }
-        
-        // Check if primes form a k-tuple constellation
-        function findConstellation(startPrime, pattern, primeSet) {
-            for (const offset of pattern) {
-                if (!primeSet.has(startPrime + offset)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
         // Get coprime residues mod m
         function getCoprimeResidues(m) {
             const residues = [];
@@ -1242,64 +1053,6 @@
                 a = temp;
             }
             return a;
-        }
-        
-        // Generate Farey sequence of order n
-        function fareySequence(n) {
-            const farey = [];
-            for (let q = 1; q <= n; q++) {
-                for (let p = 0; p <= q; p++) {
-                    if (gcd(p, q) === 1) {
-                        farey.push({ p, q, value: p / q });
-                    }
-                }
-            }
-            return farey.sort((a, b) => a.value - b.value);
-        }
-        
-        // Get Farey fraction for a given residue and modulus
-        function getFareyFraction(residue, modulus) {
-            const g = gcd(residue, modulus);
-            return { p: residue / g, q: modulus / g, gcd: g };
-        }
-        
-        // Get gap pattern based on selection
-        function getGapPattern() {
-            const pattern = document.getElementById('gapPattern').value;
-            
-            if (pattern === 'custom') {
-                const input = document.getElementById('customGaps').value;
-                if (!input.trim()) return [2];
-                return input.split(',').map(x => parseInt(x.trim())).filter(x => x > 0);
-            } else if (pattern === 'twin') {
-                return [2];
-            } else if (pattern === 'cousin') {
-                return [4];
-            } else if (pattern === 'sexy') {
-                return [6];
-            } else if (pattern === 'tuple-3') {
-                return [2, 6]; // (p, p+2, p+6)
-            } else if (pattern === 'tuple-4') {
-                return [2, 6, 8]; // (p, p+2, p+6, p+8)
-            } else if (pattern === 'tuple-5') {
-                return [2, 6, 8, 12]; // (p, p+2, p+6, p+8, p+12)
-            } else if (pattern === 'all-even') {
-                return [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
-            }
-            
-            return [2];
-        }
-        
-        // Update gap pattern UI
-        function updateGapPatternUI() {
-            const pattern = document.getElementById('gapPattern').value;
-            const customInput = document.getElementById('customGapInput');
-            
-            if (pattern === 'custom') {
-                customInput.style.display = 'block';
-            } else {
-                customInput.style.display = 'none';
-            }
         }
         
         let computationData = null;
@@ -1474,7 +1227,7 @@
                     
                     // Add precision info
                     const precisionNote = decimalPlaces > 15 ? 
-                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
+                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">⚠️ Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
                     document.getElementById('prime-count').innerHTML += precisionNote;
                     
                     // Show step-by-step
@@ -1493,20 +1246,6 @@
                     
                     if (method === 'residue' || method === 'both') {
                         showResidueAnalysis(primes, constantType, modulus);
-                    } else if (method === 'quadratic') {
-                        showQuadraticResidueAnalysis(primes, constantType, modulus);
-                    } else if (method === 'arithmetic') {
-                        showArithmeticProgressionAnalysis(primes, constantType, modulus);
-                    } else if (method === 'constellation') {
-                        showConstellationAnalysis(primes, constantType);
-                    } else if (method === 'digitsum') {
-                        showDigitSumAnalysis(primes, constantType);
-                    } else if (method === 'binaryweight') {
-                        showBinaryWeightAnalysis(primes, constantType);
-                    } else if (method === 'primitiveroot') {
-                        showPrimitiveRootAnalysis(primes, constantType);
-                    } else if (method === 'sophiegermain') {
-                        showSophieGermainAnalysis(primes, constantType);
                     } else {
                         document.getElementById('channel-analysis').style.display = 'none';
                         document.getElementById('chart-section').style.display = 'none';
@@ -1632,7 +1371,7 @@
                         <p><strong>Guaranteed bound:</strong> relative error ≤ ${(epsilon * 100).toFixed(4)}%</p>
                         <p><strong>Actual error:</strong> ${(actualError * 100).toFixed(8)}%</p>
                         <p style="color: ${actualError <= epsilon ? '#4ecdc4' : '#ff6b6b'}; font-weight: bold;">
-                            ${actualError <= epsilon ? 'Success: Error bound satisfied!' : 'Note: Actual error slightly exceeds theoretical bound (due to finite precision)'}
+                            ${actualError <= epsilon ? '✓ Error bound satisfied!' : '⚠ Note: Actual error slightly exceeds theoretical bound (due to finite precision)'}
                         </p>
                     </div>
                 </div>
@@ -1748,6 +1487,303 @@
             document.querySelectorAll('.gap-primes-list').forEach(list => {
                 list.classList.add('visible');
                 list.closest('.gap-item').classList.add('expanded');
+            });
+        }
+        
+        function createDensityAnalysisPlot(ctx) {
+            const { primes, exponent, modulus } = computationData;
+            const method = document.getElementById('method').value;
+            
+            if (method === 'gap' || method === 'both') {
+                // Gap-based density analysis
+                const gapClasses = computeGapClasses(primes);
+                const sortedGaps = Object.keys(gapClasses).map(Number).sort((a, b) => a - b);
+                
+                const labels = sortedGaps.map(g => `Gap ${g}`);
+                const contributions = sortedGaps.map(gap => {
+                    const gapPrimes = gapClasses[gap];
+                    return gapPrimes.length > 0 ? computeTruncatedProduct(gapPrimes, exponent) : 1;
+                });
+                const counts = sortedGaps.map(gap => gapClasses[gap].length);
+                
+                vizChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Contribution',
+                            data: contributions,
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y'
+                        }, {
+                            label: 'Prime Count',
+                            data: counts,
+                            backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                            borderColor: 'rgba(255, 215, 0, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#fff' }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Density Analysis by Gap Class',
+                                color: '#ffd700',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                callbacks: {
+                                    label: function(context) {
+                                        const gap = sortedGaps[context.dataIndex];
+                                        if (context.datasetIndex === 0) {
+                                            return `Contribution: ${context.parsed.y.toFixed(6)}`;
+                                        } else {
+                                            return `Prime Count: ${context.parsed.y}`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Decomposition Class', color: '#fff' },
+                                ticks: { color: '#fff', maxRotation: 45 },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { display: true, text: 'Contribution', color: '#fff' },
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: { display: true, text: 'Prime Count', color: '#fff' },
+                                ticks: { color: '#fff' },
+                                grid: { drawOnChartArea: false }
+                            }
+                        }
+                    }
+                });
+            } else if (method === 'residue' || method === 'both') {
+                // Residue-based density analysis
+                const channels = computeResidueChannels(primes, modulus);
+                const coprimeResidues = getCoprimeResidues(modulus);
+                
+                const labels = coprimeResidues.map(a => `≡ ${a} (mod ${modulus})`);
+                const contributions = coprimeResidues.map(a => {
+                    const channelPrimes = channels[a];
+                    return channelPrimes.length > 0 ? computeTruncatedProduct(channelPrimes, exponent) : 1;
+                });
+                const counts = coprimeResidues.map(a => channels[a].length);
+                
+                vizChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Contribution',
+                            data: contributions,
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y'
+                        }, {
+                            label: 'Prime Count',
+                            data: counts,
+                            backgroundColor: 'rgba(255, 215, 0, 0.7)',
+                            borderColor: 'rgba(255, 215, 0, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#fff' }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Density Analysis by Residue Class',
+                                color: '#ffd700',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.datasetIndex === 0) {
+                                            return `Contribution: ${context.parsed.y.toFixed(6)}`;
+                                        } else {
+                                            return `Prime Count: ${context.parsed.y}`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Decomposition Class', color: '#fff' },
+                                ticks: { color: '#fff', maxRotation: 45 },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { display: true, text: 'Contribution', color: '#fff' },
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: { display: true, text: 'Prime Count', color: '#fff' },
+                                ticks: { color: '#fff' },
+                                grid: { drawOnChartArea: false }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Standard method - show overall density
+                const labels = primes.slice(0, Math.min(20, primes.length));
+                const densities = labels.map((p, i) => (i + 1) / p);
+                
+                vizChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Prime Density π(x)/x',
+                            data: densities,
+                            borderColor: 'rgba(78, 205, 196, 1)',
+                            backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#fff' }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Prime Density Analysis',
+                                color: '#ffd700',
+                                font: { size: 16, weight: 'bold' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Prime p', color: '#fff' },
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Density π(x)/x', color: '#fff' },
+                                ticks: { color: '#fff' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function createPrimeCountingPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Create step function for π(x)
+            const maxPrime = Math.max(...primes);
+            const step = Math.max(1, Math.floor(maxPrime / 100));
+            
+            const xValues = [];
+            const piValues = [];
+            
+            for (let x = 2; x <= maxPrime; x += step) {
+                xValues.push(x);
+                piValues.push(primes.filter(p => p <= x).length);
+            }
+            
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        label: 'π(x) - Prime Counting Function',
+                        data: piValues,
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0,
+                        stepped: true
+                    }, {
+                        label: 'x/ln(x) - Approximation',
+                        data: xValues.map(x => x / Math.log(x)),
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Prime Counting Function π(x)',
+                            color: '#ffd700',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'x (Prime p)', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Count', color: '#fff' },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
             });
         }
         
@@ -2299,10 +2335,10 @@
                 createContributionPlot(ctx);
             } else if (type === 'gapDist') {
                 createGapDistributionPlot(ctx);
-            } else if (type === 'methodComparison') {
-                createMethodComparisonPlot(ctx);
-            } else if (type === 'densityAnalysis') {
+            } else if (type === 'density') {
                 createDensityAnalysisPlot(ctx);
+            } else if (type === 'primeCount') {
+                createPrimeCountingPlot(ctx);
             }
         }
         
@@ -2362,268 +2398,6 @@
                         },
                         y: {
                             title: { display: true, text: 'Value', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createMethodComparisonPlot(ctx) {
-            const { primes, exponent, modulus } = computationData;
-            
-            // Compare different decomposition methods
-            const methods = [];
-            
-            // Gap classes
-            const gapClasses = computeGapClasses(primes);
-            const topGaps = Object.keys(gapClasses).map(Number).sort((a, b) => 
-                gapClasses[b].length - gapClasses[a].length
-            ).slice(0, 8);
-            
-            topGaps.forEach(gap => {
-                const contribution = computeTruncatedProduct(gapClasses[gap], exponent);
-                methods.push({
-                    method: `Gap ${gap}`,
-                    contribution: contribution,
-                    count: gapClasses[gap].length
-                });
-            });
-            
-            // Residue channels
-            const channels = computeResidueChannels(primes, modulus);
-            const coprimeResidues = getCoprimeResidues(modulus);
-            
-            coprimeResidues.slice(0, 8).forEach(a => {
-                const channelPrimes = channels[a];
-                if (channelPrimes.length > 0) {
-                    const contribution = computeTruncatedProduct(channelPrimes, exponent);
-                    methods.push({
-                        method: `Res ${a} (mod ${modulus})`,
-                        contribution: contribution,
-                        count: channelPrimes.length
-                    });
-                }
-            });
-            
-            const labels = methods.map(m => m.method);
-            const contributions = methods.map(m => m.contribution);
-            const counts = methods.map(m => m.count);
-            
-            vizChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Contribution',
-                        data: contributions,
-                        backgroundColor: generateColors(labels.length),
-                        borderColor: generateColors(labels.length).map(c => c.replace('0.8', '1')),
-                        borderWidth: 2,
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Prime Count',
-                        data: counts,
-                        type: 'line',
-                        borderColor: 'rgba(255, 215, 0, 1)',
-                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                        borderWidth: 3,
-                        fill: false,
-                        yAxisID: 'y1',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#fff' }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            callbacks: {
-                                label: function(context) {
-                                    if (context.datasetIndex === 0) {
-                                        return `Contribution: ${context.parsed.y.toFixed(6)}`;
-                                    } else {
-                                        return `Primes: ${context.parsed.y}`;
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: { display: true, text: 'Decomposition Class', color: '#fff' },
-                            ticks: { color: '#fff', maxRotation: 45, minRotation: 45 },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: { display: true, text: 'Contribution', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: { display: true, text: 'Prime Count', color: '#fff' },
-                            ticks: { color: '#fff' },
-                            grid: { drawOnChartArea: false }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createDensityAnalysisPlot(ctx) {
-            const { primes, method, modulus } = computationData;
-            
-            let densityData = [];
-            let chartTitle = 'Prime Density Analysis';
-            
-            if (method === 'gap' || method === 'both') {
-                // Analyze gap distribution over prime range
-                const rangeSize = 100;
-                const ranges = Math.ceil(primes.length / rangeSize);
-                
-                for (let i = 0; i < ranges; i++) {
-                    const start = i * rangeSize;
-                    const end = Math.min((i + 1) * rangeSize, primes.length);
-                    const rangePrimes = primes.slice(start, end);
-                    
-                    if (rangePrimes.length < 2) continue;
-                    
-                    const gaps = [];
-                    for (let j = 1; j < rangePrimes.length; j++) {
-                        gaps.push(rangePrimes[j] - rangePrimes[j-1]);
-                    }
-                    
-                    const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
-                    const avgPrime = rangePrimes.reduce((a, b) => a + b, 0) / rangePrimes.length;
-                    
-                    densityData.push({ x: avgPrime, y: avgGap });
-                }
-                
-                chartTitle = 'Average Gap vs Prime Value';
-                
-            } else if (method === 'residue' || method === 'arithmetic') {
-                // Analyze distribution across residue classes
-                const channels = computeResidueChannels(primes, modulus);
-                const coprimeResidues = getCoprimeResidues(modulus);
-                
-                coprimeResidues.forEach(a => {
-                    const channelPrimes = channels[a];
-                    densityData.push({
-                        x: a,
-                        y: channelPrimes.length,
-                        label: `a=${a}`
-                    });
-                });
-                
-                chartTitle = `Prime Distribution Across Residues (mod ${modulus})`;
-                
-            } else if (method === 'digitsum') {
-                // Digital root distribution
-                const digitClasses = {};
-                for (const p of primes) {
-                    const root = digitalRoot(p);
-                    digitClasses[root] = (digitClasses[root] || 0) + 1;
-                }
-                
-                for (const [root, count] of Object.entries(digitClasses)) {
-                    densityData.push({ x: parseInt(root), y: count });
-                }
-                
-                chartTitle = 'Prime Count by Digital Root';
-                
-            } else if (method === 'binaryweight') {
-                // Hamming weight distribution
-                const weightClasses = {};
-                for (const p of primes) {
-                    const weight = hammingWeight(p);
-                    weightClasses[weight] = (weightClasses[weight] || 0) + 1;
-                }
-                
-                for (const [weight, count] of Object.entries(weightClasses)) {
-                    densityData.push({ x: parseInt(weight), y: count });
-                }
-                
-                chartTitle = 'Prime Count by Hamming Weight';
-                
-            } else {
-                // Default: prime counting function comparison
-                densityData = primes.map((p, i) => ({ x: p, y: i + 1 }));
-                chartTitle = 'Prime Counting Function π(x)';
-            }
-            
-            const isScatter = method === 'gap' || method === 'both' || !method || method === 'standard';
-            
-            vizChart = new Chart(ctx, {
-                type: isScatter ? 'scatter' : 'bar',
-                data: {
-                    labels: isScatter ? undefined : densityData.map(d => d.x),
-                    datasets: [{
-                        label: chartTitle,
-                        data: isScatter ? densityData : densityData.map(d => d.y),
-                        backgroundColor: 'rgba(78, 205, 196, 0.6)',
-                        borderColor: 'rgba(78, 205, 196, 1)',
-                        borderWidth: 2,
-                        pointRadius: isScatter ? 3 : undefined
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#fff' }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            callbacks: {
-                                label: function(context) {
-                                    if (isScatter) {
-                                        return `(${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`;
-                                    } else {
-                                        return `Count: ${context.parsed.y}`;
-                                    }
-                                }
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: chartTitle,
-                            color: '#fff',
-                            font: { size: 16 }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: isScatter ? 'linear' : 'category',
-                            title: { 
-                                display: true, 
-                                text: method === 'gap' ? 'Average Prime Value' : 
-                                      method === 'residue' || method === 'arithmetic' ? 'Residue Class' :
-                                      method === 'digitsum' ? 'Digital Root' :
-                                      method === 'binaryweight' ? 'Hamming Weight' : 'Prime p',
-                                color: '#fff' 
-                            },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            title: { 
-                                display: true, 
-                                text: method === 'gap' ? 'Average Gap' : 
-                                      'Count',
-                                color: '#fff' 
-                            },
                             ticks: { color: '#fff' },
                             grid: { color: 'rgba(255, 255, 255, 0.1)' }
                         }
@@ -2850,8 +2624,8 @@
                 
                 <div style="margin-bottom: 25px;">
                     <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
-                        <input type="checkbox" id="exportLegend" checked style="width: auto; margin-right: 10px;">
-                        <span>Include detailed legend</span>
+                        <input type="checkbox" id="exportWatermark" checked style="width: auto; margin-right: 10px;">
+                        <span>Include watermark by Wessen Getachew</span>
                     </label>
                 </div>
                 
@@ -2872,11 +2646,11 @@
                 const resolution = document.getElementById('exportResolution').value;
                 const background = document.getElementById('exportBackground').value;
                 const chartType = document.getElementById('exportChartType').value;
-                const includeLegend = document.getElementById('exportLegend').checked;
+                const includeWatermark = document.getElementById('exportWatermark').checked;
                 
                 document.body.removeChild(modal);
                 
-                performExport(resolution, background, chartType, includeLegend);
+                performExport(resolution, background, chartType, includeWatermark);
             };
         }
         
@@ -3614,15 +3388,7 @@
             const maxModulusValue = Math.max(...moduli);
             const pointSize = parseInt(document.getElementById('pointSize').value);
             const showLabels = document.getElementById('showLabels').checked;
-            const showGCDLabels = document.getElementById('showGCDLabels').checked;
             const showModLines = document.getElementById('showModLines').checked;
-            const showLiftConnections = document.getElementById('showLiftConnections').checked;
-            const liftThickness = parseFloat(document.getElementById('liftThickness').value);
-            const liftColor = document.getElementById('liftColor').value;
-            const showGapConnections = document.getElementById('showGapConnections').checked;
-            const gapThickness = parseFloat(document.getElementById('gapThickness').value);
-            const gapColor = document.getElementById('gapColor').value;
-            const gapPattern = getGapPattern();
             const colorMode = document.getElementById('colorMode').value;
             const invertColors = document.getElementById('invertColors').checked;
             const invertRings = document.getElementById('invertRings').checked;
@@ -3660,17 +3426,10 @@
                 } else if (colorMode === 'modulus') {
                     hue = (modulusIndex / moduli.length) * 280;
                     saturation = 70;
-                } else if (colorMode === 'size') {
+                } else { // size
                     const maxPrime = Math.max(...primes);
                     const ratio = prime / maxPrime;
                     hue = ratio * 120; // green to red
-                } else if (colorMode === 'gcd') {
-                    // Color by GCD using Farey sequence
-                    const g = gcd(residue, modulus);
-                    const maxGCD = Math.max(10, g);
-                    hue = (g / maxGCD) * 280;
-                    saturation = 70 + (g > 1 ? 20 : 0);
-                    lightness = 60 - (g * 3);
                 }
                 
                 if (invertColors) {
@@ -3681,10 +3440,8 @@
                 return `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`;
             };
             
-            // Store points for hover detection and lift connections
+            // Store points for hover detection
             const points = [];
-            const residueMap = {}; // Map residue -> array of {prime, x, y, modulus, modulusIndex}
-            const primePositions = {}; // Map prime -> {x, y, residue, modulus}
             
             // Draw primes on each ring
             for (let i = 0; i < moduli.length; i++) {
@@ -3723,15 +3480,6 @@
                     // Store for hover
                     points.push({ x, y, p, residue, modulus: m, color });
                     
-                    // Store for lift connections
-                    if (!residueMap[residue]) residueMap[residue] = [];
-                    residueMap[residue].push({ prime: p, x, y, modulus: m, modulusIndex: i });
-                    
-                    // Store for gap connections (use largest modulus ring for clearest view)
-                    if (i === moduli.length - 1) {
-                        primePositions[p] = { x, y, residue, modulus: m };
-                    }
-                    
                     // Draw lines from center to show mod structure
                     if (showModLines && i === moduli.length - 1 && residue < m) {
                         ctx.strokeStyle = invertColors ? 'rgba(78, 205, 196, 0.2)' : 'rgba(78, 205, 196, 0.1)';
@@ -3740,193 +3488,6 @@
                         ctx.moveTo(centerX, centerY);
                         ctx.lineTo(x, y);
                         ctx.stroke();
-                    }
-                }
-            }
-            
-            // Draw r→r lift connections (only to next modulus level)
-            if (showLiftConnections) {
-                ctx.strokeStyle = liftColor;
-                ctx.lineWidth = liftThickness;
-                ctx.globalAlpha = 0.4;
-                
-                for (const residue in residueMap) {
-                    const pointsWithResidue = residueMap[residue];
-                    // Sort by modulus index to ensure we connect consecutive rings
-                    pointsWithResidue.sort((a, b) => a.modulusIndex - b.modulusIndex);
-                    
-                    // Connect each point to the next modulus level only
-                    for (let i = 0; i < pointsWithResidue.length - 1; i++) {
-                        const p1 = pointsWithResidue[i];
-                        const p2 = pointsWithResidue[i + 1];
-                        
-                        // Only connect if they are on consecutive modulus rings
-                        if (p2.modulusIndex === p1.modulusIndex + 1) {
-                            ctx.beginPath();
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-                
-                ctx.globalAlpha = 1.0;
-            }
-            
-            // Draw gap connections (r to r+2n when both are prime)
-            if (showGapConnections) {
-                ctx.lineWidth = gapThickness;
-                ctx.globalAlpha = 0.5;
-                
-                // Create map of gaps found for statistics
-                const gapsFound = {};
-                gapPattern.forEach(g => gapsFound[g] = 0);
-                
-                // For each prime p, check if p + gap is also prime
-                // Then connect their positions on the largest modulus ring
-                const largestMod = moduli[moduli.length - 1];
-                
-                for (const p of primes) {
-                    for (const gap of gapPattern) {
-                        const targetPrime = p + gap;
-                        
-                        // Check if target is also a prime
-                        if (primes.includes(targetPrime)) {
-                            // Get residues for both primes mod largest modulus
-                            const r1 = p % largestMod;
-                            const r2 = targetPrime % largestMod;
-                            
-                            // Only draw if both residues are coprime to modulus
-                            if (gcd(r1, largestMod) === 1 && gcd(r2, largestMod) === 1) {
-                                // Calculate positions on largest ring
-                                const ringIndex = invertRings ? 0 : (moduli.length - 1);
-                                const radius = (ringIndex + 1) * radiusStep;
-                                
-                                let angle1 = (2 * Math.PI * r1) / largestMod;
-                                let angle2 = (2 * Math.PI * r2) / largestMod;
-                                
-                                // Apply rotation
-                                if (rotationMode === 'global') {
-                                    angle1 += globalRotationAngle;
-                                    angle2 += globalRotationAngle;
-                                } else if (rotationMode === 'local') {
-                                    const rotationOffset = globalRotationAngle * largestMod / maxModulusValue;
-                                    angle1 += rotationOffset;
-                                    angle2 += rotationOffset;
-                                }
-                                
-                                const x1 = centerX + radius * Math.cos(angle1);
-                                const y1 = centerY + radius * Math.sin(angle1);
-                                const x2 = centerX + radius * Math.cos(angle2);
-                                const y2 = centerY + radius * Math.sin(angle2);
-                                
-                                // Use different colors for different gaps
-                                const gapIndex = gapPattern.indexOf(gap);
-                                const hue = (gapIndex / gapPattern.length) * 360;
-                                ctx.strokeStyle = `hsla(${hue}, 80%, 60%, 0.6)`;
-                                
-                                ctx.beginPath();
-                                ctx.moveTo(x1, y1);
-                                ctx.lineTo(x2, y2);
-                                ctx.stroke();
-                                
-                                gapsFound[gap]++;
-                            }
-                        }
-                    }
-                }
-                
-                ctx.globalAlpha = 1.0;
-                
-                // Display gap statistics
-                if (Object.keys(gapsFound).length > 0) {
-                    ctx.save();
-                    ctx.font = `${Math.max(10, height * 0.015)}px Arial`;
-                    ctx.textAlign = 'left';
-                    
-                    const statsX = padding;
-                    const statsY = padding + height * 0.05;
-                    
-                    // Background
-                    ctx.fillStyle = invertColors ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.8)';
-                    ctx.fillRect(statsX, statsY, width * 0.15, Object.keys(gapsFound).length * height * 0.025 + padding);
-                    
-                    // Text
-                    ctx.fillStyle = invertColors ? '#000' : '#fff';
-                    let yOffset = statsY + height * 0.02;
-                    
-                    for (const gap in gapsFound) {
-                        const count = gapsFound[gap];
-                        const gapIndex = gapPattern.indexOf(parseInt(gap));
-                        const hue = (gapIndex / gapPattern.length) * 360;
-                        
-                        // Color indicator
-                        ctx.fillStyle = `hsla(${hue}, 80%, 60%, 0.8)`;
-                        ctx.fillRect(statsX + padding / 2, yOffset - height * 0.012, height * 0.015, height * 0.015);
-                        
-                        // Text
-                        ctx.fillStyle = invertColors ? '#000' : '#fff';
-                        ctx.fillText(`Gap ${gap}: ${count} pairs`, statsX + padding / 2 + height * 0.02, yOffset);
-                        yOffset += height * 0.025;
-                    }
-                    
-                    ctx.restore();
-                }
-            }
-            
-            // Draw GCD/Farey labels
-            if (showGCDLabels) {
-                ctx.font = `${Math.max(8, pointSize)}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                const labeledResidues = new Set();
-                
-                for (let i = moduli.length - 1; i >= 0; i--) {
-                    const m = moduli[i];
-                    const ringIndex = invertRings ? (moduli.length - 1 - i) : i;
-                    const radius = (ringIndex + 1) * radiusStep;
-                    
-                    // Only show labels for outer rings to avoid clutter
-                    if (i < moduli.length - 3) continue;
-                    
-                    for (let r = 0; r < m; r++) {
-                        if (gcd(r, m) !== 1) continue;
-                        
-                        const farey = getFareyFraction(r, m);
-                        const labelKey = `${farey.p}/${farey.q}`;
-                        
-                        // Avoid duplicate labels
-                        if (labeledResidues.has(labelKey)) continue;
-                        labeledResidues.add(labelKey);
-                        
-                        let angle = (2 * Math.PI * r) / m;
-                        if (rotationMode === 'global') {
-                            angle += globalRotationAngle;
-                        } else if (rotationMode === 'local') {
-                            angle += globalRotationAngle * m / maxModulusValue;
-                        }
-                        
-                        const labelRadius = radius + radiusStep * 0.3;
-                        const x = centerX + labelRadius * Math.cos(angle);
-                        const y = centerY + labelRadius * Math.sin(angle);
-                        
-                        // Draw background for label
-                        const labelText = farey.gcd > 1 ? `${farey.p}/${farey.q} (gcd=${farey.gcd})` : `${farey.p}/${farey.q}`;
-                        const metrics = ctx.measureText(labelText);
-                        const padding = 3;
-                        
-                        ctx.fillStyle = invertColors ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.8)';
-                        ctx.fillRect(
-                            x - metrics.width / 2 - padding,
-                            y - pointSize - padding,
-                            metrics.width + padding * 2,
-                            pointSize * 2 + padding * 2
-                        );
-                        
-                        // Draw label text
-                        ctx.fillStyle = invertColors ? '#000' : (farey.gcd > 1 ? '#ffd700' : '#4ecdc4');
-                        ctx.fillText(labelText, x, y);
                     }
                 }
             }
@@ -3961,33 +3522,14 @@
                     const angleDeg = (angleRad * 180 / Math.PI).toFixed(1);
                     const angleRadStr = (angleRad / Math.PI).toFixed(3);
                     
-                    // Get Farey representation
-                    const farey = getFareyFraction(closestPoint.residue, closestPoint.modulus);
-                    
-                    // Check for gap connections
-                    const gapConnections = [];
-                    for (const gap of gapPattern) {
-                        if (primes.includes(closestPoint.p + gap)) {
-                            gapConnections.push(`+${gap}`);
-                        }
-                        if (primes.includes(closestPoint.p - gap)) {
-                            gapConnections.push(`-${gap}`);
-                        }
-                    }
-                    
                     // Create detailed tooltip
                     const lines = [
                         `Prime: p = ${closestPoint.p}`,
                         `Residue: r = ${closestPoint.residue} (mod ${closestPoint.modulus})`,
-                        `Farey: ${farey.p}/${farey.q}${farey.gcd > 1 ? ` (gcd=${farey.gcd})` : ''}`,
                         `Fraction: r/m = ${closestPoint.residue}/${closestPoint.modulus} = ${(closestPoint.residue / closestPoint.modulus).toFixed(4)}`,
                         `Angle: θ = ${angleRadStr}π rad = ${angleDeg}°`,
                         `Position: (${Math.cos(angleRad).toFixed(3)}, ${Math.sin(angleRad).toFixed(3)})`
                     ];
-                    
-                    if (gapConnections.length > 0) {
-                        lines.push(`Gap connections: ${gapConnections.join(', ')}`);
-                    }
                     
                     ctx.font = '12px Arial';
                     const lineHeight = 16;
@@ -4040,18 +3582,6 @@
             html += `<div class="ring-legend-item"><strong>Moduli used:</strong> ${moduli.join(', ')}</div>`;
             html += `<div class="ring-legend-item"><strong>Ring order:</strong> ${invertRings ? 'Inverted (smallest outer)' : 'Normal (smallest inner)'}</div>`;
             
-            if (showGapConnections) {
-                const pattern = getGapPattern();
-                html += `<div class="ring-legend-item"><strong>Gap pattern:</strong> ${pattern.join(', ')}</div>`;
-                
-                // Show color coding for gaps
-                pattern.forEach((gap, idx) => {
-                    const hue = (idx / pattern.length) * 360;
-                    const color = `hsla(${hue}, 80%, 60%, 0.6)`;
-                    html += `<div class="ring-legend-item"><div class="ring-legend-color" style="background: ${color};"></div><span>Gap ${gap}</span></div>`;
-                });
-            }
-            
             if (colorMode === 'residue') {
                 html += '<div class="ring-legend-item"><strong>Color by Residue Class:</strong> Hue represents (p mod m)/m position around each ring</div>';
             } else if (colorMode === 'modulus') {
@@ -4068,12 +3598,8 @@
                 if (moduli.length > 10) {
                     html += '<div class="ring-legend-item"><span>... (gradient continues)</span></div>';
                 }
-            } else if (colorMode === 'size') {
+            } else {
                 html += '<div class="ring-legend-item"><strong>Color by Prime Size:</strong> Green (small) → Yellow → Red (large)</div>';
-            } else if (colorMode === 'gcd') {
-                html += '<div class="ring-legend-item"><strong>Color by GCD (Farey):</strong> Colors represent gcd(r,m) values in reduced fractions p/q</div>';
-                html += '<div class="ring-legend-item"><div class="ring-legend-color" style="background: hsla(0, 70%, 60%, 0.8);"></div><span>gcd=1 (coprime)</span></div>';
-                html += '<div class="ring-legend-item"><div class="ring-legend-color" style="background: hsla(140, 90%, 40%, 0.8);"></div><span>gcd>1 (composite)</span></div>';
             }
             
             legend.innerHTML = html;
@@ -4280,7 +3806,6 @@
         
         window.onload = () => {
             compute();
-            updateGapPatternUI();
         };
     </script>
 </body>
