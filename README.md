@@ -930,8 +930,11 @@
                     <button class="viz-btn active" onclick="changeViz('convergence')">Convergence Plot</button>
                     <button class="viz-btn" onclick="changeViz('contribution')">Prime Contributions</button>
                     <button class="viz-btn" onclick="changeViz('gapDist')">Gap Distribution</button>
+                    <button class="viz-btn" onclick="changeViz('primeCount')">Prime Counting π(x)</button>
+                    <button class="viz-btn" onclick="changeViz('density')">Prime Density Analysis</button>
                 </div>
                 <canvas id="vizCanvas"></canvas>
+                <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
             </div>
             
             <div id="prime-ring-section" class="prime-ring-container" style="display: none;">
@@ -2030,12 +2033,19 @@
                 vizChart.destroy();
             }
             
+            // Hide stats by default
+            document.getElementById('vizStats').style.display = 'none';
+            
             if (type === 'convergence') {
                 createConvergencePlot(ctx);
             } else if (type === 'contribution') {
                 createContributionPlot(ctx);
             } else if (type === 'gapDist') {
                 createGapDistributionPlot(ctx);
+            } else if (type === 'primeCount') {
+                createPrimeCountingPlot(ctx);
+            } else if (type === 'density') {
+                createDensityAnalysisPlot(ctx);
             }
         }
         
@@ -2882,6 +2892,269 @@
                                 font: { size: Math.floor(height * 0.025) }
                             },
                             grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createPrimeCountingPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Generate π(x) data - count primes up to x
+            const step = Math.max(1, Math.floor(primes[primes.length - 1] / 200));
+            const countingData = [];
+            const approximations = [];
+            
+            for (let x = 2; x <= primes[primes.length - 1]; x += step) {
+                const count = primes.filter(p => p <= x).length;
+                countingData.push({ x, y: count });
+                
+                // Add approximations: x/ln(x) and Li(x) ≈ x/ln(x)
+                const approx = x / Math.log(x);
+                approximations.push({ x, y: approx });
+            }
+            
+            // Calculate statistics
+            const maxX = primes[primes.length - 1];
+            const actualCount = primes.length;
+            const approxCount = maxX / Math.log(maxX);
+            const error = Math.abs(actualCount - approxCount);
+            const errorPercent = (error / actualCount * 100).toFixed(2);
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Counting Statistics</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">π(${maxX}) actual</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;">${actualCount}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">x/ln(x) approximation</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ffd700;">${approxCount.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Error</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ff6b6b;">${errorPercent}%</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Prime Number Theorem</div>
+                        <div style="font-size: 1em; font-weight: bold; color: #9966ff;">π(x) ~ x/ln(x)</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About the Prime Counting Function π(x):</strong><br>
+                    The function π(x) counts the number of primes ≤ x. The Prime Number Theorem states that π(x) ~ x/ln(x) as x→∞, 
+                    meaning the ratio π(x)/(x/ln(x)) approaches 1. A better approximation is the logarithmic integral Li(x).
+                </div>
+            `;
+            
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'π(x) - Actual Count',
+                        data: countingData,
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }, {
+                        label: 'x/ln(x) - Approximation',
+                        data: approximations,
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#fff',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Number of Primes', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createDensityAnalysisPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Calculate density in intervals
+            const intervalSize = Math.max(10, Math.floor(primes[primes.length - 1] / 50));
+            const densityData = [];
+            const theoreticalDensity = [];
+            
+            for (let x = intervalSize; x <= primes[primes.length - 1]; x += intervalSize) {
+                const primesInInterval = primes.filter(p => p > x - intervalSize && p <= x).length;
+                const density = primesInInterval / intervalSize;
+                densityData.push({ x, y: density });
+                
+                // Theoretical density: 1/ln(x)
+                const theoretical = 1 / Math.log(x);
+                theoreticalDensity.push({ x, y: theoretical });
+            }
+            
+            // Calculate average density
+            const avgDensity = densityData.reduce((sum, d) => sum + d.y, 0) / densityData.length;
+            const avgTheoretical = theoreticalDensity.reduce((sum, d) => sum + d.y, 0) / theoreticalDensity.length;
+            
+            // Calculate variance
+            const variance = densityData.reduce((sum, d) => sum + Math.pow(d.y - avgDensity, 2), 0) / densityData.length;
+            const stdDev = Math.sqrt(variance);
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Density Analysis</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Density (interval: ${intervalSize})</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;">${avgDensity.toFixed(6)}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Theoretical (1/ln(x))</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ffd700;">${avgTheoretical.toFixed(6)}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Standard Deviation</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ff6b6b;">${stdDev.toFixed(6)}</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.1); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Total Primes</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #9966ff;">${primes.length}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About Prime Density:</strong><br>
+                    Prime density at x is approximately 1/ln(x), meaning as numbers get larger, primes become less frequent. 
+                    This plot shows the actual density (primes per unit interval) compared to the theoretical prediction. 
+                    Fluctuations reveal the irregular distribution of primes despite their predictable average behavior.
+                </div>
+            `;
+            
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Actual Density',
+                        data: densityData,
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(78, 205, 196, 1)'
+                    }, {
+                        label: 'Theoretical Density (1/ln(x))',
+                        data: theoreticalDensity,
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 3,
+                        borderDash: [10, 5],
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#fff',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(8)}`;
+                                },
+                                afterLabel: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        return `Interval: [${context.parsed.x - intervalSize}, ${context.parsed.x}]`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Density (primes per unit)', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#fff',
+                                callback: function(value) {
+                                    return value.toFixed(4);
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
                         }
                     }
                 }
