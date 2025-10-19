@@ -2592,10 +2592,10 @@
             
             ctx.save();
             
-            // Create legend box
+            // Create legend box with more space
             const legendPadding = width * 0.02;
             const legendBoxY = legendY;
-            const legendBoxHeight = height * 0.08;
+            const legendBoxHeight = height * 0.12; // Increased height
             
             // Semi-transparent background for legend
             ctx.fillStyle = background === 'white' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)';
@@ -2609,9 +2609,8 @@
             ctx.fillStyle = textColor;
             ctx.font = `${height * 0.02}px Arial`;
             
-            let legendText = '';
-            let itemY = legendBoxY + legendPadding * 2;
-            const itemSpacing = height * 0.025;
+            let itemY = legendBoxY + legendPadding * 2.5;
+            const itemSpacing = height * 0.028;
             
             if (chartType === 'channel') {
                 const channels = computeResidueChannels(primes, modulus);
@@ -2633,8 +2632,9 @@
                 ctx.fillStyle = textColor;
                 ctx.fillText(`Small (<${modulus})`, legendPadding * 2 + height * 0.025, itemY);
                 
-                // Channels
-                for (let i = 0; i < Math.min(coprimeResidues.length, itemsPerRow - 1); i++) {
+                // Channels - first row
+                const firstRowCount = Math.min(itemsPerRow - 1, coprimeResidues.length);
+                for (let i = 0; i < firstRowCount; i++) {
                     const x = legendPadding * 2 + (i + 1) * itemWidth;
                     const a = coprimeResidues[i];
                     
@@ -2642,6 +2642,21 @@
                     ctx.fillRect(x, itemY - height * 0.015, height * 0.02, height * 0.02);
                     ctx.fillStyle = textColor;
                     ctx.fillText(`≡${a}`, x + height * 0.025, itemY);
+                }
+                
+                // Second row if needed
+                if (coprimeResidues.length > firstRowCount) {
+                    itemY += itemSpacing;
+                    const remaining = coprimeResidues.length - firstRowCount;
+                    for (let i = 0; i < Math.min(remaining, itemsPerRow); i++) {
+                        const x = legendPadding * 2 + i * itemWidth;
+                        const a = coprimeResidues[firstRowCount + i];
+                        
+                        ctx.fillStyle = colors[firstRowCount + i + 1];
+                        ctx.fillRect(x, itemY - height * 0.015, height * 0.02, height * 0.02);
+                        ctx.fillStyle = textColor;
+                        ctx.fillText(`≡${a}`, x + height * 0.025, itemY);
+                    }
                 }
                 
             } else if (chartType === 'convergence') {
@@ -2721,12 +2736,12 @@
                 });
                 
             } else if (chartType === 'goldbachComet') {
-                ctx.font = `${height * 0.02}px Arial`;
+                ctx.font = `${height * 0.018}px Arial`;
                 ctx.fillText('Color intensity: Number of prime pair partitions (low → high)', legendPadding * 2, itemY);
                 
-                itemY += itemSpacing;
+                itemY += itemSpacing * 0.8;
                 const gradientWidth = width * 0.6;
-                const gradientHeight = height * 0.02;
+                const gradientHeight = height * 0.025;
                 const gradient = ctx.createLinearGradient(legendPadding * 2, itemY, legendPadding * 2 + gradientWidth, itemY);
                 
                 for (let i = 0; i <= 10; i++) {
@@ -2736,11 +2751,19 @@
                 }
                 
                 ctx.fillStyle = gradient;
-                ctx.fillRect(legendPadding * 2, itemY - gradientHeight, gradientWidth, gradientHeight);
+                ctx.fillRect(legendPadding * 2, itemY, gradientWidth, gradientHeight);
+                
+                // Add labels
+                ctx.fillStyle = textColor;
+                ctx.font = `${height * 0.015}px Arial`;
+                ctx.fillText('Few', legendPadding * 2, itemY + gradientHeight + height * 0.02);
+                ctx.textAlign = 'right';
+                ctx.fillText('Many', legendPadding * 2 + gradientWidth, itemY + gradientHeight + height * 0.02);
+                ctx.textAlign = 'left';
                 
             } else {
                 // Generic legend
-                ctx.font = `${height * 0.02}px Arial`;
+                ctx.font = `${height * 0.018}px Arial`;
                 ctx.fillText(`Chart: ${chartType} | Primes: ${primes.length} | Modulus: ${modulus}`, legendPadding * 2, itemY);
             }
             
@@ -2965,9 +2988,9 @@
                 // Calculate dimensions
                 const padding = width * 0.04;
                 const titleHeight = height * 0.15;
-                const chartHeight = height * 0.70;
                 const watermarkHeight = includeWatermark ? height * 0.05 : 0;
-                const legendHeight = includeLegend ? height * 0.10 : 0;
+                const legendHeight = includeLegend ? height * 0.15 : 0; // Increased for legend space
+                const chartHeight = height * 0.60; // Reduced to make room for legend
                 
                 const textColor = background === 'white' ? '#000000' : '#ffffff';
                 const accentColor = background === 'white' ? '#1e3c72' : '#ffd700';
