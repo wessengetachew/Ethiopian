@@ -932,6 +932,9 @@
                     <button class="viz-btn" onclick="changeViz('gapDist')">Gap Distribution</button>
                     <button class="viz-btn" onclick="changeViz('primeCount')">Prime Counting π(x)</button>
                     <button class="viz-btn" onclick="changeViz('density')">Prime Density Analysis</button>
+                    <button class="viz-btn" onclick="changeViz('gapHistogram')">Prime Gaps Histogram</button>
+                    <button class="viz-btn" onclick="changeViz('sacksSpiral')">Sacks Spiral</button>
+                    <button class="viz-btn" onclick="changeViz('zetaZeros')">Riemann Zeta Zeros</button>
                 </div>
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
@@ -2046,6 +2049,12 @@
                 createPrimeCountingPlot(ctx);
             } else if (type === 'density') {
                 createDensityAnalysisPlot(ctx);
+            } else if (type === 'gapHistogram') {
+                createGapHistogramPlot(ctx);
+            } else if (type === 'sacksSpiral') {
+                createSacksSpiralPlot(ctx);
+            } else if (type === 'zetaZeros') {
+                createZetaZerosPlot(ctx);
             }
         }
         
@@ -2267,6 +2276,125 @@
             });
         }
         
+        function generateGapDistChartForExport(ctx, width, height, background) {
+            const { primes, exponent } = computationData;
+            
+            // Calculate gaps
+            const gaps = [];
+            for (let i = 1; i < primes.length; i++) {
+                gaps.push(primes[i] - primes[i-1]);
+            }
+            
+            // Count gap frequencies
+            const gapCounts = {};
+            gaps.forEach(gap => {
+                gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+            });
+            
+            // Sort by gap size
+            const sortedGaps = Object.keys(gapCounts).map(Number).sort((a, b) => a - b);
+            const counts = sortedGaps.map(gap => gapCounts[gap]);
+            
+            // Calculate contributions by gap
+            const gapContributions = sortedGaps.map(gap => {
+                const gapPrimes = [];
+                for (let i = 1; i < primes.length; i++) {
+                    if (primes[i] - primes[i-1] === gap) {
+                        gapPrimes.push(primes[i]);
+                    }
+                }
+                return gapPrimes.length > 0 ? computeTruncatedProduct(gapPrimes, exponent) : 1;
+            });
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedGaps.map(g => `Gap ${g}`),
+                    datasets: [{
+                        label: 'Frequency',
+                        data: counts,
+                        backgroundColor: background === 'white' ? 'rgba(30, 60, 114, 0.6)' : 'rgba(78, 205, 196, 0.6)',
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)',
+                        borderWidth: 3,
+                        yAxisID: 'y',
+                    }, {
+                        label: 'Contribution',
+                        data: gapContributions,
+                        type: 'line',
+                        borderColor: background === 'white' ? 'rgba(255, 99, 71, 1)' : 'rgba(255, 215, 0, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(255, 99, 71, 0.1)' : 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 4,
+                        fill: false,
+                        yAxisID: 'y1',
+                        tension: 0.4,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Prime Gap Size', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.022) },
+                                maxRotation: 45
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { 
+                                display: true, 
+                                text: 'Frequency', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { 
+                                display: true, 
+                                text: 'Contribution', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+        
         function exportChartImage() {
             if (!computationData) {
                 alert('Please compute a value first!');
@@ -2328,6 +2456,9 @@
                         <option value="gapDist">Gap Distribution Analysis</option>
                         <option value="primeCount">Prime Counting π(x)</option>
                         <option value="density">Prime Density Analysis</option>
+                        <option value="gapHistogram">Prime Gaps Histogram</option>
+                        <option value="sacksSpiral">Sacks Spiral</option>
+                        <option value="zetaZeros">Riemann Zeta Zeros</option>
                     </select>
                 </div>
                 
@@ -2409,6 +2540,9 @@
                          chartType === 'contribution' ? 'Individual Prime Contributions' :
                          chartType === 'primeCount' ? 'Prime Counting Function π(x)' :
                          chartType === 'density' ? 'Prime Density Analysis' :
+                         chartType === 'gapHistogram' ? 'Prime Gaps Histogram' :
+                         chartType === 'sacksSpiral' ? 'Sacks Spiral Visualization' :
+                         chartType === 'zetaZeros' ? 'Riemann Zeta Function - Non-Trivial Zeros' :
                          'Prime Gap Distribution Analysis';
             ctx.fillText(title, width / 2, padding + height * 0.045);
             
@@ -2456,6 +2590,12 @@
                 chartInstance = generatePrimeCountChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'density') {
                 chartInstance = generateDensityChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'gapHistogram') {
+                chartInstance = generateGapHistogramChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'sacksSpiral') {
+                chartInstance = generateSacksSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'zetaZeros') {
+                chartInstance = generateZetaZerosChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -2906,6 +3046,498 @@
             });
         }
         
+        function createGapHistogramPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Calculate all gaps
+            const gaps = [];
+            for (let i = 1; i < primes.length; i++) {
+                gaps.push(primes[i] - primes[i-1]);
+            }
+            
+            // Count gap frequencies
+            const gapCounts = {};
+            gaps.forEach(gap => {
+                gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+            });
+            
+            // Sort by gap size
+            const sortedGaps = Object.keys(gapCounts).map(Number).sort((a, b) => a - b);
+            const counts = sortedGaps.map(gap => gapCounts[gap]);
+            
+            // Find special gaps
+            const twinPrimes = gapCounts[2] || 0;
+            const cousinPrimes = gapCounts[4] || 0;
+            const sexyPrimes = gapCounts[6] || 0;
+            const maxGap = Math.max(...sortedGaps);
+            const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+            const maxGapCount = Math.max(...counts);
+            const mostCommonGap = sortedGaps[counts.indexOf(maxGapCount)];
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Gaps Analysis</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px; border-left: 3px solid #ff6384;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Twin Primes (gap=2)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${twinPrimes}</div>
+                    </div>
+                    <div style="background: rgba(255, 159, 64, 0.15); padding: 12px; border-radius: 8px; border-left: 3px solid #ff9f40;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Cousin Primes (gap=4)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff9f40;">${cousinPrimes}</div>
+                    </div>
+                    <div style="background: rgba(255, 205, 86, 0.15); padding: 12px; border-radius: 8px; border-left: 3px solid #ffcd56;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Sexy Primes (gap=6)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffcd56;">${sexyPrimes}</div>
+                    </div>
+                    <div style="background: rgba(75, 192, 192, 0.15); padding: 12px; border-radius: 8px; border-left: 3px solid #4bc0c0;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Average Gap</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4bc0c0;">${avgGap.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px; border-left: 3px solid #9966ff;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Maximum Gap</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${maxGap}</div>
+                    </div>
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px; border-left: 3px solid #4ecdc4;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Most Common Gap</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${mostCommonGap} (${maxGapCount}x)</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About Prime Gaps:</strong><br>
+                    • <strong>Twin Primes:</strong> Pairs like (3,5), (5,7), (11,13) with gap=2<br>
+                    • <strong>Cousin Primes:</strong> Pairs like (3,7), (7,11), (13,17) with gap=4<br>
+                    • <strong>Sexy Primes:</strong> Pairs like (5,11), (7,13), (11,17) with gap=6 (from Latin "sex" = six)<br>
+                    • <strong>Cramér's Conjecture:</strong> Max gap ≤ (ln p)² for large primes p<br>
+                    • Average gap near p ≈ ln(p) by the Prime Number Theorem
+                </div>
+            `;
+            
+            // Color bars by special types
+            const barColors = sortedGaps.map(gap => {
+                if (gap === 2) return 'rgba(255, 99, 132, 0.8)';
+                if (gap === 4) return 'rgba(255, 159, 64, 0.8)';
+                if (gap === 6) return 'rgba(255, 205, 86, 0.8)';
+                if (gap === maxGap) return 'rgba(153, 102, 255, 0.8)';
+                return 'rgba(78, 205, 196, 0.7)';
+            });
+            
+            vizChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedGaps.map(g => g.toString()),
+                    datasets: [{
+                        label: 'Frequency',
+                        data: counts,
+                        backgroundColor: barColors,
+                        borderColor: barColors.map(c => c.replace('0.7', '1').replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    const gap = sortedGaps[context.dataIndex];
+                                    const count = context.parsed.y;
+                                    const pct = (count / gaps.length * 100).toFixed(2);
+                                    let type = '';
+                                    if (gap === 2) type = ' (Twin Primes)';
+                                    else if (gap === 4) type = ' (Cousin Primes)';
+                                    else if (gap === 6) type = ' (Sexy Primes)';
+                                    else if (gap === maxGap) type = ' (Maximum Gap)';
+                                    return [
+                                        `Gap ${gap}${type}`,
+                                        `Frequency: ${count}`,
+                                        `Percentage: ${pct}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Gap Size', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#fff',
+                                maxRotation: 45,
+                                callback: function(value, index) {
+                                    // Show every nth label to avoid crowding
+                                    if (sortedGaps.length > 30) {
+                                        return index % Math.ceil(sortedGaps.length / 30) === 0 ? this.getLabelForValue(value) : '';
+                                    }
+                                    return this.getLabelForValue(value);
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Frequency', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createSacksSpiralPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Sacks spiral: r = √n, θ = 2π√n
+            const spiralData = [];
+            const maxN = Math.min(10000, primes[primes.length - 1]); // Limit for performance
+            
+            // Include all numbers up to maxN
+            for (let n = 1; n <= maxN; n++) {
+                const r = Math.sqrt(n);
+                const theta = 2 * Math.PI * Math.sqrt(n);
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+                
+                const isPrime = primes.includes(n);
+                
+                spiralData.push({ x, y, n, isPrime });
+            }
+            
+            const primePoints = spiralData.filter(p => p.isPrime);
+            const compositePoints = spiralData.filter(p => !p.isPrime && p.n > 1);
+            
+            // Calculate pattern statistics
+            const maxR = Math.sqrt(maxN);
+            const primesInSpiral = primePoints.length;
+            const density = primesInSpiral / maxN;
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Sacks Spiral Analysis</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Numbers Plotted</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${maxN.toLocaleString()}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes Found</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${primesInSpiral}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Prime Density</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${(density * 100).toFixed(2)}%</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Spiral Radius</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${maxR.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About the Sacks Spiral:</strong><br>
+                    • Discovered by Robert Sacks, this Archimedean spiral plots integers at position (r,θ) = (√n, 2π√n)<br>
+                    • <span style="color: #ffd700;">●</span> Gold dots = Prime numbers<br>
+                    • <span style="color: rgba(255,255,255,0.3);">●</span> Gray dots = Composite numbers<br>
+                    • Primes form striking radial rays, revealing deep patterns in their distribution<br>
+                    • Unlike Ulam spiral, perfect squares line up along the horizontal axis (θ = 0)<br>
+                    • The ray patterns correspond to polynomial families that produce many primes
+                </div>
+            `;
+            
+            // Clear previous chart if it exists
+            if (vizChart) {
+                vizChart.destroy();
+                vizChart = null;
+            }
+            
+            // Draw custom spiral on canvas
+            const canvas = document.getElementById('vizCanvas');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) / (2 * maxR) * 0.85;
+            
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw composite numbers first (background)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            for (const point of compositePoints) {
+                const screenX = centerX + point.x * scale;
+                const screenY = centerY + point.y * scale;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw primes (foreground)
+            ctx.fillStyle = '#ffd700';
+            for (const point of primePoints) {
+                const screenX = centerX + point.x * scale;
+                const screenY = centerY + point.y * scale;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw center marker
+            ctx.fillStyle = '#4ecdc4';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Add hover interaction
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // Find closest point
+                let closestPoint = null;
+                let minDist = 10;
+                
+                for (const point of spiralData) {
+                    const screenX = centerX + point.x * scale;
+                    const screenY = centerY + point.y * scale;
+                    const dist = Math.sqrt((mouseX - screenX) ** 2 + (mouseY - screenY) ** 2);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestPoint = point;
+                    }
+                }
+                
+                if (closestPoint) {
+                    // Redraw to clear old tooltip
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                    for (const point of compositePoints) {
+                        const screenX = centerX + point.x * scale;
+                        const screenY = centerY + point.y * scale;
+                        ctx.beginPath();
+                        ctx.arc(screenX, screenY, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    ctx.fillStyle = '#ffd700';
+                    for (const point of primePoints) {
+                        const screenX = centerX + point.x * scale;
+                        const screenY = centerY + point.y * scale;
+                        ctx.beginPath();
+                        ctx.arc(screenX, screenY, 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    ctx.fillStyle = '#4ecdc4';
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Highlight selected point
+                    const screenX = centerX + closestPoint.x * scale;
+                    const screenY = centerY + closestPoint.y * scale;
+                    ctx.strokeStyle = '#ff6384';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, 6, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Draw tooltip
+                    const tooltipX = mouseX + 15;
+                    const tooltipY = mouseY - 15;
+                    
+                    const lines = [
+                        `n = ${closestPoint.n}`,
+                        closestPoint.isPrime ? 'PRIME' : 'Composite',
+                        `r = √${closestPoint.n} = ${closestPoint.x.toFixed(3)}`,
+                        `θ = 2π√${closestPoint.n} = ${(2 * Math.PI * Math.sqrt(closestPoint.n)).toFixed(3)}`
+                    ];
+                    
+                    ctx.font = '13px Arial';
+                    const lineHeight = 18;
+                    const padding = 10;
+                    const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+                    const boxWidth = maxWidth + padding * 2;
+                    const boxHeight = lines.length * lineHeight + padding * 2;
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                    ctx.fillRect(tooltipX - padding, tooltipY - padding, boxWidth, boxHeight);
+                    
+                    ctx.strokeStyle = closestPoint.isPrime ? '#ffd700' : 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(tooltipX - padding, tooltipY - padding, boxWidth, boxHeight);
+                    
+                    ctx.fillStyle = closestPoint.isPrime ? '#ffd700' : '#fff';
+                    lines.forEach((line, idx) => {
+                        ctx.fillText(line, tooltipX, tooltipY + idx * lineHeight + 13);
+                    });
+                    
+                    canvas.style.cursor = 'pointer';
+                } else {
+                    canvas.style.cursor = 'default';
+                }
+            };
+        }
+        
+        function createZetaZerosPlot(ctx) {
+            // First 50 non-trivial zeros of Riemann zeta function (imaginary parts)
+            // These are on the critical line Re(s) = 1/2
+            const zetaZeros = [
+                14.134725, 21.022040, 25.010858, 30.424876, 32.935062,
+                37.586178, 40.918719, 43.327073, 48.005151, 49.773832,
+                52.970321, 56.446248, 59.347044, 60.831779, 65.112544,
+                67.079811, 69.546402, 72.067158, 75.704691, 77.144840,
+                79.337375, 82.910381, 84.735493, 87.425275, 88.809111,
+                92.491899, 94.651344, 95.870634, 98.831194, 101.317851,
+                103.725538, 105.446623, 107.168611, 111.029536, 111.874659,
+                114.320220, 116.226680, 118.790782, 121.370125, 122.946829,
+                124.256819, 127.516683, 129.578704, 131.087688, 133.497737,
+                134.756509, 138.116042, 139.736209, 141.123707, 143.111846
+            ];
+            
+            // Calculate statistics
+            const avgSpacing = zetaZeros.slice(1).map((z, i) => z - zetaZeros[i]).reduce((a, b) => a + b) / (zetaZeros.length - 1);
+            const minSpacing = Math.min(...zetaZeros.slice(1).map((z, i) => z - zetaZeros[i]));
+            const maxSpacing = Math.max(...zetaZeros.slice(1).map((z, i) => z - zetaZeros[i]));
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Riemann Zeta Function - Non-Trivial Zeros</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Zeros Shown</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${zetaZeros.length}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">First Zero</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${zetaZeros[0].toFixed(6)}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Spacing</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${avgSpacing.toFixed(3)}</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Spacing Range</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${minSpacing.toFixed(3)} - ${maxSpacing.toFixed(3)}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About Riemann Zeta Zeros:</strong><br>
+                    • The <strong>Riemann Hypothesis</strong> (unproven): All non-trivial zeros lie on the critical line Re(s) = 1/2<br>
+                    • These zeros encode deep information about the distribution of prime numbers<br>
+                    • Von Mangoldt's explicit formula connects zeros to prime counting function π(x)<br>
+                    • The zeros are complex numbers: ρ = 1/2 + it (shown values are the imaginary parts t)<br>
+                    • Average spacing grows like 2π/ln(t) for large t<br>
+                    • Computing over 10 trillion zeros has found <strong>none off the critical line</strong><br>
+                    • The chart shows zeros on critical line at Re(s) = 1/2
+                </div>
+            `;
+            
+            // Create scatter plot of zeros on critical line
+            const zeroPoints = zetaZeros.map((t, idx) => ({ x: 0.5, y: t }));
+            
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Riemann Zeta Zeros (Re=1/2)',
+                        data: zeroPoints,
+                        backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointStyle: 'circle'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#fff',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    const idx = context.dataIndex;
+                                    const t = zetaZeros[idx];
+                                    const nextT = idx < zetaZeros.length - 1 ? zetaZeros[idx + 1] : null;
+                                    const spacing = nextT ? (nextT - t).toFixed(3) : 'N/A';
+                                    return [
+                                        `Zero #${idx + 1}`,
+                                        `ρ = 1/2 + ${t.toFixed(6)}i`,
+                                        `Im(ρ) = ${t.toFixed(6)}`,
+                                        `Spacing to next: ${spacing}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Re(s) - Real Part (Critical Line at 1/2)', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 1,
+                            ticks: { 
+                                color: '#fff',
+                                stepSize: 0.1
+                            },
+                            grid: { 
+                                color: function(context) {
+                                    return context.tick.value === 0.5 ? 'rgba(255, 215, 0, 0.5)' : 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    return context.tick.value === 0.5 ? 3 : 1;
+                                }
+                            }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Im(s) - Imaginary Part', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
         function createPrimeCountingPlot(ctx) {
             const { primes } = computationData;
             
@@ -3327,6 +3959,231 @@
                             title: { 
                                 display: true, 
                                 text: 'Density (primes per unit)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateGapHistogramChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            const gaps = [];
+            for (let i = 1; i < primes.length; i++) {
+                gaps.push(primes[i] - primes[i-1]);
+            }
+            
+            const gapCounts = {};
+            gaps.forEach(gap => {
+                gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+            });
+            
+            const sortedGaps = Object.keys(gapCounts).map(Number).sort((a, b) => a - b);
+            const counts = sortedGaps.map(gap => gapCounts[gap]);
+            const maxGap = Math.max(...sortedGaps);
+            
+            const barColors = sortedGaps.map(gap => {
+                if (gap === 2) return background === 'white' ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 99, 132, 0.8)';
+                if (gap === 4) return background === 'white' ? 'rgba(255, 159, 64, 0.8)' : 'rgba(255, 159, 64, 0.8)';
+                if (gap === 6) return background === 'white' ? 'rgba(255, 205, 86, 0.8)' : 'rgba(255, 205, 86, 0.8)';
+                if (gap === maxGap) return background === 'white' ? 'rgba(153, 102, 255, 0.8)' : 'rgba(153, 102, 255, 0.8)';
+                return background === 'white' ? 'rgba(30, 60, 114, 0.7)' : 'rgba(78, 205, 196, 0.7)';
+            });
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedGaps.map(g => g.toString()),
+                    datasets: [{
+                        label: 'Frequency',
+                        data: counts,
+                        backgroundColor: barColors,
+                        borderColor: barColors.map(c => c.replace('0.7', '1').replace('0.8', '1')),
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Gap Size', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.022) },
+                                maxRotation: 45,
+                                callback: function(value, index) {
+                                    if (sortedGaps.length > 30) {
+                                        return index % Math.ceil(sortedGaps.length / 30) === 0 ? this.getLabelForValue(value) : '';
+                                    }
+                                    return this.getLabelForValue(value);
+                                }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Frequency', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateSacksSpiralForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            const maxN = Math.min(10000, primes[primes.length - 1]);
+            const spiralData = [];
+            
+            for (let n = 1; n <= maxN; n++) {
+                const r = Math.sqrt(n);
+                const theta = 2 * Math.PI * Math.sqrt(n);
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+                const isPrime = primes.includes(n);
+                spiralData.push({ x, y, n, isPrime });
+            }
+            
+            const primePoints = spiralData.filter(p => p.isPrime);
+            const compositePoints = spiralData.filter(p => !p.isPrime && p.n > 1);
+            
+            // Create custom canvas rendering
+            const maxR = Math.sqrt(maxN);
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const scale = Math.min(width, height) / (2 * maxR) * 0.85;
+            
+            ctx.fillStyle = background === 'white' ? '#ffffff' : '#000000';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw composites
+            ctx.fillStyle = background === 'white' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)';
+            for (const point of compositePoints) {
+                const screenX = centerX + point.x * scale;
+                const screenY = centerY + point.y * scale;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw primes
+            ctx.fillStyle = background === 'white' ? '#d4af37' : '#ffd700';
+            for (const point of primePoints) {
+                const screenX = centerX + point.x * scale;
+                const screenY = centerY + point.y * scale;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw center
+            ctx.fillStyle = background === 'white' ? '#1e3c72' : '#4ecdc4';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            return { destroy: () => {} };
+        }
+        
+        function generateZetaZerosChartForExport(ctx, width, height, background) {
+            const zetaZeros = [
+                14.134725, 21.022040, 25.010858, 30.424876, 32.935062,
+                37.586178, 40.918719, 43.327073, 48.005151, 49.773832,
+                52.970321, 56.446248, 59.347044, 60.831779, 65.112544,
+                67.079811, 69.546402, 72.067158, 75.704691, 77.144840,
+                79.337375, 82.910381, 84.735493, 87.425275, 88.809111,
+                92.491899, 94.651344, 95.870634, 98.831194, 101.317851,
+                103.725538, 105.446623, 107.168611, 111.029536, 111.874659,
+                114.320220, 116.226680, 118.790782, 121.370125, 122.946829,
+                124.256819, 127.516683, 129.578704, 131.087688, 133.497737,
+                134.756509, 138.116042, 139.736209, 141.123707, 143.111846
+            ];
+            
+            const zeroPoints = zetaZeros.map(t => ({ x: 0.5, y: t }));
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Riemann Zeta Zeros',
+                        data: zeroPoints,
+                        backgroundColor: background === 'white' ? 'rgba(212, 175, 55, 0.8)' : 'rgba(255, 215, 0, 0.8)',
+                        borderColor: background === 'white' ? 'rgba(212, 175, 55, 1)' : 'rgba(255, 215, 0, 1)',
+                        pointRadius: 8,
+                        pointStyle: 'circle'
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Re(s) - Real Part (Critical Line at 1/2)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            min: 0,
+                            max: 1,
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) },
+                                stepSize: 0.1
+                            },
+                            grid: { 
+                                color: function(context) {
+                                    if (context.tick.value === 0.5) {
+                                        return background === 'white' ? 'rgba(212, 175, 55, 0.5)' : 'rgba(255, 215, 0, 0.5)';
+                                    }
+                                    return background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    return context.tick.value === 0.5 ? 4 : 1;
+                                }
+                            }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Im(s) - Imaginary Part', 
                                 color: textColor,
                                 font: { size: Math.floor(height * 0.03) }
                             },
