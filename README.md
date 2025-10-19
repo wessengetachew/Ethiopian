@@ -2112,10 +2112,8 @@
                 createErrorAnalysisPlot(freshCtx);
             } else if (type === 'primeRaces') {
                 createPrimeRacesPlot(freshCtx);
-                                } else if (type === 'goldbachComet') {
+            } else if (type === 'goldbachComet') {
                 createGoldbachCometPlot(freshCtx);
-            } else if (type === 'modularLaplace') {
-                createModularLaplacePlot(freshCtx);
             }
         }
         
@@ -2663,6 +2661,10 @@
                 chartInstance = generateErrorAnalysisChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'modularLaplace') {
                 chartInstance = generateModularLaplaceChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'primeRaces') {
+                chartInstance = generatePrimeRacesChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'goldbachComet') {
+                chartInstance = generateGoldbachCometChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -4269,18 +4271,14 @@
         function createPrimeRacesPlot(ctx) {
             const { primes, modulus } = computationData;
             
-            // Get user-specified modulus
-            const userModulus = parseInt(document.getElementById('raceModulus').value) || 4;
-            
             // Get coprime residues for the modulus
-            const coprimeResidues = getCoprimeResidues(userModulus);
+            const coprimeResidues = getCoprimeResidues(modulus);
             
-            // Use the specified modulus
-            let actualModulus = userModulus;
+            // If modulus doesn't have exactly 2 coprime residues, fall back to mod 4
+            let actualModulus = modulus;
             let residues = coprimeResidues;
             
-            // If only 1 coprime residue, that's just trivial (mod 1 or 2)
-            if (coprimeResidues.length < 2) {
+            if (coprimeResidues.length !== 2) {
                 actualModulus = 4;
                 residues = [1, 3];
             }
@@ -4306,74 +4304,45 @@
                 const dataPoint = { x: p };
                 residues.forEach(r => dataPoint[`count_${r}`] = counts[r]);
                 
-                // Calculate differences for 2-way race
-                if (residues.length === 2) {
-                    dataPoint.diff = counts[residues[0]] - counts[residues[1]];
-                }
+                // Calculate difference (first residue - second residue)
+                dataPoint.diff = counts[residues[0]] - counts[residues[1]];
                 raceData.push(dataPoint);
             }
             
             // Calculate statistics
-            let finalDiff = 0;
-            let maxDiff = 0;
-            let leaderChanges = 0;
-            let currentLeader = "Multiple";
-            
-            if (residues.length === 2) {
-                finalDiff = counts[residues[0]] - counts[residues[1]];
-                maxDiff = Math.max(...raceData.map(d => Math.abs(d.diff)));
-                leaderChanges = raceData.reduce((changes, d, i) => {
-                    if (i === 0) return changes;
-                    const prevDiff = raceData[i-1].diff;
-                    const currDiff = d.diff;
-                    if ((prevDiff > 0 && currDiff < 0) || (prevDiff < 0 && currDiff > 0)) {
-                        return changes + 1;
-                    }
-                    return changes;
-                }, 0);
-                currentLeader = finalDiff > 0 ? `${residues[0]} (mod ${actualModulus})` : 
-                               finalDiff < 0 ? `${residues[1]} (mod ${actualModulus})` : "Tie";
-            } else {
-                // For multi-way races, find current leader
-                const maxCount = Math.max(...residues.map(r => counts[r]));
-                const leaders = residues.filter(r => counts[r] === maxCount);
-                if (leaders.length === 1) {
-                    currentLeader = `${leaders[0]} (mod ${actualModulus})`;
-                } else {
-                    currentLeader = `Tie: ${leaders.join(', ')} (mod ${actualModulus})`;
+            const finalDiff = counts[residues[0]] - counts[residues[1]];
+            const maxDiff = Math.max(...raceData.map(d => Math.abs(d.diff)));
+            const leaderChanges = raceData.reduce((changes, d, i) => {
+                if (i === 0) return changes;
+                const prevDiff = raceData[i-1].diff;
+                const currDiff = d.diff;
+                if ((prevDiff > 0 && currDiff < 0) || (prevDiff < 0 && currDiff > 0)) {
+                    return changes + 1;
                 }
-            }
+                return changes;
+            }, 0);
+            
+            const currentLeader = finalDiff > 0 ? `${residues[0]} (mod ${actualModulus})` : 
+                                 finalDiff < 0 ? `${residues[1]} (mod ${actualModulus})` : "Tie";
             
             // Display stats
             const statsDiv = document.getElementById('vizStats');
             statsDiv.style.display = 'block';
-            
-            let statsHTML = `
+            statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Races: Modulus ${actualModulus} (Residues: ${residues.join(' vs ')})</h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            `;
-            
-            // Add stat box for each residue
-            const colors = ['#4ecdc4', '#ff6384', '#ffcd56', '#9966ff', '#ff9f40', '#4bc0c0'];
-            residues.forEach((r, idx) => {
-                const color = colors[idx % colors.length];
-                statsHTML += `
-                    <div style="background: ${color}33; padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ ${r} (mod ${actualModulus})</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: ${color};">${counts[r]}</div>
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ ${residues[0]} (mod ${actualModulus})</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${counts[residues[0]]}</div>
                     </div>
-                `;
-            });
-            
-            statsHTML += `
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ ${residues[1]} (mod ${actualModulus})</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${counts[residues[1]]}</div>
+                    </div>
                     <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
                         <div style="font-size: 0.9em; opacity: 0.8;">Current Leader</div>
                         <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${currentLeader}</div>
                     </div>
-            `;
-            
-            if (residues.length === 2) {
-                statsHTML += `
                     <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
                         <div style="font-size: 0.9em; opacity: 0.8;">Current Gap</div>
                         <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${Math.abs(finalDiff)}</div>
@@ -4386,55 +4355,43 @@
                         <div style="font-size: 0.9em; opacity: 0.8;">Lead Changes</div>
                         <div style="font-size: 1.4em; font-weight: bold; color: #4bc0c0;">${leaderChanges}</div>
                     </div>
-                `;
-            }
-            
-            statsHTML += `</div>`;
-            
-            statsHTML += `
+                </div>
                 <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About Prime Races (mod ${actualModulus}):</strong><br>
                     • <strong>Chebyshev's Bias:</strong> In prime races, certain residue classes tend to "win" more often than others<br>
                     • By Dirichlet's theorem, all coprime residue classes mod ${actualModulus} have equal density asymptotically<br>
                     • Despite equal density, one class is typically ahead at any given point<br>
-            `;
-            
-            if (actualModulus === 4) {
-                statsHTML += `• For mod 4: Primes ≡ 3 (mod 4) lead ~99.6% of the time (Chebyshev's bias)<br>
-                    • First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>`;
-            }
-            
-            statsHTML += `
+                    ${actualModulus === 4 ? `• For mod 4: Primes ≡ 3 (mod 4) lead ~99.6% of the time (Chebyshev's bias)<br>
+                    • First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>` : ''}
                     • The lead changes infinitely often (Littlewood, 1914), but very rarely<br>
                     • Related to the <strong>Shanks-Rényi race</strong> and Rubinstein-Sarnak's work on prime number races<br>
+                    ${coprimeResidues.length !== 2 ? `<br><strong>Note:</strong> Modulus ${modulus} has ${coprimeResidues.length} coprime residues. Using mod 4 for classic 2-way race.` : ''}
+                </div>
             `;
-            
-            if (residues.length > 2) {
-                statsHTML += `<br><strong>Note:</strong> Modulus ${actualModulus} has ${residues.length} coprime residues. Multi-way race visualization.`;
-            }
-            
-            statsHTML += `</div>`;
-            
-            statsDiv.innerHTML = statsHTML;
             
             vizChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: raceData.map(d => d.x),
-                    datasets: residues.map((r, idx) => {
-                        const colors = ['rgba(78, 205, 196, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 205, 86, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)'];
-                        const bgColors = ['rgba(78, 205, 196, 0.1)', 'rgba(255, 99, 132, 0.1)', 'rgba(255, 205, 86, 0.1)', 'rgba(153, 102, 255, 0.1)', 'rgba(255, 159, 64, 0.1)', 'rgba(75, 192, 192, 0.1)'];
-                        return {
-                            label: `π(x; ${actualModulus}, ${r}) - Primes ≡ ${r} (mod ${actualModulus})`,
-                            data: raceData.map(d => ({ x: d.x, y: d[`count_${r}`] })),
-                            borderColor: colors[idx % colors.length],
-                            backgroundColor: bgColors[idx % bgColors.length],
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0,
-                            pointRadius: 0
-                        };
-                    })
+                    datasets: [{
+                        label: `π(x; ${actualModulus}, ${residues[0]}) - Primes ≡ ${residues[0]} (mod ${actualModulus})`,
+                        data: raceData.map(d => ({ x: d.x, y: d[`count_${residues[0]}`] })),
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }, {
+                        label: `π(x; ${actualModulus}, ${residues[1]}) - Primes ≡ ${residues[1]} (mod ${actualModulus})`,
+                        data: raceData.map(d => ({ x: d.x, y: d[`count_${residues[1]}`] })),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }]
                 },
                 options: {
                     responsive: true,
@@ -4451,16 +4408,12 @@
                             callbacks: {
                                 label: function(context) {
                                     const idx = context.dataIndex;
-                                    if (residues.length === 2 && raceData[idx].diff !== undefined) {
-                                        const diff = raceData[idx].diff;
-                                        const leader = diff > 0 ? `${residues[0]} (mod ${actualModulus}) leads` : 
-                                                      diff < 0 ? `${residues[1]} (mod ${actualModulus}) leads` : "Tied";
-                                        return [
-                                            `${context.dataset.label}: ${context.parsed.y}`,
-                                            `Gap: ${Math.abs(diff)} (${leader})`
-                                        ];
-                                    }
-                                    return `${context.dataset.label}: ${context.parsed.y}`;
+                                    const diff = raceData[idx].diff;
+                                    const leader = diff > 0 ? "3 (mod 4) leads" : diff < 0 ? "1 (mod 4) leads" : "Tied";
+                                    return [
+                                        `${context.dataset.label}: ${context.parsed.y}`,
+                                        `Gap: ${Math.abs(diff)} (${leader})`
+                                    ];
                                 }
                             }
                         }
@@ -4855,279 +4808,6 @@
             });
         }
         
-        function updateModularLaplace() {
-            if (currentViz === 'modularLaplace') {
-                updateVisualization('modularLaplace');
-            }
-        }
-        
-        function updatePrimeRace() {
-            if (currentViz === 'primeRaces') {
-                updateVisualization('primeRaces');
-            }
-        }
-        
-        function updateGoldbach() {
-            if (currentViz === 'goldbachComet') {
-                updateVisualization('goldbachComet');
-            }
-        }
-        
-        function createModularLaplacePlot(ctx) {
-            const { primes, modulus } = computationData;
-            
-            // Get user-specified base modulus and lift levels
-            const baseM = parseInt(document.getElementById('laplaceBaseModulus').value) || 30;
-            const numLevels = parseInt(document.getElementById('laplaceLiftLevels').value) || 5;
-            
-            // Definition: Modular Laplace Transform
-            // For M = baseM * 2^n, and Φ(M) = {r ∈ Z_M : gcd(r,M) = 1}
-            // L_M[f](s) = Σ_{r ∈ Φ(M)} f(r) * e^(-s * 2πir/M)
-            
-            // Generate moduli: M = baseM * 2^k for k = 0, 1, 2, ...
-            const scaleLevels = [];
-            for (let k = 0; k < numLevels; k++) {
-                scaleLevels.push(k);
-            }
-            const moduli = scaleLevels.map(k => baseM * Math.pow(2, k));
-            
-            // Define function f(r) = number of primes ≡ r (mod M)
-            const computePrimeCount = (M) => {
-                const coprimes = getCoprimeResidues(M);
-                const counts = {};
-                coprimes.forEach(r => counts[r] = 0);
-                
-                primes.forEach(p => {
-                    if (p >= M) {
-                        const residue = p % M;
-                        if (coprimes.includes(residue)) {
-                            counts[residue]++;
-                        }
-                    }
-                });
-                
-                return counts;
-            };
-            
-            // Compute Modular Laplace Transform L_M[f](s)
-            // For real s values from 0 to 2π
-            const sValues = [];
-            for (let s = 0; s <= 2 * Math.PI; s += 0.1) {
-                sValues.push(s);
-            }
-            
-            const transforms = {};
-            
-            for (const M of moduli) {
-                const counts = computePrimeCount(M);
-                const coprimes = getCoprimeResidues(M);
-                const transformValues = [];
-                
-                for (const s of sValues) {
-                    // L_M[f](s) = Σ f(r) * e^(-s * 2πir/M)
-                    let real = 0;
-                    let imag = 0;
-                    
-                    for (const r of coprimes) {
-                        const f_r = counts[r];
-                        const phase = -s * 2 * Math.PI * r / M;
-                        real += f_r * Math.cos(phase);
-                        imag += f_r * Math.sin(phase);
-                    }
-                    
-                    const magnitude = Math.sqrt(real * real + imag * imag);
-                    transformValues.push({ s, magnitude, real, imag });
-                }
-                
-                transforms[M] = transformValues;
-            }
-            
-            // Calculate statistics
-            const M0 = moduli[0];
-            const totalPrimes = Object.values(computePrimeCount(M0)).reduce((a, b) => a + b, 0);
-            const avgMagnitude = transforms[M0].reduce((sum, v) => sum + v.magnitude, 0) / transforms[M0].length;
-            const maxMagnitude = Math.max(...transforms[M0].map(v => v.magnitude));
-            const phiM0 = eulerPhi(M0);
-            
-            // Calculate lift scaling verification
-            // L_{M*2^k}[f](s) should ≈ e^(-s*2^k) * L_M[f](s)
-            const s_test = 1.0; // test at s = 1
-            const baseTransform = transforms[baseM].find(v => Math.abs(v.s - s_test) < 0.05);
-            const liftScaling = [];
-            
-            for (let k = 1; k < scaleLevels.length; k++) {
-                const M_k = baseM * Math.pow(2, k);
-                const transform_k = transforms[M_k].find(v => Math.abs(v.s - s_test) < 0.05);
-                const theoretical = Math.exp(-s_test * Math.pow(2, k)) * baseTransform.magnitude;
-                const actual = transform_k.magnitude;
-                const ratio = actual / theoretical;
-                liftScaling.push({ k, M: M_k, theoretical, actual, ratio });
-            }
-            
-            // Display stats with mathematical definition
-            const statsDiv = document.getElementById('vizStats');
-            statsDiv.style.display = 'block';
-            statsDiv.innerHTML = `
-                <h4 style="color: #ffd700; margin-bottom: 15px;">Modular Laplace Transform ℒ<sub>M</sub>[f](s)</h4>
-                
-                <div style="background: rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #4ecdc4;">
-                    <h5 style="color: #4ecdc4; margin-bottom: 15px;">Mathematical Definition</h5>
-                    <div style="font-family: 'Courier New', monospace; line-height: 1.8; font-size: 0.95em;">
-                        Let M = ${baseM}·2<sup>n</sup> be a modulus and<br>
-                        Φ(M) = {r ∈ ℤ<sub>M</sub> : gcd(r, M) = 1}<br><br>
-                        
-                        <strong style="color: #ffd700;">Modular Laplace Transform:</strong><br>
-                        <div style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 6px; margin: 10px 0;">
-                            ℒ<sub>M</sub>[f](s) = Σ<sub>r∈Φ(M)</sub> f(r)·e<sup>−s·(2πir/M)</sup>
-                        </div>
-                        
-                        where f(r) = #{primes p : p ≡ r (mod M)}<br><br>
-                        
-                        <strong style="color: #4ecdc4;">Lift Dynamics:</strong><br>
-                        Under lifting r ↦ r + M·2<sup>k</sup>:<br>
-                        <div style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 6px; margin: 10px 0;">
-                            ℒ<sub>M·2<sup>k</sup></sub>[f](s) = e<sup>−s·2<sup>k</sup></sup> · ℒ<sub>M</sub>[f](s)
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Base Modulus M</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${M0}</div>
-                    </div>
-                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">|Φ(${M0})|</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${phiM0}</div>
-                    </div>
-                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Primes Analyzed</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${totalPrimes}</div>
-                    </div>
-                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Max |ℒ<sub>M</sub>|(s)</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${maxMagnitude.toFixed(2)}</div>
-                    </div>
-                </div>
-                
-                <div style="background: rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                    <h5 style="color: #ffd700; margin-bottom: 15px;">Lift Scaling Verification (at s = ${s_test})</h5>
-                    <div style="font-family: 'Courier New', monospace; font-size: 0.9em; line-height: 1.8;">
-                        ${liftScaling.map(ls => `
-                            <div style="padding: 8px; margin: 5px 0; background: rgba(0, 0, 0, 0.3); border-radius: 5px;">
-                                M = ${ls.M} (2<sup>${ls.k}</sup> lift):<br>
-                                Theoretical: e<sup>−${s_test}·2<sup>${ls.k}</sup></sup> · |ℒ<sub>${baseM}</sub>| = ${ls.theoretical.toFixed(4)}<br>
-                                Actual: |ℒ<sub>${ls.M}</sub>| = ${ls.actual.toFixed(4)}<br>
-                                Ratio: ${ls.ratio.toFixed(4)} ${Math.abs(1 - ls.ratio) < 0.1 ? '✓' : '⚠'}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                
-                <div style="background: rgba(255, 255, 255, 0.05); padding: 18px; border-radius: 10px; line-height: 1.7;">
-                    <h5 style="color: #4ecdc4; margin-bottom: 12px;">Interpretation</h5>
-                    <ul style="margin-left: 20px; line-height: 1.8;">
-                        <li><strong>Domain variable r:</strong> Discrete "time" or modular index over coprime residues</li>
-                        <li><strong>Transform parameter s:</strong> Continuous spectral variable capturing modular frequency</li>
-                        <li><strong>gcd-filter:</strong> The condition gcd(r,M)=1 isolates residues with maximal independence</li>
-                        <li><strong>Lifting operator:</strong> Reproduces exponential damping e<sup>−s·2<sup>k</sup></sup> across scales</li>
-                        <li><strong>Spectral peaks:</strong> Reveal harmonic structure in prime residue distribution</li>
-                        <li><strong>Complex plane:</strong> Real and imaginary parts encode phase relationships</li>
-                    </ul>
-                    <div style="margin-top: 15px; padding: 12px; background: rgba(78, 205, 196, 0.1); border-radius: 6px; border-left: 3px solid #4ecdc4;">
-                        <strong>Key Insight:</strong> ℒ<sub>M</sub> provides a modular–spectral analogue of the classical Laplace transform, 
-                        revealing hidden harmonic order within the residue structure of integers and linking discrete number theory to continuous spectral analysis.
-                    </div>
-                </div>
-            `;
-            
-            // Create chart showing transform magnitude for different moduli
-            const datasets = moduli.map((M, idx) => {
-                const k = scaleLevels[idx];
-                const hue = (idx / moduli.length) * 280;
-                return {
-                    label: `M = ${M} (2^${k} × 30)`,
-                    data: transforms[M].map(v => ({ x: v.s, y: v.magnitude })),
-                    borderColor: `hsla(${hue}, 70%, 60%, 1)`,
-                    backgroundColor: `hsla(${hue}, 70%, 60%, 0.1)`,
-                    borderWidth: 3,
-                    fill: false,
-                    tension: 0.4,
-                    pointRadius: 0
-                };
-            });
-            
-            vizChart = new Chart(ctx, {
-                type: 'line',
-                data: { datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { 
-                                color: '#fff',
-                                font: { size: 13 }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            callbacks: {
-                                label: function(context) {
-                                    const M = moduli[context.datasetIndex];
-                                    const point = transforms[M][context.dataIndex];
-                                    return [
-                                        `${context.dataset.label}`,
-                                        `s = ${point.s.toFixed(3)}`,
-                                        `|ℒ_M(s)| = ${point.magnitude.toFixed(4)}`,
-                                        `Real: ${point.real.toFixed(4)}`,
-                                        `Imag: ${point.imag.toFixed(4)}`
-                                    ];
-                                }
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Modular Laplace Transform Magnitude |ℒ_M[f](s)|',
-                            color: '#ffd700',
-                            font: { size: 16, weight: 'bold' }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: { 
-                                display: true, 
-                                text: 's (spectral parameter)', 
-                                color: '#fff',
-                                font: { size: 15, weight: 'bold' }
-                            },
-                            ticks: { 
-                                color: '#fff',
-                                callback: function(value) {
-                                    if (value === 0) return '0';
-                                    if (Math.abs(value - Math.PI) < 0.1) return 'π';
-                                    if (Math.abs(value - 2*Math.PI) < 0.1) return '2π';
-                                    return value.toFixed(1);
-                                }
-                            },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            title: { 
-                                display: true, 
-                                text: '|ℒ_M[f](s)| (Transform Magnitude)', 
-                                color: '#fff',
-                                font: { size: 15, weight: 'bold' }
-                            },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
-        
         function generateModularLaplaceChartForExport(ctx, width, height, background) {
             const { primes } = computationData;
             
@@ -5258,6 +4938,216 @@
                             title: { 
                                 display: true, 
                                 text: '|ℒ_M[f](s)| (Transform Magnitude)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generatePrimeRacesChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            // Use current user settings
+            const userModulus = parseInt(document.getElementById('raceModulus').value) || 4;
+            const coprimeResidues = getCoprimeResidues(userModulus);
+            
+            let actualModulus = userModulus;
+            let residues = coprimeResidues;
+            
+            if (coprimeResidues.length < 2) {
+                actualModulus = 4;
+                residues = [1, 3];
+            }
+            
+            // Build race data
+            const counts = {};
+            residues.forEach(r => counts[r] = 0);
+            const raceData = [];
+            
+            for (const p of primes) {
+                if (p < actualModulus) continue;
+                const residue = p % actualModulus;
+                if (residues.includes(residue)) {
+                    counts[residue]++;
+                }
+                const dataPoint = { x: p };
+                residues.forEach(r => dataPoint[`count_${r}`] = counts[r]);
+                raceData.push(dataPoint);
+            }
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            const colors = ['rgba(78, 205, 196, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 205, 86, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)'];
+            const bgColors = ['rgba(78, 205, 196, 0.1)', 'rgba(255, 99, 132, 0.1)', 'rgba(255, 205, 86, 0.1)', 'rgba(153, 102, 255, 0.1)', 'rgba(255, 159, 64, 0.1)', 'rgba(75, 192, 192, 0.1)'];
+            
+            if (background === 'white') {
+                colors[0] = 'rgba(30, 60, 114, 1)';
+                colors[1] = 'rgba(220, 53, 69, 1)';
+                bgColors[0] = 'rgba(30, 60, 114, 0.1)';
+                bgColors[1] = 'rgba(220, 53, 69, 0.1)';
+            }
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: raceData.map(d => d.x),
+                    datasets: residues.map((r, idx) => ({
+                        label: `π(x; ${actualModulus}, ${r}) - Primes ≡ ${r} (mod ${actualModulus})`,
+                        data: raceData.map(d => ({ x: d.x, y: d[`count_${r}`] })),
+                        borderColor: colors[idx % colors.length],
+                        backgroundColor: bgColors[idx % bgColors.length],
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }))
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.022) }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Prime Races (mod ${actualModulus})`,
+                            color: background === 'white' ? '#1e3c72' : '#ffd700',
+                            font: { size: Math.floor(height * 0.028), weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x (prime value)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Count of Primes', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateGoldbachCometChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            // Use current user settings
+            const maxN = Math.min(parseInt(document.getElementById('goldbachMaxN').value) || 10000, 100000);
+            const adjustedMaxN = maxN % 2 === 0 ? maxN : maxN - 1;
+            
+            const primeSet = new Set(primes);
+            const goldbachData = [];
+            
+            for (let n = 4; n <= adjustedMaxN; n += 2) {
+                let count = 0;
+                
+                for (const p of primes) {
+                    if (p > n / 2) break;
+                    const q = n - p;
+                    if (q >= 2 && primeSet.has(q)) {
+                        count++;
+                    }
+                }
+                
+                if (count > 0) {
+                    goldbachData.push({ n: n, count: count });
+                }
+            }
+            
+            if (goldbachData.length === 0) {
+                return { destroy: () => {} };
+            }
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            const maxCount = Math.max(...goldbachData.map(d => d.count));
+            
+            return new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Goldbach Partitions G(n)',
+                        data: goldbachData.map(d => ({ x: d.n, y: d.count })),
+                        backgroundColor: function(context) {
+                            const count = context.raw.y;
+                            const ratio = count / maxCount;
+                            const hue = ratio * 240;
+                            if (background === 'white') {
+                                return `hsla(${hue}, 70%, 45%, 0.7)`;
+                            }
+                            return `hsla(${hue}, 80%, 60%, 0.7)`;
+                        },
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 0.3)' : 'rgba(78, 205, 196, 0.3)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.022) }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Goldbach Comet (up to n = ${adjustedMaxN})`,
+                            color: background === 'white' ? '#1e3c72' : '#ffd700',
+                            font: { size: Math.floor(height * 0.028), weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'n (even number)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'G(n) - Number of Prime Pair Partitions', 
                                 color: textColor,
                                 font: { size: Math.floor(height * 0.025), weight: 'bold' }
                             },
