@@ -3228,9 +3228,6 @@
         function createSacksSpiralPlot(ctx) {
             const { primes } = computationData;
             
-            // Create a Set for O(1) prime lookup
-            const primeSet = new Set(primes);
-            
             // Sacks spiral: r = √n, θ = 2π√n
             // Use all computed primes, no artificial cap
             const spiralData = [];
@@ -3243,7 +3240,7 @@
                 const x = r * Math.cos(theta);
                 const y = r * Math.sin(theta);
                 
-                const isPrime = primeSet.has(n);
+                const isPrime = primes.includes(n);
                 
                 spiralData.push({ x, y, n, isPrime });
             }
