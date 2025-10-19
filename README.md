@@ -1059,6 +1059,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         // Compute Euler's totient function
         function eulerPhi(n) {
@@ -2513,6 +2514,8 @@
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Chart Type:</label>
                     <select id="exportChartType" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="all">🎁 Export All Charts (ZIP)</option>
+                        <option value="all-individual">📑 Export All Charts (Individual Files)</option>
                         <option value="channel">Residue Channel Contributions</option>
                         <option value="convergence">Convergence Plot</option>
                         <option value="contribution">Prime Contributions</option>
@@ -2562,7 +2565,25 @@
                 
                 document.body.removeChild(modal);
                 
-                performExport(resolution, background, chartType, includeWatermark, includeLegend);
+                // Check if exporting all charts
+                if (chartType === 'all' || chartType === 'all-individual') {
+                    const allChartTypes = [
+                        'channel', 'convergence', 'contribution', 'gapDist',
+                        'primeCount', 'density', 'gapHistogram', 'sacksSpiral',
+                        'zetaZeros', 'errorAnalysis', 'primeRaces', 'goldbachComet',
+                        'modularLaplace'
+                    ];
+                    
+                    if (chartType === 'all') {
+                        // Export as ZIP
+                        exportAllChartsAsZip(allChartTypes, resolution, background, includeWatermark, includeLegend);
+                    } else {
+                        // Export individually
+                        exportAllChartsIndividually(allChartTypes, resolution, background, includeWatermark, includeLegend);
+                    }
+                } else {
+                    performExport(resolution, background, chartType, includeWatermark, includeLegend);
+                }
             };
         }
         
@@ -2724,6 +2745,348 @@
             }
             
             ctx.restore();
+        }
+        
+        
+        async function exportAllChartsAsZip(chartTypes, resolution, background, includeWatermark, includeLegend) {
+            // Create progress indicator
+            const progressDiv = document.createElement('div');
+            progressDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 30px 40px;
+                border-radius: 15px;
+                z-index: 10001;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                color: white;
+                text-align: center;
+                min-width: 300px;
+            `;
+            progressDiv.innerHTML = `
+                <h3 style="color: #ffd700; margin-bottom: 15px;">Exporting All Charts</h3>
+                <div id="exportProgress" style="margin-bottom: 10px; font-size: 1.1em;">Preparing export...</div>
+                <div style="background: rgba(0,0,0,0.3); height: 20px; border-radius: 10px; overflow: hidden; margin-top: 15px;">
+                    <div id="exportProgressBar" style="background: linear-gradient(90deg, #4ecdc4, #44a8a3); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+            `;
+            document.body.appendChild(progressDiv);
+            
+            const updateProgress = (text, percent) => {
+                document.getElementById('exportProgress').textContent = text;
+                document.getElementById('exportProgressBar').style.width = percent + '%';
+            };
+            
+            try {
+                const zip = new JSZip();
+                const chartNames = {
+                    'channel': 'Residue_Channel_Contributions',
+                    'convergence': 'Convergence_Plot',
+                    'contribution': 'Prime_Contributions',
+                    'gapDist': 'Gap_Distribution_Analysis',
+                    'primeCount': 'Prime_Counting_Function',
+                    'density': 'Prime_Density_Analysis',
+                    'gapHistogram': 'Prime_Gaps_Histogram',
+                    'sacksSpiral': 'Sacks_Spiral',
+                    'zetaZeros': 'Riemann_Zeta_Zeros',
+                    'errorAnalysis': 'Error_Analysis',
+                    'primeRaces': 'Prime_Races',
+                    'goldbachComet': 'Goldbach_Comet',
+                    'modularLaplace': 'Modular_Laplace_Transform'
+                };
+                
+                for (let i = 0; i < chartTypes.length; i++) {
+                    const chartType = chartTypes[i];
+                    const chartName = chartNames[chartType];
+                    
+                    updateProgress(`Generating ${chartName}... (${i + 1}/${chartTypes.length})`, (i / chartTypes.length) * 100);
+                    
+                    // Generate chart
+                    const blob = await generateChartBlob(resolution, background, chartType, includeWatermark, includeLegend);
+                    
+                    if (blob) {
+                        zip.file(`${chartName}.jpg`, blob);
+                    }
+                    
+                    // Small delay to allow UI to update
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                updateProgress('Creating ZIP file...', 95);
+                
+                // Generate ZIP
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                
+                updateProgress('Download starting...', 100);
+                
+                // Download
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `modular_sieve_all_charts_${resolution}_${Date.now()}.zip`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                // Remove progress indicator after short delay
+                setTimeout(() => {
+                    document.body.removeChild(progressDiv);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                progressDiv.innerHTML = `
+                    <h3 style="color: #ff6b6b; margin-bottom: 15px;">Export Failed</h3>
+                    <p>${error.message}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 15px; padding: 10px 20px; background: #4ecdc4; color: white; border: none; border-radius: 8px; cursor: pointer;">Close</button>
+                `;
+            }
+        }
+        
+        async function exportAllChartsIndividually(chartTypes, resolution, background, includeWatermark, includeLegend) {
+            // Create progress indicator
+            const progressDiv = document.createElement('div');
+            progressDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 30px 40px;
+                border-radius: 15px;
+                z-index: 10001;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                color: white;
+                text-align: center;
+                min-width: 300px;
+            `;
+            progressDiv.innerHTML = `
+                <h3 style="color: #ffd700; margin-bottom: 15px;">Exporting All Charts</h3>
+                <div id="exportProgress" style="margin-bottom: 10px; font-size: 1.1em;">Preparing export...</div>
+                <div style="background: rgba(0,0,0,0.3); height: 20px; border-radius: 10px; overflow: hidden; margin-top: 15px;">
+                    <div id="exportProgressBar" style="background: linear-gradient(90deg, #4ecdc4, #44a8a3); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                    Note: Multiple downloads will start. Please allow popups if prompted.
+                </div>
+            `;
+            document.body.appendChild(progressDiv);
+            
+            const updateProgress = (text, percent) => {
+                document.getElementById('exportProgress').textContent = text;
+                document.getElementById('exportProgressBar').style.width = percent + '%';
+            };
+            
+            try {
+                const chartNames = {
+                    'channel': 'Residue_Channel_Contributions',
+                    'convergence': 'Convergence_Plot',
+                    'contribution': 'Prime_Contributions',
+                    'gapDist': 'Gap_Distribution_Analysis',
+                    'primeCount': 'Prime_Counting_Function',
+                    'density': 'Prime_Density_Analysis',
+                    'gapHistogram': 'Prime_Gaps_Histogram',
+                    'sacksSpiral': 'Sacks_Spiral',
+                    'zetaZeros': 'Riemann_Zeta_Zeros',
+                    'errorAnalysis': 'Error_Analysis',
+                    'primeRaces': 'Prime_Races',
+                    'goldbachComet': 'Goldbach_Comet',
+                    'modularLaplace': 'Modular_Laplace_Transform'
+                };
+                
+                for (let i = 0; i < chartTypes.length; i++) {
+                    const chartType = chartTypes[i];
+                    const chartName = chartNames[chartType];
+                    
+                    updateProgress(`Downloading ${chartName}... (${i + 1}/${chartTypes.length})`, (i / chartTypes.length) * 100);
+                    
+                    // Generate and download chart
+                    const blob = await generateChartBlob(resolution, background, chartType, includeWatermark, includeLegend);
+                    
+                    if (blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${chartName}_${resolution}_${Date.now()}.jpg`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }
+                    
+                    // Delay between downloads to avoid browser blocking
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                updateProgress('All charts downloaded!', 100);
+                
+                // Remove progress indicator after short delay
+                setTimeout(() => {
+                    document.body.removeChild(progressDiv);
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                progressDiv.innerHTML = `
+                    <h3 style="color: #ff6b6b; margin-bottom: 15px;">Export Failed</h3>
+                    <p>${error.message}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 15px; padding: 10px 20px; background: #4ecdc4; color: white; border: none; border-radius: 8px; cursor: pointer;">Close</button>
+                `;
+            }
+        }
+        
+        async function generateChartBlob(resolution, background, chartType, includeWatermark, includeLegend) {
+            return new Promise((resolve) => {
+                const { epsilon, constantType, modulus, primes, computedValue, exactValue } = computationData;
+                
+                let width, height;
+                if (resolution === '1080p') {
+                    width = 1920;
+                    height = 1080;
+                } else if (resolution === '1080p2x') {
+                    width = 3840;
+                    height = 2160;
+                } else if (resolution === '4k') {
+                    width = 3840;
+                    height = 2160;
+                } else {
+                    width = 7680;
+                    height = 4320;
+                }
+                
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = width;
+                exportCanvas.height = height;
+                const ctx = exportCanvas.getContext('2d');
+                
+                // Set background
+                ctx.fillStyle = background === 'white' ? '#ffffff' : '#000000';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Calculate dimensions
+                const padding = width * 0.04;
+                const titleHeight = height * 0.15;
+                const chartHeight = height * 0.70;
+                const watermarkHeight = includeWatermark ? height * 0.05 : 0;
+                const legendHeight = includeLegend ? height * 0.10 : 0;
+                
+                const textColor = background === 'white' ? '#000000' : '#ffffff';
+                const accentColor = background === 'white' ? '#1e3c72' : '#ffd700';
+                
+                // Draw title
+                ctx.fillStyle = accentColor;
+                ctx.font = `bold ${height * 0.045}px Arial`;
+                ctx.textAlign = 'center';
+                const title = chartType === 'channel' ? `Residue Channel Contributions (mod ${modulus})` :
+                             chartType === 'convergence' ? 'Convergence to Exact Value' :
+                             chartType === 'contribution' ? 'Individual Prime Contributions' :
+                             chartType === 'primeCount' ? 'Prime Counting Function π(x)' :
+                             chartType === 'density' ? 'Prime Density Analysis' :
+                             chartType === 'gapHistogram' ? 'Prime Gaps Histogram' :
+                             chartType === 'sacksSpiral' ? 'Sacks Spiral Visualization' :
+                             chartType === 'zetaZeros' ? 'Riemann Zeta Function - Non-Trivial Zeros' :
+                             chartType === 'errorAnalysis' ? 'Error Analysis - Convergence Rate' :
+                             chartType === 'primeRaces' ? 'Prime Races' :
+                             chartType === 'goldbachComet' ? 'Goldbach Comet' :
+                             chartType === 'modularLaplace' ? 'Modular Laplace Transform' :
+                             'Prime Gap Distribution Analysis';
+                ctx.fillText(title, width / 2, padding + height * 0.045);
+                
+                // Draw subtitle
+                ctx.fillStyle = textColor;
+                ctx.font = `${height * 0.025}px Arial`;
+                const subtitle = `Computing ${constantType === 'pi' ? 'π' : 'ζ(' + computationData.exponent + ')'} using ${primes.length} primes (ε = ${epsilon})`;
+                ctx.fillText(subtitle, width / 2, padding + height * 0.08);
+                
+                // Draw stats
+                ctx.font = `${height * 0.022}px Arial`;
+                ctx.textAlign = 'left';
+                const statsY = padding + height * 0.11;
+                const leftX = padding;
+                const rightX = width * 0.5 + padding;
+                
+                ctx.fillText(`Computed: ${computedValue.toFixed(15)}`, leftX, statsY);
+                ctx.fillText(`Exact: ${exactValue.toFixed(15)}`, rightX, statsY);
+                
+                const relError = Math.abs(computedValue - exactValue) / exactValue;
+                ctx.fillText(`Relative Error: ${(relError * 100).toFixed(8)}%`, leftX, statsY + height * 0.028);
+                ctx.fillText(`Primes Used: ${primes.length}`, rightX, statsY + height * 0.028);
+                
+                // Create temp canvas for chart
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width - padding * 2;
+                tempCanvas.height = chartHeight * 1.2;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Generate chart
+                let chartInstance;
+                
+                if (chartType === 'channel') {
+                    chartInstance = generateChannelChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'convergence') {
+                    chartInstance = generateConvergenceChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'contribution') {
+                    chartInstance = generateContributionChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'gapDist') {
+                    chartInstance = generateGapDistChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'primeCount') {
+                    chartInstance = generatePrimeCountChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'density') {
+                    chartInstance = generateDensityChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'gapHistogram') {
+                    chartInstance = generateGapHistogramChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'sacksSpiral') {
+                    chartInstance = generateSacksSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'zetaZeros') {
+                    chartInstance = generateZetaZerosChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'errorAnalysis') {
+                    chartInstance = generateErrorAnalysisChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'modularLaplace') {
+                    chartInstance = generateModularLaplaceChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'primeRaces') {
+                    chartInstance = generatePrimeRacesChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                } else if (chartType === 'goldbachComet') {
+                    chartInstance = generateGoldbachCometChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+                }
+                
+                setTimeout(() => {
+                    const chartX = padding / 2;
+                    const chartY = titleHeight + padding;
+                    const availableHeight = height - chartY - watermarkHeight - legendHeight - padding;
+                    
+                    let drawWidth = tempCanvas.width;
+                    let drawHeight = tempCanvas.height;
+                    
+                    if (drawHeight > availableHeight) {
+                        const scale = availableHeight / drawHeight;
+                        drawHeight = availableHeight;
+                        drawWidth = tempCanvas.width * scale;
+                    }
+                    
+                    const finalX = (width - drawWidth) / 2;
+                    ctx.drawImage(tempCanvas, finalX, chartY, drawWidth, drawHeight);
+                    
+                    if (includeLegend) {
+                        const legendY = chartY + drawHeight + padding * 2;
+                        drawChartLegend(ctx, chartType, legendY, width, height, background, textColor, accentColor);
+                    }
+                    
+                    if (includeWatermark) {
+                        const watermarkY = height - padding - height * 0.025;
+                        ctx.fillStyle = background === 'white' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';
+                        ctx.font = `italic ${height * 0.022}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Generated by Wessen Getachew - Modular Sieve Calculator', width / 2, watermarkY);
+                        
+                        ctx.font = `${height * 0.018}px Arial`;
+                        ctx.fillText(new Date().toISOString().split('T')[0], width / 2, watermarkY + height * 0.025);
+                    }
+                    
+                    exportCanvas.toBlob((blob) => {
+                        chartInstance.destroy();
+                        resolve(blob);
+                    }, 'image/jpeg', 0.95);
+                }, 1000);
+            });
         }
         
         function performExport(resolution, background, chartType, includeWatermark, includeLegend) {
