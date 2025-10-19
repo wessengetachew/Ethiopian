@@ -2663,6 +2663,20 @@
                 chartInstance = generateErrorAnalysisChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'modularLaplace') {
                 chartInstance = generateModularLaplaceChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'primeRaces') {
+                chartInstance = generatePrimeRacesChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'goldbachComet') {
+                chartInstance = generateGoldbachCometChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'primeCount') {
+                chartInstance = generatePrimeCountChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'density') {
+                chartInstance = generateDensityChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'gapHistogram') {
+                chartInstance = generateGapHistogramChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'sacksSpiral') {
+                chartInstance = generateSacksSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'zetaZeros') {
+                chartInstance = generateZetaZerosChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -5258,6 +5272,216 @@
                             title: { 
                                 display: true, 
                                 text: '|ℒ_M[f](s)| (Transform Magnitude)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generatePrimeRacesChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            // Use current user settings
+            const userModulus = parseInt(document.getElementById('raceModulus').value) || 4;
+            const coprimeResidues = getCoprimeResidues(userModulus);
+            
+            let actualModulus = userModulus;
+            let residues = coprimeResidues;
+            
+            if (coprimeResidues.length < 2) {
+                actualModulus = 4;
+                residues = [1, 3];
+            }
+            
+            // Build race data
+            const counts = {};
+            residues.forEach(r => counts[r] = 0);
+            const raceData = [];
+            
+            for (const p of primes) {
+                if (p < actualModulus) continue;
+                const residue = p % actualModulus;
+                if (residues.includes(residue)) {
+                    counts[residue]++;
+                }
+                const dataPoint = { x: p };
+                residues.forEach(r => dataPoint[`count_${r}`] = counts[r]);
+                raceData.push(dataPoint);
+            }
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            const colors = ['rgba(78, 205, 196, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 205, 86, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)'];
+            const bgColors = ['rgba(78, 205, 196, 0.1)', 'rgba(255, 99, 132, 0.1)', 'rgba(255, 205, 86, 0.1)', 'rgba(153, 102, 255, 0.1)', 'rgba(255, 159, 64, 0.1)', 'rgba(75, 192, 192, 0.1)'];
+            
+            if (background === 'white') {
+                colors[0] = 'rgba(30, 60, 114, 1)';
+                colors[1] = 'rgba(220, 53, 69, 1)';
+                bgColors[0] = 'rgba(30, 60, 114, 0.1)';
+                bgColors[1] = 'rgba(220, 53, 69, 0.1)';
+            }
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: raceData.map(d => d.x),
+                    datasets: residues.map((r, idx) => ({
+                        label: `π(x; ${actualModulus}, ${r}) - Primes ≡ ${r} (mod ${actualModulus})`,
+                        data: raceData.map(d => ({ x: d.x, y: d[`count_${r}`] })),
+                        borderColor: colors[idx % colors.length],
+                        backgroundColor: bgColors[idx % bgColors.length],
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }))
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.022) }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Prime Races (mod ${actualModulus})`,
+                            color: background === 'white' ? '#1e3c72' : '#ffd700',
+                            font: { size: Math.floor(height * 0.028), weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x (prime value)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Count of Primes', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateGoldbachCometChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            // Use current user settings
+            const maxN = Math.min(parseInt(document.getElementById('goldbachMaxN').value) || 10000, 100000);
+            const adjustedMaxN = maxN % 2 === 0 ? maxN : maxN - 1;
+            
+            const primeSet = new Set(primes);
+            const goldbachData = [];
+            
+            for (let n = 4; n <= adjustedMaxN; n += 2) {
+                let count = 0;
+                
+                for (const p of primes) {
+                    if (p > n / 2) break;
+                    const q = n - p;
+                    if (q >= 2 && primeSet.has(q)) {
+                        count++;
+                    }
+                }
+                
+                if (count > 0) {
+                    goldbachData.push({ n: n, count: count });
+                }
+            }
+            
+            if (goldbachData.length === 0) {
+                return { destroy: () => {} };
+            }
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            const maxCount = Math.max(...goldbachData.map(d => d.count));
+            
+            return new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Goldbach Partitions G(n)',
+                        data: goldbachData.map(d => ({ x: d.n, y: d.count })),
+                        backgroundColor: function(context) {
+                            const count = context.raw.y;
+                            const ratio = count / maxCount;
+                            const hue = ratio * 240;
+                            if (background === 'white') {
+                                return `hsla(${hue}, 70%, 45%, 0.7)`;
+                            }
+                            return `hsla(${hue}, 80%, 60%, 0.7)`;
+                        },
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 0.3)' : 'rgba(78, 205, 196, 0.3)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.022) }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Goldbach Comet (up to n = ${adjustedMaxN})`,
+                            color: background === 'white' ? '#1e3c72' : '#ffd700',
+                            font: { size: Math.floor(height * 0.028), weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'n (even number)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025), weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.02) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'G(n) - Number of Prime Pair Partitions', 
                                 color: textColor,
                                 font: { size: Math.floor(height * 0.025), weight: 'bold' }
                             },
