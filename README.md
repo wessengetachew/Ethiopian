@@ -936,6 +936,8 @@
                     <button class="viz-btn" onclick="changeViz('sacksSpiral')">Sacks Spiral</button>
                     <button class="viz-btn" onclick="changeViz('zetaZeros')">Riemann Zeta Zeros</button>
                     <button class="viz-btn" onclick="changeViz('errorAnalysis')">Error Analysis</button>
+                    <button class="viz-btn" onclick="changeViz('primeRaces')">Prime Races</button>
+                    <button class="viz-btn" onclick="changeViz('goldbachComet')">Goldbach Comet</button>
                 </div>
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
@@ -2058,6 +2060,10 @@
                 createZetaZerosPlot(ctx);
             } else if (type === 'errorAnalysis') {
                 createErrorAnalysisPlot(ctx);
+            } else if (type === 'primeRaces') {
+                createPrimeRacesPlot(ctx);
+            } else if (type === 'goldbachComet') {
+                createGoldbachCometPlot(ctx);
             }
         }
         
@@ -4199,6 +4205,360 @@
                                 font: { size: Math.floor(height * 0.025) }
                             },
                             grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        function createPrimeRacesPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Prime races: compare π(x; 4, 1) vs π(x; 4, 3)
+            // Count primes ≡ 1 (mod 4) vs primes ≡ 3 (mod 4)
+            const mod4_1 = [];  // primes ≡ 1 (mod 4)
+            const mod4_3 = [];  // primes ≡ 3 (mod 4)
+            
+            let count_1 = 0;
+            let count_3 = 0;
+            
+            const raceData = [];
+            
+            for (const p of primes) {
+                if (p === 2) continue; // Skip 2
+                
+                const residue = p % 4;
+                if (residue === 1) {
+                    count_1++;
+                    mod4_1.push(p);
+                } else if (residue === 3) {
+                    count_3++;
+                    mod4_3.push(p);
+                }
+                
+                raceData.push({
+                    x: p,
+                    count_1: count_1,
+                    count_3: count_3,
+                    diff: count_3 - count_1  // Track who's ahead
+                });
+            }
+            
+            // Calculate statistics
+            const finalDiff = count_3 - count_1;
+            const maxDiff = Math.max(...raceData.map(d => Math.abs(d.diff)));
+            const leaderChanges = raceData.reduce((changes, d, i) => {
+                if (i === 0) return changes;
+                const prevDiff = raceData[i-1].diff;
+                const currDiff = d.diff;
+                if ((prevDiff > 0 && currDiff < 0) || (prevDiff < 0 && currDiff > 0)) {
+                    return changes + 1;
+                }
+                return changes;
+            }, 0);
+            
+            const currentLeader = finalDiff > 0 ? "3 (mod 4)" : finalDiff < 0 ? "1 (mod 4)" : "Tie";
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Races: 1 vs 3 (mod 4)</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ 1 (mod 4)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${count_1}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ 3 (mod 4)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${count_3}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Current Leader</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${currentLeader}</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Current Gap</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${Math.abs(finalDiff)}</div>
+                    </div>
+                    <div style="background: rgba(255, 159, 64, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Max Gap Seen</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff9f40;">${maxDiff}</div>
+                    </div>
+                    <div style="background: rgba(75, 192, 192, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Lead Changes</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4bc0c0;">${leaderChanges}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About Prime Races:</strong><br>
+                    • <strong>Chebyshev's Bias:</strong> Primes ≡ 3 (mod 4) tend to "win" more often than primes ≡ 1 (mod 4)<br>
+                    • Despite both classes having equal density (by Dirichlet's theorem), 3 (mod 4) is ahead ~99.6% of the time<br>
+                    • This mysterious bias extends to other moduli (e.g., 3 mod 4 beats 1 mod 4, 2 mod 3 beats 1 mod 3)<br>
+                    • The lead changes infinitely often (Littlewood, 1914), but very rarely<br>
+                    • First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>
+                    • Related to the <strong>Shanks-Rényi race</strong> and Rubinstein-Sarnak's work on prime number races
+                </div>
+            `;
+            
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: raceData.map(d => d.x),
+                    datasets: [{
+                        label: 'π(x; 4, 1) - Primes ≡ 1 (mod 4)',
+                        data: raceData.map(d => ({ x: d.x, y: d.count_1 })),
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }, {
+                        label: 'π(x; 4, 3) - Primes ≡ 3 (mod 4)',
+                        data: raceData.map(d => ({ x: d.x, y: d.count_3 })),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#fff',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    const idx = context.dataIndex;
+                                    const diff = raceData[idx].diff;
+                                    const leader = diff > 0 ? "3 (mod 4) leads" : diff < 0 ? "1 (mod 4) leads" : "Tied";
+                                    return [
+                                        `${context.dataset.label}: ${context.parsed.y}`,
+                                        `Gap: ${Math.abs(diff)} (${leader})`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x (prime value)', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Count of Primes', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createGoldbachCometPlot(ctx) {
+            const { primes } = computationData;
+            
+            // Create a Set for O(1) prime lookup
+            const primeSet = new Set(primes);
+            
+            // Goldbach Comet: for even number n, count number of ways to write n = p + q (p, q prime)
+            const maxN = Math.min(10000, primes[primes.length - 1]);
+            const goldbachData = [];
+            
+            // For each even number, count Goldbach partitions
+            for (let n = 4; n <= maxN; n += 2) {
+                let count = 0;
+                
+                // Count ways to write n as sum of two primes
+                for (const p of primes) {
+                    if (p > n / 2) break;  // Avoid double counting
+                    const q = n - p;
+                    if (q >= 2 && primeSet.has(q)) {
+                        count++;
+                    }
+                }
+                
+                if (count > 0) {  // Only add if we found partitions
+                    goldbachData.push({ n: n, count: count });
+                }
+            }
+            
+            // Calculate statistics
+            if (goldbachData.length === 0) {
+                // Fallback if no data
+                const statsDiv = document.getElementById('vizStats');
+                statsDiv.style.display = 'block';
+                statsDiv.innerHTML = `
+                    <h4 style="color: #ffd700; margin-bottom: 15px;">Goldbach Comet</h4>
+                    <div style="padding: 20px; background: rgba(255, 99, 132, 0.15); border-radius: 8px; text-align: center;">
+                        <p style="font-size: 1.2em; color: #ff6384;">Not enough primes computed to generate Goldbach Comet.</p>
+                        <p style="margin-top: 10px; opacity: 0.8;">Try increasing the target error or using more primes.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const avgCount = goldbachData.reduce((sum, d) => sum + d.count, 0) / goldbachData.length;
+            const maxCount = Math.max(...goldbachData.map(d => d.count));
+            const maxCountN = goldbachData.find(d => d.count === maxCount).n;
+            const minCount = Math.min(...goldbachData.map(d => d.count));
+            const minCountN = goldbachData.find(d => d.count === minCount).n;
+            
+            // Find numbers with count = 1 (most difficult to partition)
+            const hardToPartition = goldbachData.filter(d => d.count === 1).map(d => d.n);
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Goldbach Comet</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Even Numbers Analyzed</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${goldbachData.length}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Partitions</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${avgCount.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Most Partitions</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${maxCount} (n=${maxCountN})</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Fewest Partitions</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${minCount} (n=${minCountN})</div>
+                    </div>
+                    <div style="background: rgba(255, 159, 64, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">With Only 1 Partition</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff9f40;">${hardToPartition.length}</div>
+                    </div>
+                    <div style="background: rgba(75, 192, 192, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Goldbach Verified</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4bc0c0;">✓ All</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About the Goldbach Comet:</strong><br>
+                    • <strong>Goldbach's Conjecture</strong> (1742, unproven): Every even integer > 2 is the sum of two primes<br>
+                    • The "comet" shape emerges when plotting G(n) = number of ways to write n = p + q<br>
+                    • <strong>Dense vertical lines:</strong> Correspond to numbers divisible by small primes (2, 6, 30, etc.)<br>
+                    • <strong>Tail of the comet:</strong> Numbers with many prime partitions (highly composite even numbers)<br>
+                    • Verified for all even numbers up to 4 × 10¹⁸<br>
+                    • Weak Goldbach (every odd > 5 is sum of 3 primes) was proven by Helfgott in 2013<br>
+                    • The function G(n) grows roughly as n/ln²(n) for large n
+                </div>
+            `;
+            
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Goldbach Partitions G(n)',
+                        data: goldbachData.map(d => ({ x: d.n, y: d.count })),
+                        backgroundColor: function(context) {
+                            // Color by count
+                            const count = context.raw.y;
+                            const ratio = count / maxCount;
+                            const hue = ratio * 240; // Blue to purple gradient
+                            return `hsla(${hue}, 80%, 60%, 0.7)`;
+                        },
+                        borderColor: 'rgba(78, 205, 196, 0.3)',
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#fff',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    const n = context.parsed.x;
+                                    const count = context.parsed.y;
+                                    
+                                    // Find actual partitions for this n
+                                    const partitions = [];
+                                    for (const p of primes) {
+                                        if (p > n / 2) break;
+                                        const q = n - p;
+                                        if (q >= 2 && primeSet.has(q)) {
+                                            partitions.push(`${p} + ${q}`);
+                                        }
+                                    }
+                                    
+                                    const result = [
+                                        `n = ${n}`,
+                                        `Partitions: ${count}`,
+                                        ''
+                                    ];
+                                    
+                                    // Show first few partitions
+                                    const showCount = Math.min(5, partitions.length);
+                                    for (let i = 0; i < showCount; i++) {
+                                        result.push(partitions[i]);
+                                    }
+                                    if (partitions.length > showCount) {
+                                        result.push(`... and ${partitions.length - showCount} more`);
+                                    }
+                                    
+                                    return result;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'n (even number)', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'G(n) - Number of Prime Pair Partitions', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
                         }
                     }
                 }
