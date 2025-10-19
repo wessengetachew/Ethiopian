@@ -2033,37 +2033,50 @@
         function updateVisualization(type) {
             if (!computationData) return;
             
-            const ctx = document.getElementById('vizCanvas').getContext('2d');
+            const canvas = document.getElementById('vizCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear any existing event listeners
+            const newCanvas = canvas.cloneNode(true);
+            canvas.parentNode.replaceChild(newCanvas, canvas);
+            
+            // Get fresh references
+            const freshCanvas = document.getElementById('vizCanvas');
+            const freshCtx = freshCanvas.getContext('2d');
             
             if (vizChart) {
                 vizChart.destroy();
+                vizChart = null;
             }
+            
+            // Clear the canvas completely
+            freshCtx.clearRect(0, 0, freshCanvas.width, freshCanvas.height);
             
             // Hide stats by default
             document.getElementById('vizStats').style.display = 'none';
             
             if (type === 'convergence') {
-                createConvergencePlot(ctx);
+                createConvergencePlot(freshCtx);
             } else if (type === 'contribution') {
-                createContributionPlot(ctx);
+                createContributionPlot(freshCtx);
             } else if (type === 'gapDist') {
-                createGapDistributionPlot(ctx);
+                createGapDistributionPlot(freshCtx);
             } else if (type === 'primeCount') {
-                createPrimeCountingPlot(ctx);
+                createPrimeCountingPlot(freshCtx);
             } else if (type === 'density') {
-                createDensityAnalysisPlot(ctx);
+                createDensityAnalysisPlot(freshCtx);
             } else if (type === 'gapHistogram') {
-                createGapHistogramPlot(ctx);
+                createGapHistogramPlot(freshCtx);
             } else if (type === 'sacksSpiral') {
-                createSacksSpiralPlot(ctx);
+                createSacksSpiralPlot(freshCtx);
             } else if (type === 'zetaZeros') {
-                createZetaZerosPlot(ctx);
+                createZetaZerosPlot(freshCtx);
             } else if (type === 'errorAnalysis') {
-                createErrorAnalysisPlot(ctx);
+                createErrorAnalysisPlot(freshCtx);
             } else if (type === 'primeRaces') {
-                createPrimeRacesPlot(ctx);
+                createPrimeRacesPlot(freshCtx);
             } else if (type === 'goldbachComet') {
-                createGoldbachCometPlot(ctx);
+                createGoldbachCometPlot(freshCtx);
             }
         }
         
@@ -3215,9 +3228,13 @@
         function createSacksSpiralPlot(ctx) {
             const { primes } = computationData;
             
+            // Create a Set for O(1) prime lookup
+            const primeSet = new Set(primes);
+            
             // Sacks spiral: r = √n, θ = 2π√n
+            // Use all computed primes, no artificial cap
             const spiralData = [];
-            const maxN = Math.min(10000, primes[primes.length - 1]); // Limit for performance
+            const maxN = primes[primes.length - 1];
             
             // Include all numbers up to maxN
             for (let n = 1; n <= maxN; n++) {
@@ -3226,7 +3243,7 @@
                 const x = r * Math.cos(theta);
                 const y = r * Math.sin(theta);
                 
-                const isPrime = primes.includes(n);
+                const isPrime = primeSet.has(n);
                 
                 spiralData.push({ x, y, n, isPrime });
             }
@@ -4213,67 +4230,92 @@
         
         
         function createPrimeRacesPlot(ctx) {
-            const { primes } = computationData;
+            const { primes, modulus } = computationData;
             
-            // Prime races: compare π(x; 4, 1) vs π(x; 4, 3)
-            // Count primes ≡ 1 (mod 4) vs primes ≡ 3 (mod 4)
-            const mod4_1 = [];  // primes ≡ 1 (mod 4)
-            const mod4_3 = [];  // primes ≡ 3 (mod 4)
+            // Always use the actual modulus from computation
+            const actualModulus = modulus;
+            const coprimeResidues = getCoprimeResidues(actualModulus);
             
-            let count_1 = 0;
-            let count_3 = 0;
+            // For 2-way race, use first two coprime residues
+            // For multi-way race (>2 residues), show all of them
+            const residues = coprimeResidues.slice(0, Math.min(8, coprimeResidues.length)); // Cap at 8 for readability
+            
+            // Initialize counters for each residue class
+            const counts = {};
+            residues.forEach(r => counts[r] = 0);
             
             const raceData = [];
             
             for (const p of primes) {
-                if (p === 2) continue; // Skip 2
+                // Skip primes smaller than modulus
+                if (p < actualModulus) continue;
                 
-                const residue = p % 4;
-                if (residue === 1) {
-                    count_1++;
-                    mod4_1.push(p);
-                } else if (residue === 3) {
-                    count_3++;
-                    mod4_3.push(p);
+                const residue = p % actualModulus;
+                
+                // Only count if it's a coprime residue we're tracking
+                if (residues.includes(residue)) {
+                    counts[residue]++;
                 }
                 
-                raceData.push({
-                    x: p,
-                    count_1: count_1,
-                    count_3: count_3,
-                    diff: count_3 - count_1  // Track who's ahead
-                });
+                // Store cumulative counts
+                const dataPoint = { x: p };
+                residues.forEach(r => dataPoint[`count_${r}`] = counts[r]);
+                
+                // Calculate difference for 2-way race (first residue - second residue)
+                if (residues.length >= 2) {
+                    dataPoint.diff = counts[residues[0]] - counts[residues[1]];
+                }
+                raceData.push(dataPoint);
             }
             
-            // Calculate statistics
-            const finalDiff = count_3 - count_1;
-            const maxDiff = Math.max(...raceData.map(d => Math.abs(d.diff)));
-            const leaderChanges = raceData.reduce((changes, d, i) => {
-                if (i === 0) return changes;
-                const prevDiff = raceData[i-1].diff;
-                const currDiff = d.diff;
-                if ((prevDiff > 0 && currDiff < 0) || (prevDiff < 0 && currDiff > 0)) {
-                    return changes + 1;
-                }
-                return changes;
-            }, 0);
+            // Calculate statistics for 2-way race
+            let finalDiff = 0;
+            let maxDiff = 0;
+            let leaderChanges = 0;
+            let currentLeader = "N/A";
             
-            const currentLeader = finalDiff > 0 ? "3 (mod 4)" : finalDiff < 0 ? "1 (mod 4)" : "Tie";
+            if (residues.length >= 2) {
+                finalDiff = counts[residues[0]] - counts[residues[1]];
+                maxDiff = Math.max(...raceData.map(d => Math.abs(d.diff || 0)));
+                leaderChanges = raceData.reduce((changes, d, i) => {
+                    if (i === 0 || !d.diff) return changes;
+                    const prevDiff = raceData[i-1].diff || 0;
+                    const currDiff = d.diff;
+                    if ((prevDiff > 0 && currDiff < 0) || (prevDiff < 0 && currDiff > 0)) {
+                        return changes + 1;
+                    }
+                    return changes;
+                }, 0);
+                
+                currentLeader = finalDiff > 0 ? `${residues[0]} (mod ${actualModulus})` : 
+                               finalDiff < 0 ? `${residues[1]} (mod ${actualModulus})` : "Tie";
+            }
             
             // Display stats
             const statsDiv = document.getElementById('vizStats');
             statsDiv.style.display = 'block';
-            statsDiv.innerHTML = `
-                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Races: 1 vs 3 (mod 4)</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ 1 (mod 4)</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${count_1}</div>
-                    </div>
-                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ 3 (mod 4)</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${count_3}</div>
-                    </div>
+            
+            // Build stats HTML dynamically based on number of residues
+            let statsHTML = `<h4 style="color: #ffd700; margin-bottom: 15px;">Prime Races: Modulus ${actualModulus} (${residues.length}-way race)</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">`;
+            
+            // Add a card for each residue
+            const colors = ['rgba(78, 205, 196, 0.15)', 'rgba(255, 99, 132, 0.15)', 'rgba(255, 215, 0, 0.15)', 
+                          'rgba(153, 102, 255, 0.15)', 'rgba(255, 159, 64, 0.15)', 'rgba(75, 192, 192, 0.15)',
+                          'rgba(255, 99, 71, 0.15)', 'rgba(147, 112, 219, 0.15)'];
+            const textColors = ['#4ecdc4', '#ff6384', '#ffd700', '#9966ff', '#ff9f40', '#4bc0c0', '#ff6347', '#9370db'];
+            
+            residues.forEach((r, idx) => {
+                statsHTML += `
+                    <div style="background: ${colors[idx % colors.length]}; padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes ≡ ${r} (mod ${actualModulus})</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: ${textColors[idx % textColors.length]};">${counts[r]}</div>
+                    </div>`;
+            });
+            
+            // Add race statistics for 2-way races
+            if (residues.length >= 2) {
+                statsHTML += `
                     <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
                         <div style="font-size: 0.9em; opacity: 0.8;">Current Leader</div>
                         <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${currentLeader}</div>
@@ -4289,42 +4331,49 @@
                     <div style="background: rgba(75, 192, 192, 0.15); padding: 12px; border-radius: 8px;">
                         <div style="font-size: 0.9em; opacity: 0.8;">Lead Changes</div>
                         <div style="font-size: 1.4em; font-weight: bold; color: #4bc0c0;">${leaderChanges}</div>
-                    </div>
-                </div>
+                    </div>`;
+            }
+            
+            statsHTML += `</div>
                 <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
-                    <strong>About Prime Races:</strong><br>
-                    • <strong>Chebyshev's Bias:</strong> Primes ≡ 3 (mod 4) tend to "win" more often than primes ≡ 1 (mod 4)<br>
-                    • Despite both classes having equal density (by Dirichlet's theorem), 3 (mod 4) is ahead ~99.6% of the time<br>
-                    • This mysterious bias extends to other moduli (e.g., 3 mod 4 beats 1 mod 4, 2 mod 3 beats 1 mod 3)<br>
+                    <strong>About Prime Races (mod ${actualModulus}):</strong><br>
+                    • <strong>Chebyshev's Bias:</strong> In prime races, certain residue classes tend to "win" more often than others<br>
+                    • By Dirichlet's theorem, all ${residues.length} coprime residue classes mod ${actualModulus} have equal density asymptotically<br>
+                    • Despite equal density, one class is typically ahead at any given point (for 2-way races)<br>
+                    ${actualModulus === 4 && residues.length === 2 ? `• For mod 4: Primes ≡ 3 (mod 4) lead ~99.6% of the time (classic Chebyshev's bias)<br>
+                    • First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>` : ''}
                     • The lead changes infinitely often (Littlewood, 1914), but very rarely<br>
-                    • First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>
-                    • Related to the <strong>Shanks-Rényi race</strong> and Rubinstein-Sarnak's work on prime number races
+                    • Related to the <strong>Shanks-Rényi race</strong> and Rubinstein-Sarnak's work<br>
+                    • Current computation uses ${primes.length} primes up to ${primes[primes.length-1]}
                 </div>
             `;
+            
+            statsDiv.innerHTML = statsHTML;
+            
+            // Create datasets dynamically for each residue
+            const lineColors = ['rgba(78, 205, 196, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 215, 0, 1)', 
+                              'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)',
+                              'rgba(255, 99, 71, 1)', 'rgba(147, 112, 219, 1)'];
+            const fillColors = ['rgba(78, 205, 196, 0.1)', 'rgba(255, 99, 132, 0.1)', 'rgba(255, 215, 0, 0.1)', 
+                              'rgba(153, 102, 255, 0.1)', 'rgba(255, 159, 64, 0.1)', 'rgba(75, 192, 192, 0.1)',
+                              'rgba(255, 99, 71, 0.1)', 'rgba(147, 112, 219, 0.1)'];
+            
+            const datasets = residues.map((r, idx) => ({
+                label: `π(x; ${actualModulus}, ${r}) - Primes ≡ ${r} (mod ${actualModulus})`,
+                data: raceData.map(d => ({ x: d.x, y: d[`count_${r}`] })),
+                borderColor: lineColors[idx % lineColors.length],
+                backgroundColor: fillColors[idx % fillColors.length],
+                borderWidth: 3,
+                fill: false,
+                tension: 0,
+                pointRadius: 0
+            }));
             
             vizChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: raceData.map(d => d.x),
-                    datasets: [{
-                        label: 'π(x; 4, 1) - Primes ≡ 1 (mod 4)',
-                        data: raceData.map(d => ({ x: d.x, y: d.count_1 })),
-                        borderColor: 'rgba(78, 205, 196, 1)',
-                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
-                        borderWidth: 3,
-                        fill: false,
-                        tension: 0,
-                        pointRadius: 0
-                    }, {
-                        label: 'π(x; 4, 3) - Primes ≡ 3 (mod 4)',
-                        data: raceData.map(d => ({ x: d.x, y: d.count_3 })),
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        borderWidth: 3,
-                        fill: false,
-                        tension: 0,
-                        pointRadius: 0
-                    }]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -4385,7 +4434,8 @@
             const primeSet = new Set(primes);
             
             // Goldbach Comet: for even number n, count number of ways to write n = p + q (p, q prime)
-            const maxN = Math.min(10000, primes[primes.length - 1]);
+            // Use all primes computed, no artificial cap
+            const maxN = primes[primes.length - 1];
             const goldbachData = [];
             
             // For each even number, count Goldbach partitions
