@@ -2326,6 +2326,8 @@
                         <option value="convergence">Convergence Plot</option>
                         <option value="contribution">Prime Contributions</option>
                         <option value="gapDist">Gap Distribution Analysis</option>
+                        <option value="primeCount">Prime Counting π(x)</option>
+                        <option value="density">Prime Density Analysis</option>
                     </select>
                 </div>
                 
@@ -2405,6 +2407,8 @@
             const title = chartType === 'channel' ? `Residue Channel Contributions (mod ${modulus})` :
                          chartType === 'convergence' ? 'Convergence to Exact Value' :
                          chartType === 'contribution' ? 'Individual Prime Contributions' :
+                         chartType === 'primeCount' ? 'Prime Counting Function π(x)' :
+                         chartType === 'density' ? 'Prime Density Analysis' :
                          'Prime Gap Distribution Analysis';
             ctx.fillText(title, width / 2, padding + height * 0.045);
             
@@ -2448,6 +2452,10 @@
                 chartInstance = generateContributionChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'gapDist') {
                 chartInstance = generateGapDistChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'primeCount') {
+                chartInstance = generatePrimeCountChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'density') {
+                chartInstance = generateDensityChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -3155,6 +3163,178 @@
                                 }
                             },
                             grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generatePrimeCountChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            const step = Math.max(1, Math.floor(primes[primes.length - 1] / 200));
+            const countingData = [];
+            const approximations = [];
+            
+            for (let x = 2; x <= primes[primes.length - 1]; x += step) {
+                const count = primes.filter(p => p <= x).length;
+                countingData.push({ x, y: count });
+                
+                const approx = x / Math.log(x);
+                approximations.push({ x, y: approx });
+            }
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'π(x) - Actual Count',
+                        data: countingData,
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(30, 60, 114, 0.1)' : 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0,
+                        pointRadius: 0
+                    }, {
+                        label: 'x/ln(x) - Approximation',
+                        data: approximations,
+                        borderColor: background === 'white' ? 'rgba(255, 99, 71, 1)' : 'rgba(255, 215, 0, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(255, 99, 71, 0.1)' : 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 4,
+                        borderDash: [15, 8],
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Number of Primes', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateDensityChartForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            
+            const intervalSize = Math.max(10, Math.floor(primes[primes.length - 1] / 50));
+            const densityData = [];
+            const theoreticalDensity = [];
+            
+            for (let x = intervalSize; x <= primes[primes.length - 1]; x += intervalSize) {
+                const primesInInterval = primes.filter(p => p > x - intervalSize && p <= x).length;
+                const density = primesInInterval / intervalSize;
+                densityData.push({ x, y: density });
+                
+                const theoretical = 1 / Math.log(x);
+                theoreticalDensity.push({ x, y: theoretical });
+            }
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Actual Density',
+                        data: densityData,
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(30, 60, 114, 0.3)' : 'rgba(78, 205, 196, 0.3)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)'
+                    }, {
+                        label: 'Theoretical Density (1/ln(x))',
+                        data: theoreticalDensity,
+                        borderColor: background === 'white' ? 'rgba(255, 99, 71, 1)' : 'rgba(255, 215, 0, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(255, 99, 71, 0.1)' : 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 4,
+                        borderDash: [15, 8],
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Density (primes per unit)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
                         }
                     }
                 }
