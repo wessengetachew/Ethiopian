@@ -935,6 +935,7 @@
                     <button class="viz-btn" onclick="changeViz('gapHistogram')">Prime Gaps Histogram</button>
                     <button class="viz-btn" onclick="changeViz('sacksSpiral')">Sacks Spiral</button>
                     <button class="viz-btn" onclick="changeViz('zetaZeros')">Riemann Zeta Zeros</button>
+                    <button class="viz-btn" onclick="changeViz('errorAnalysis')">Error Analysis</button>
                 </div>
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
@@ -2055,6 +2056,8 @@
                 createSacksSpiralPlot(ctx);
             } else if (type === 'zetaZeros') {
                 createZetaZerosPlot(ctx);
+            } else if (type === 'errorAnalysis') {
+                createErrorAnalysisPlot(ctx);
             }
         }
         
@@ -2459,6 +2462,7 @@
                         <option value="gapHistogram">Prime Gaps Histogram</option>
                         <option value="sacksSpiral">Sacks Spiral</option>
                         <option value="zetaZeros">Riemann Zeta Zeros</option>
+                        <option value="errorAnalysis">Error Analysis</option>
                     </select>
                 </div>
                 
@@ -2543,6 +2547,7 @@
                          chartType === 'gapHistogram' ? 'Prime Gaps Histogram' :
                          chartType === 'sacksSpiral' ? 'Sacks Spiral Visualization' :
                          chartType === 'zetaZeros' ? 'Riemann Zeta Function - Non-Trivial Zeros' :
+                         chartType === 'errorAnalysis' ? 'Error Analysis - Convergence Rate' :
                          'Prime Gap Distribution Analysis';
             ctx.fillText(title, width / 2, padding + height * 0.045);
             
@@ -2596,6 +2601,8 @@
                 chartInstance = generateSacksSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'zetaZeros') {
                 chartInstance = generateZetaZerosChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'errorAnalysis') {
+                chartInstance = generateErrorAnalysisChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -4190,6 +4197,286 @@
                             ticks: { 
                                 color: textColor,
                                 font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createErrorAnalysisPlot(ctx) {
+            const { partialProducts, exactValue, constantType, epsilon } = computationData;
+            
+            // Calculate absolute and relative errors at each step
+            const errorData = partialProducts.map(p => {
+                let currentValue;
+                if (constantType === 'pi') {
+                    currentValue = Math.sqrt(6 * p.value);
+                } else {
+                    currentValue = p.value;
+                }
+                
+                const absError = Math.abs(currentValue - exactValue);
+                const relError = absError / Math.abs(exactValue);
+                
+                return {
+                    prime: p.prime,
+                    absError: absError,
+                    relError: relError,
+                    logAbsError: Math.log10(absError),
+                    logRelError: Math.log10(relError)
+                };
+            });
+            
+            // Calculate convergence rate
+            const convergenceRates = [];
+            for (let i = 1; i < errorData.length; i++) {
+                const rate = errorData[i].relError / errorData[i-1].relError;
+                convergenceRates.push(rate);
+            }
+            const avgConvergenceRate = convergenceRates.reduce((a, b) => a + b, 0) / convergenceRates.length;
+            
+            // Find when error drops below target epsilon
+            const targetMetIndex = errorData.findIndex(e => e.relError <= epsilon);
+            const primesNeededForTarget = targetMetIndex >= 0 ? errorData[targetMetIndex].prime : 'Not yet met';
+            
+            // Calculate theoretical error bound
+            const finalError = errorData[errorData.length - 1].relError;
+            const theoreticalBound = epsilon;
+            
+            // Display stats
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Error Analysis & Convergence Rate</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Final Relative Error</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${(finalError * 100).toFixed(8)}%</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Target Error (ε)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${(theoreticalBound * 100).toFixed(4)}%</div>
+                    </div>
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Convergence Rate</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${avgConvergenceRate.toFixed(6)}</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Target Met At Prime</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${primesNeededForTarget}</div>
+                    </div>
+                    <div style="background: rgba(255, 159, 64, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Initial Error (p=2)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff9f40;">${(errorData[0].relError * 100).toFixed(4)}%</div>
+                    </div>
+                    <div style="background: rgba(75, 192, 192, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Error Reduction Factor</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4bc0c0;">${(errorData[0].relError / finalError).toFixed(2)}×</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About Error Analysis:</strong><br>
+                    • <strong>Relative Error:</strong> |computed - exact| / |exact| measures accuracy as a percentage<br>
+                    • <strong>Convergence Rate:</strong> Ratio of consecutive errors shows how fast error decreases<br>
+                    • Rate < 1 indicates convergence (smaller = faster)<br>
+                    • <strong>Theoretical Guarantee:</strong> Euler product truncation ensures error ≤ ε<br>
+                    • Log scale reveals exponential convergence behavior<br>
+                    • Each additional prime contributes multiplicatively to accuracy
+                </div>
+            `;
+            
+            // Create dual-axis chart
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: errorData.map(e => e.prime),
+                    datasets: [{
+                        label: 'Relative Error (log scale)',
+                        data: errorData.map(e => e.logRelError),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Absolute Error (log scale)',
+                        data: errorData.map(e => e.logAbsError),
+                        borderColor: 'rgba(78, 205, 196, 1)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Target Threshold',
+                        data: Array(errorData.length).fill(Math.log10(epsilon)),
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        pointRadius: 0,
+                        fill: false,
+                        yAxisID: 'y'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#fff',
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    const idx = context.dataIndex;
+                                    if (context.datasetIndex === 0) {
+                                        return `Rel Error: ${(errorData[idx].relError * 100).toExponential(4)}%`;
+                                    } else if (context.datasetIndex === 1) {
+                                        return `Abs Error: ${errorData[idx].absError.toExponential(4)}`;
+                                    } else {
+                                        return `Target: ${(epsilon * 100).toFixed(4)}%`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { 
+                                display: true, 
+                                text: 'Prime p (log scale)', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Error (log₁₀ scale)', 
+                                color: '#fff',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: '#fff',
+                                callback: function(value) {
+                                    return '10^' + value.toFixed(1);
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateErrorAnalysisChartForExport(ctx, width, height, background) {
+            const { partialProducts, exactValue, constantType, epsilon } = computationData;
+            
+            const errorData = partialProducts.map(p => {
+                let currentValue;
+                if (constantType === 'pi') {
+                    currentValue = Math.sqrt(6 * p.value);
+                } else {
+                    currentValue = p.value;
+                }
+                
+                const absError = Math.abs(currentValue - exactValue);
+                const relError = absError / Math.abs(exactValue);
+                
+                return {
+                    prime: p.prime,
+                    absError: absError,
+                    relError: relError,
+                    logAbsError: Math.log10(absError),
+                    logRelError: Math.log10(relError)
+                };
+            });
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: errorData.map(e => e.prime),
+                    datasets: [{
+                        label: 'Relative Error (log scale)',
+                        data: errorData.map(e => e.logRelError),
+                        borderColor: background === 'white' ? 'rgba(220, 53, 69, 1)' : 'rgba(255, 99, 132, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(220, 53, 69, 0.1)' : 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }, {
+                        label: 'Absolute Error (log scale)',
+                        data: errorData.map(e => e.logAbsError),
+                        borderColor: background === 'white' ? 'rgba(30, 60, 114, 1)' : 'rgba(78, 205, 196, 1)',
+                        backgroundColor: background === 'white' ? 'rgba(30, 60, 114, 0.1)' : 'rgba(78, 205, 196, 0.1)',
+                        borderWidth: 4,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }, {
+                        label: 'Target Threshold',
+                        data: Array(errorData.length).fill(Math.log10(epsilon)),
+                        borderColor: background === 'white' ? 'rgba(212, 175, 55, 1)' : 'rgba(255, 215, 0, 1)',
+                        borderWidth: 3,
+                        borderDash: [15, 8],
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: { 
+                                display: true, 
+                                text: 'Prime p (log scale)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Error (log₁₀ scale)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) },
+                                callback: function(value) {
+                                    return '10^' + value.toFixed(1);
+                                }
                             },
                             grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
                         }
