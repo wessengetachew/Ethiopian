@@ -1043,24 +1043,8 @@
                         </label>
                     </div>
                     <label>
-                        Visualization Type:
-                        <select id="liftType">
-                            <option value="standard">Standard (All Residues)</option>
-                            <option value="embedding">Embedding Lift (ι_k)</option>
-                            <option value="translational">Translational Lift (τ_k,t)</option>
-                        </select>
-                    </label>
-                    <label id="fiberLabel" style="display: none;">
-                        Fiber t (for τ_k,t):
-                        <input type="number" id="fiberValue" value="0" min="0" max="15" step="1">
-                    </label>
-                    <label>
                         Point Size:
                         <input type="number" id="pointSize" value="4" min="2" max="10" step="1">
-                    </label>
-                    <label>
-                        Ring Thickness:
-                        <input type="number" id="ringThickness" value="1" min="1" max="5" step="0.5">
                     </label>
                     <label>
                         <input type="checkbox" id="showLabels" checked>
@@ -1080,7 +1064,6 @@
                             <option value="residue">Residue Class</option>
                             <option value="modulus">Modulus Level</option>
                             <option value="size">Prime Size</option>
-                            <option value="lift">Lift Type</option>
                         </select>
                     </label>
                     <button onclick="updatePrimeRing()" style="padding: 6px 16px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update</button>
@@ -5620,7 +5603,8 @@
                 <div style="background: rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #4ecdc4;">
                     <h5 style="color: #4ecdc4; margin-bottom: 15px;">Mathematical Definition</h5>
                     <div style="font-family: 'Courier New', monospace; line-height: 1.8; font-size: 0.95em;">
-                        Let M ∈ ℤ<sub>>0</sub> and Φ(M) = {r ∈ ℤ<sub>M</sub> : gcd(r, M) = 1}<br><br>
+                        Let M = ${baseM}·2<sup>n</sup> be a modulus and<br>
+                        Φ(M) = {r ∈ ℤ<sub>M</sub> : gcd(r, M) = 1}<br><br>
                         
                         <strong style="color: #ffd700;">Modular Laplace Transform:</strong><br>
                         <div style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 6px; margin: 10px 0;">
@@ -5629,35 +5613,11 @@
                         
                         where f(r) = #{primes p : p ≡ r (mod M)}<br><br>
                         
-                        <strong style="color: #4ecdc4;">Lift Dynamics (Two Canonical Lifts):</strong><br>
-                        For M<sub>k</sub> := M·2<sup>k</sup>, we have two natural lifts:<br><br>
-                        
-                        <strong>1. Embedding Lift (Canonical Inclusion):</strong><br>
-                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 5px; margin: 8px 0;">
-                            ι<sub>k</sub> : Φ(M) ↪ ℤ<sub>M<sub>k</sub></sub>, &nbsp; ι<sub>k</sub>(r) := r<br>
-                            Pushforward: (ι<sub>k</sub>)<sub>*</sub>f(r') = f(r' mod M) if r'≡r (mod M), 0 otherwise
-                        </div>
-                        
-                        <strong>2. Translational/Exponential Lift:</strong><br>
-                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 5px; margin: 8px 0;">
-                            τ<sub>k,t</sub> : Φ(M) → ℤ<sub>M<sub>k</sub></sub>, &nbsp; τ<sub>k,t</sub>(r) := r + tM<br>
-                            for t ∈ {0,1,...,2<sup>k</sup>−1}
-                        </div>
-                        
-                        <strong>Exponential-Scaled Extension 𝓔<sub>k</sub>[f]:</strong><br>
-                        For r' = r + jM with r ∈ Φ(M), j ∈ {0,...,2<sup>k</sup>−1}:<br>
+                        <strong style="color: #4ecdc4;">Lift Dynamics:</strong><br>
+                        Under lifting r ↦ r + M·2<sup>k</sup>:<br>
                         <div style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 6px; margin: 10px 0;">
-                            𝓔<sub>k</sub>[f](r') := ω(j)·f(r), &nbsp; where ω(j) = e<sup>−s·φ(j)</sup><br>
-                            Uniform choice: φ(j) = 2<sup>k</sup> for all j
+                            ℒ<sub>M·2<sup>k</sup></sub>[f](s) = e<sup>−s·2<sup>k</sup></sup> · ℒ<sub>M</sub>[f](s)
                         </div>
-                        
-                        <strong style="color: #ffd700;">Transform Scaling Theorem:</strong><br>
-                        <div style="background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 6px; margin: 10px 0;">
-                            ℒ<sub>M<sub>k</sub></sub>[𝓔<sub>k</sub>[f]](s) = e<sup>−s·2<sup>k</sup></sup> · S<sub>k</sub>(s) · ℒ<sub>M</sub>[f](s)
-                        </div>
-                        
-                        where S<sub>k</sub>(s) = Σ<sub>j=0</sub><sup>2<sup>k</sup>−1</sup> e<sup>−s·(2πij/2<sup>k</sup>)</sup> is the fiber-sum<br>
-                        (geometric sum encoding interference from multiple lift-fibers)
                     </div>
                 </div>
                 
@@ -5683,66 +5643,30 @@
                 <div style="background: rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
                     <h5 style="color: #ffd700; margin-bottom: 15px;">Lift Scaling Verification (at s = ${s_test})</h5>
                     <div style="font-family: 'Courier New', monospace; font-size: 0.9em; line-height: 1.8;">
-                        <div style="background: rgba(78, 205, 196, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 3px solid #4ecdc4;">
-                            <strong style="color: #4ecdc4;">Theorem:</strong> ℒ<sub>M·2<sup>k</sup></sub>[𝓔<sub>k</sub>[f]](s) = e<sup>−s·2<sup>k</sup></sup> · S<sub>k</sub>(s) · ℒ<sub>M</sub>[f](s)<br><br>
-                            For uniform extension with fiber-sum S<sub>k</sub>(s) ≈ 1 at special s-values,<br>
-                            we observe approximate pure exponential scaling.
-                        </div>
                         ${liftScaling.map(ls => `
                             <div style="padding: 8px; margin: 5px 0; background: rgba(0, 0, 0, 0.3); border-radius: 5px;">
-                                <strong>M<sub>${ls.k}</sub> = ${ls.M}</strong> (k=${ls.k}, lift = 2<sup>${ls.k}</sup>):<br>
+                                M = ${ls.M} (2<sup>${ls.k}</sup> lift):<br>
                                 Theoretical: e<sup>−${s_test}·2<sup>${ls.k}</sup></sup> · |ℒ<sub>${baseM}</sub>| = ${ls.theoretical.toFixed(4)}<br>
                                 Actual: |ℒ<sub>${ls.M}</sub>| = ${ls.actual.toFixed(4)}<br>
-                                Ratio (Actual/Theoretical): ${ls.ratio.toFixed(4)} ${Math.abs(1 - ls.ratio) < 0.1 ? '✓ (within 10%)' : '⚠ (deviation > 10%)'}<br>
-                                Deviation: ${((Math.abs(1 - ls.ratio)) * 100).toFixed(2)}%
+                                Ratio: ${ls.ratio.toFixed(4)} ${Math.abs(1 - ls.ratio) < 0.1 ? '✓' : '⚠'}
                             </div>
                         `).join('')}
-                        <div style="margin-top: 15px; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 5px; border-left: 3px solid #ffd700;">
-                            <strong style="color: #ffd700;">Note on Fiber-Sum S<sub>k</sub>(s):</strong><br>
-                            The geometric sum S<sub>k</sub>(s) = Σ<sub>j=0</sub><sup>2<sup>k</sup>−1</sup> e<sup>−s·(2πij/2<sup>k</sup>)</sup><br>
-                            equals 2<sup>k</sup> when s makes the phase trivial,<br>
-                            and creates interference patterns otherwise.<br>
-                            Deviations above reflect this fiber-sum modulation.
-                        </div>
                     </div>
                 </div>
                 
                 <div style="background: rgba(255, 255, 255, 0.05); padding: 18px; border-radius: 10px; line-height: 1.7;">
-                    <h5 style="color: #4ecdc4; margin-bottom: 12px;">Interpretation & Lift Theory</h5>
+                    <h5 style="color: #4ecdc4; margin-bottom: 12px;">Interpretation</h5>
                     <ul style="margin-left: 20px; line-height: 1.8;">
                         <li><strong>Domain variable r:</strong> Discrete "time" or modular index over coprime residues</li>
                         <li><strong>Transform parameter s:</strong> Continuous spectral variable capturing modular frequency</li>
                         <li><strong>gcd-filter:</strong> The condition gcd(r,M)=1 isolates residues with maximal independence</li>
+                        <li><strong>Lifting operator:</strong> Reproduces exponential damping e<sup>−s·2<sup>k</sup></sup> across scales</li>
                         <li><strong>Spectral peaks:</strong> Reveal harmonic structure in prime residue distribution</li>
                         <li><strong>Complex plane:</strong> Real and imaginary parts encode phase relationships</li>
                     </ul>
-                    
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 3px solid #4ecdc4;">
-                        <h6 style="color: #4ecdc4; margin-bottom: 10px;">Two Canonical Lift Types:</h6>
-                        <ol style="margin-left: 20px; line-height: 1.8;">
-                            <li><strong>Embedding Lift (ι<sub>k</sub>):</strong> Canonical inclusion that preserves residues. Induces pushforward (ι<sub>k</sub>)<sub>*</sub>f where lifted function evaluates at r' mod M</li>
-                            <li><strong>Translational Lift (τ<sub>k,t</sub>):</strong> Shifts r ↦ r + tM for chosen fiber t ∈ {0,...,2<sup>k</sup>−1}. Supports function on specific fiber</li>
-                        </ol>
-                    </div>
-                    
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 3px solid #ffd700;">
-                        <h6 style="color: #ffd700; margin-bottom: 10px;">Exponential-Scaled Extension 𝓔<sub>k</sub>:</h6>
-                        <p style="margin-bottom: 10px;">
-                            Decomposes each r' ∈ Φ(M<sub>k</sub>) as r' = r + jM with phase factor ω(j) = e<sup>−s·φ(j)</sup>.<br>
-                            Uniform choice φ(j) = 2<sup>k</sup> yields clean exponential scaling modulated by fiber-sum.
-                        </p>
-                        <p style="margin-top: 10px; font-size: 0.95em;">
-                            <strong>Scaling Theorem:</strong> ℒ<sub>M<sub>k</sub></sub>[𝓔<sub>k</sub>[f]](s) = e<sup>−s·2<sup>k</sup></sup> · S<sub>k</sub>(s) · ℒ<sub>M</sub>[f](s)<br>
-                            where S<sub>k</sub>(s) = Σ<sub>j=0</sub><sup>2<sup>k</sup>−1</sup> e<sup>−s·(2πij/2<sup>k</sup>)</sup> is a geometric fiber-sum encoding interference.
-                        </p>
-                        <p style="margin-top: 10px; font-style: italic; opacity: 0.9;">
-                            For pure exponential scaling (S<sub>k</sub>(s) = 1), choose s such that 2πis/2<sup>k</sup> is an integer multiple of 2πi, or engineer the extension to collapse to a single fiber.
-                        </p>
-                    </div>
-                    
                     <div style="margin-top: 15px; padding: 12px; background: rgba(78, 205, 196, 0.1); border-radius: 6px; border-left: 3px solid #4ecdc4;">
                         <strong>Key Insight:</strong> ℒ<sub>M</sub> provides a modular–spectral analogue of the classical Laplace transform, 
-                        revealing hidden harmonic order within the residue structure of integers. The lift dynamics show how transforms at different scales relate through <strong>exponential damping × fiber interference</strong>, linking discrete number theory to continuous spectral analysis and revealing the deep structure of prime distributions across modular lifts.
+                        revealing hidden harmonic order within the residue structure of integers and linking discrete number theory to continuous spectral analysis.
                     </div>
                 </div>
             `;
@@ -6405,21 +6329,6 @@
             }
         }
         
-        // Add listener for lift type change
-        document.addEventListener('DOMContentLoaded', function() {
-            const liftTypeSelect = document.getElementById('liftType');
-            if (liftTypeSelect) {
-                liftTypeSelect.addEventListener('change', function() {
-                    const fiberLabel = document.getElementById('fiberLabel');
-                    if (this.value === 'translational') {
-                        fiberLabel.style.display = 'block';
-                    } else {
-                        fiberLabel.style.display = 'none';
-                    }
-                });
-            }
-        });
-        
         function getModulusList() {
             const mode = document.getElementById('modulusMode').value;
             
@@ -6503,15 +6412,12 @@
             const moduli = getModulusList();
             const maxModulusValue = Math.max(...moduli);
             const pointSize = parseInt(document.getElementById('pointSize').value);
-            const ringThickness = parseFloat(document.getElementById('ringThickness').value);
             const showLabels = document.getElementById('showLabels').checked;
             const showModLines = document.getElementById('showModLines').checked;
             const colorMode = document.getElementById('colorMode').value;
             const invertColors = document.getElementById('invertColors').checked;
             const invertRings = document.getElementById('invertRings').checked;
             const rotationMode = document.getElementById('rotationMode').value;
-            const liftType = document.getElementById('liftType').value;
-            const fiberValue = parseInt(document.getElementById('fiberValue').value) || 0;
             
             const primes = computationData.primes;
             const maxRadius = Math.min(width, height) * 0.45;
@@ -6525,9 +6431,9 @@
             }
             ctx.fillRect(0, 0, width, height);
             
-            // Draw modulus rings with thickness
+            // Draw modulus rings
             ctx.strokeStyle = invertColors ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
-            ctx.lineWidth = ringThickness;
+            ctx.lineWidth = 1;
             for (let i = 0; i < moduli.length; i++) {
                 const ringIndex = invertRings ? (moduli.length - 1 - i) : i;
                 const radius = (ringIndex + 1) * radiusStep;
@@ -6536,53 +6442,11 @@
                 ctx.stroke();
             }
             
-            // Determine if prime should be shown based on lift type
-            const shouldShowPrime = (p, m, residue, modulusIndex) => {
-                if (liftType === 'standard') {
-                    return true;
-                }
-                
-                // Get base modulus (assume first in list or power-of-2 base)
-                const baseM = moduli[0];
-                
-                if (liftType === 'embedding') {
-                    // Embedding lift ι_k: only show if p ≡ r (mod baseM) for some r in Φ(baseM)
-                    // This means showing primes whose residue mod current m came from baseM
-                    const baseResidue = p % baseM;
-                    return gcd(baseResidue, baseM) === 1 && residue === (p % m);
-                }
-                
-                if (liftType === 'translational') {
-                    // Translational lift τ_{k,t}: show primes in fiber r + t*M
-                    // For M_k = M * 2^k, check if residue came from specific fiber
-                    if (m <= baseM) return gcd(residue, m) === 1;
-                    
-                    // Calculate which fiber this prime belongs to
-                    const k = Math.log2(m / baseM);
-                    if (!Number.isInteger(k)) return gcd(residue, m) === 1;
-                    
-                    const baseResidue = p % baseM;
-                    const fiberIndex = Math.floor((p - baseResidue) / baseM) % Math.pow(2, k);
-                    
-                    return gcd(baseResidue, baseM) === 1 && fiberIndex === fiberValue;
-                }
-                
-                return true;
-            };
-            
             // Generate colors based on mode
-            const getColor = (prime, residue, modulus, modulusIndex, isEmbedding, isTranslational) => {
+            const getColor = (prime, residue, modulus, modulusIndex) => {
                 let hue, saturation = 80, lightness = 60;
                 
-                if (colorMode === 'lift') {
-                    if (liftType === 'embedding') {
-                        hue = isEmbedding ? 200 : 30;  // Blue for embedded, orange for others
-                    } else if (liftType === 'translational') {
-                        hue = isTranslational ? 280 : 30;  // Purple for selected fiber, orange for others
-                    } else {
-                        hue = (residue / modulus) * 360;
-                    }
-                } else if (colorMode === 'residue') {
+                if (colorMode === 'residue') {
                     hue = (residue / modulus) * 360;
                 } else if (colorMode === 'modulus') {
                     hue = (modulusIndex / moduli.length) * 280;
@@ -6616,9 +6480,6 @@
                     // Only plot if gcd(residue, m) = 1
                     if (gcd(residue, m) !== 1) continue;
                     
-                    // Check lift type filter
-                    if (!shouldShowPrime(p, m, residue, i)) continue;
-                    
                     // Calculate angle: θ = 2π * residue / m
                     let angle = (2 * Math.PI * residue) / m;
                     
@@ -6634,20 +6495,15 @@
                     const x = centerX + radius * Math.cos(angle);
                     const y = centerY + radius * Math.sin(angle);
                     
-                    // Determine lift status for coloring
-                    const baseM = moduli[0];
-                    const isEmbedding = (p % baseM === residue % baseM);
-                    const isTranslational = liftType === 'translational' && shouldShowPrime(p, m, residue, i);
-                    
                     // Draw point
-                    const color = getColor(p, residue, m, i, isEmbedding, isTranslational);
+                    const color = getColor(p, residue, m, i);
                     ctx.fillStyle = color;
                     ctx.beginPath();
                     ctx.arc(x, y, pointSize, 0, Math.PI * 2);
                     ctx.fill();
                     
                     // Store for hover
-                    points.push({ x, y, p, residue, modulus: m, color, liftType: liftType });
+                    points.push({ x, y, p, residue, modulus: m, color });
                     
                     // Draw lines from center to show mod structure
                     if (showModLines && i === moduli.length - 1 && residue < m) {
@@ -6691,13 +6547,13 @@
                     const angleDeg = (angleRad * 180 / Math.PI).toFixed(1);
                     const angleRadStr = (angleRad / Math.PI).toFixed(3);
                     
-                    // Create detailed tooltip with lift info
+                    // Create detailed tooltip
                     const lines = [
                         `Prime: p = ${closestPoint.p}`,
                         `Residue: r = ${closestPoint.residue} (mod ${closestPoint.modulus})`,
-                        `Lift Type: ${closestPoint.liftType}`,
                         `Fraction: r/m = ${closestPoint.residue}/${closestPoint.modulus} = ${(closestPoint.residue / closestPoint.modulus).toFixed(4)}`,
-                        `Angle: θ = ${angleRadStr}π rad = ${angleDeg}°`
+                        `Angle: θ = ${angleRadStr}π rad = ${angleDeg}°`,
+                        `Position: (${Math.cos(angleRad).toFixed(3)}, ${Math.sin(angleRad).toFixed(3)})`
                     ];
                     
                     ctx.font = '12px Arial';
@@ -6741,7 +6597,7 @@
             };
             
             // Update legend
-            updateRingLegend(colorMode, moduli, primes, invertRings, liftType);
+            updateRingLegend(colorMode, moduli, primes, invertRings);
         }
         
         function updateRingLegend(colorMode, moduli, primes, invertRings) {
