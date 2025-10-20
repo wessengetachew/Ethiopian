@@ -3020,43 +3020,62 @@
             return new Promise((resolve) => {
                 const { epsilon, constantType, modulus, primes, computedValue, exactValue } = computationData;
                 
-                let width, height;
+                let baseWidth, baseHeight;
                 if (resolution === '1080p') {
-                    width = 1920;
-                    height = 1080;
+                    baseWidth = 1920;
+                    baseHeight = 1080;
                 } else if (resolution === '1080p2x') {
-                    width = 3840;
-                    height = 2160;
+                    baseWidth = 3840;
+                    baseHeight = 2160;
                 } else if (resolution === '4k') {
-                    width = 3840;
-                    height = 2160;
+                    baseWidth = 3840;
+                    baseHeight = 2160;
                 } else {
-                    width = 7680;
-                    height = 4320;
+                    baseWidth = 7680;
+                    baseHeight = 4320;
                 }
+                
+                // Calculate required height based on content
+                const padding = baseWidth * 0.04;
+                const titleHeight = baseHeight * 0.15;
+                const chartHeight = baseHeight * 0.70;
+                const watermarkHeight = includeWatermark ? baseHeight * 0.05 : 0;
+                
+                // Calculate legend height dynamically
+                let legendHeight = 0;
+                if (includeLegend) {
+                    if (chartType === 'channel') {
+                        const coprimeResidues = getCoprimeResidues(modulus);
+                        const numRows = Math.ceil((coprimeResidues.length + 1) / 10);
+                        legendHeight = baseHeight * 0.08 + (numRows * baseHeight * 0.035);
+                    } else if (chartType === 'gapHistogram') {
+                        legendHeight = baseHeight * 0.15;
+                    } else if (chartType === 'goldbachComet') {
+                        legendHeight = baseHeight * 0.12;
+                    } else if (chartType === 'primeRaces') {
+                        legendHeight = baseHeight * 0.10;
+                    } else {
+                        legendHeight = baseHeight * 0.10;
+                    }
+                }
+                
+                // EXTEND canvas height
+                const width = baseWidth;
+                const height = titleHeight + chartHeight + legendHeight + watermarkHeight + (padding * 4);
                 
                 const exportCanvas = document.createElement('canvas');
                 exportCanvas.width = width;
                 exportCanvas.height = height;
                 const ctx = exportCanvas.getContext('2d');
                 
-                // Set background
                 ctx.fillStyle = background === 'white' ? '#ffffff' : '#000000';
                 ctx.fillRect(0, 0, width, height);
-                
-                // Calculate dimensions
-                const padding = width * 0.04;
-                const titleHeight = height * 0.15;
-                const watermarkHeight = includeWatermark ? height * 0.05 : 0;
-                const legendHeight = includeLegend ? height * 0.15 : 0; // Increased for legend space
-                const chartHeight = height * 0.60; // Reduced to make room for legend
                 
                 const textColor = background === 'white' ? '#000000' : '#ffffff';
                 const accentColor = background === 'white' ? '#1e3c72' : '#ffd700';
                 
-                // Draw title
                 ctx.fillStyle = accentColor;
-                ctx.font = `bold ${height * 0.045}px Arial`;
+                ctx.font = `bold ${baseHeight * 0.045}px Arial`;
                 ctx.textAlign = 'center';
                 const title = chartType === 'channel' ? `Residue Channel Contributions (mod ${modulus})` :
                              chartType === 'convergence' ? 'Convergence to Exact Value' :
@@ -3071,18 +3090,16 @@
                              chartType === 'goldbachComet' ? 'Goldbach Comet' :
                              chartType === 'modularLaplace' ? 'Modular Laplace Transform' :
                              'Prime Gap Distribution Analysis';
-                ctx.fillText(title, width / 2, padding + height * 0.045);
+                ctx.fillText(title, width / 2, padding + baseHeight * 0.045);
                 
-                // Draw subtitle
                 ctx.fillStyle = textColor;
-                ctx.font = `${height * 0.025}px Arial`;
+                ctx.font = `${baseHeight * 0.025}px Arial`;
                 const subtitle = `Computing ${constantType === 'pi' ? 'π' : 'ζ(' + computationData.exponent + ')'} using ${primes.length} primes (ε = ${epsilon})`;
-                ctx.fillText(subtitle, width / 2, padding + height * 0.08);
+                ctx.fillText(subtitle, width / 2, padding + baseHeight * 0.08);
                 
-                // Draw stats
-                ctx.font = `${height * 0.022}px Arial`;
+                ctx.font = `${baseHeight * 0.022}px Arial`;
                 ctx.textAlign = 'left';
-                const statsY = padding + height * 0.11;
+                const statsY = padding + baseHeight * 0.11;
                 const leftX = padding;
                 const rightX = width * 0.5 + padding;
                 
@@ -3090,16 +3107,14 @@
                 ctx.fillText(`Exact: ${exactValue.toFixed(15)}`, rightX, statsY);
                 
                 const relError = Math.abs(computedValue - exactValue) / exactValue;
-                ctx.fillText(`Relative Error: ${(relError * 100).toFixed(8)}%`, leftX, statsY + height * 0.028);
-                ctx.fillText(`Primes Used: ${primes.length}`, rightX, statsY + height * 0.028);
+                ctx.fillText(`Relative Error: ${(relError * 100).toFixed(8)}%`, leftX, statsY + baseHeight * 0.028);
+                ctx.fillText(`Primes Used: ${primes.length}`, rightX, statsY + baseHeight * 0.028);
                 
-                // Create temp canvas for chart
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = width - padding * 2;
-                tempCanvas.height = chartHeight * 1.2;
+                tempCanvas.height = chartHeight;
                 const tempCtx = tempCanvas.getContext('2d');
                 
-                // Generate chart
                 let chartInstance;
                 
                 if (chartType === 'channel') {
@@ -3131,36 +3146,25 @@
                 }
                 
                 setTimeout(() => {
-                    const chartX = padding / 2;
+                    const chartX = padding;
                     const chartY = titleHeight + padding;
-                    const availableHeight = height - chartY - watermarkHeight - legendHeight - padding;
                     
-                    let drawWidth = tempCanvas.width;
-                    let drawHeight = tempCanvas.height;
-                    
-                    if (drawHeight > availableHeight) {
-                        const scale = availableHeight / drawHeight;
-                        drawHeight = availableHeight;
-                        drawWidth = tempCanvas.width * scale;
-                    }
-                    
-                    const finalX = (width - drawWidth) / 2;
-                    ctx.drawImage(tempCanvas, finalX, chartY, drawWidth, drawHeight);
+                    ctx.drawImage(tempCanvas, chartX, chartY, tempCanvas.width, tempCanvas.height);
                     
                     if (includeLegend) {
-                        const legendY = chartY + drawHeight + padding * 2;
+                        const legendY = chartY + tempCanvas.height + padding * 2;
                         drawChartLegend(ctx, chartType, legendY, width, height, background, textColor, accentColor);
                     }
                     
                     if (includeWatermark) {
-                        const watermarkY = height - padding - height * 0.025;
+                        const watermarkY = height - padding - baseHeight * 0.025;
                         ctx.fillStyle = background === 'white' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';
-                        ctx.font = `italic ${height * 0.022}px Arial`;
+                        ctx.font = `italic ${baseHeight * 0.022}px Arial`;
                         ctx.textAlign = 'center';
                         ctx.fillText('Generated by Wessen Getachew - Modular Sieve Calculator', width / 2, watermarkY);
                         
-                        ctx.font = `${height * 0.018}px Arial`;
-                        ctx.fillText(new Date().toISOString().split('T')[0], width / 2, watermarkY + height * 0.025);
+                        ctx.font = `${baseHeight * 0.018}px Arial`;
+                        ctx.fillText(new Date().toISOString().split('T')[0], width / 2, watermarkY + baseHeight * 0.025);
                     }
                     
                     exportCanvas.toBlob((blob) => {
