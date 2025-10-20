@@ -3198,12 +3198,12 @@
             ctx.fillStyle = background === 'white' ? '#ffffff' : '#000000';
             ctx.fillRect(0, 0, width, height);
             
-            // Calculate dimensions with better proportions
+            // Calculate dimensions
             const padding = width * 0.04;
             const titleHeight = height * 0.15;
-            const chartHeight = height * 0.70;
             const watermarkHeight = includeWatermark ? height * 0.05 : 0;
-            const legendHeight = includeLegend ? height * 0.10 : 0;
+            const legendHeight = includeLegend ? height * 0.20 : 0; // Increased from 0.15 to 0.20
+            const chartHeight = height * 0.50; // Reduced from 0.70 to 0.50 to make room
             
             // Text color based on background
             const textColor = background === 'white' ? '#000000' : '#ffffff';
@@ -3245,13 +3245,13 @@
             ctx.fillText(`Relative Error: ${(relError * 100).toFixed(8)}%`, leftX, statsY + height * 0.028);
             ctx.fillText(`Primes Used: ${primes.length}`, rightX, statsY + height * 0.028);
             
-            // Create temporary canvas for chart with proper sizing
+            // Create temp canvas for chart
             const tempCanvas = document.createElement('canvas');
             const chartPadding = padding * 2;
             
-            // Make temp canvas larger to capture full chart
+            // Make temp canvas sized to fit the allocated chart area
             tempCanvas.width = width - chartPadding;
-            tempCanvas.height = chartHeight * 1.2; // Increased to capture full chart
+            tempCanvas.height = chartHeight; // Use the allocated chart height
             const tempCtx = tempCanvas.getContext('2d');
             
             // Generate chart based on type
