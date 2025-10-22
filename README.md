@@ -806,7 +806,7 @@
                         r<sub>p</sub> = (2πi · p) / M
                     </div>
                     
-                    <p>where M = 30 × 2<sup>n</sup> defines the modular level and gcd(p, M) = 1 ensures primitive placement on the unit circle.</p>
+                    <p>where M = m × 2<sup>n</sup> defines the modular level and gcd(p, M) = 1 ensures primitive placement on the unit circle.</p>
                     
                     <p style="margin-top: 15px;">The accumulation of all such prime residues across lifts of the form:</p>
                     
@@ -856,7 +856,7 @@
                     </ul>
                     
                     <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <strong>💡 Note:</strong> This calculator is an educational tool designed to demonstrate the power of Euler products and modular arithmetic in computing fundamental mathematical constants. It combines classical number theory with modern computational methods and interactive visualization.
+                        <strong> Note:</strong> This calculator is an educational tool designed to demonstrate the power of Euler products and modular arithmetic in computing fundamental mathematical constants. It combines classical number theory with modern computational methods and interactive visualization.
                     </p>
                 </div>
             </div>
