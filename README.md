@@ -1003,6 +1003,11 @@
                         <span>5x (Zoom In)</span>
                     </div>
                 </div>
+                <div style="margin: 15px 0;">
+                    <button onclick="exportCurrentVisualization()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #9966ff, #8855ee); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                        Export Current Visualization
+                    </button>
+                </div>
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
             </div>
@@ -2606,6 +2611,124 @@
                 document.body.removeChild(modal);
                 
                 performExport(resolution, background, chartType, includeWatermark);
+            };
+        }
+        
+        function exportCurrentVisualization() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            // Create modal for export options
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 40px;
+                border-radius: 20px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            `;
+            
+            const vizNames = {
+                'convergence': 'Convergence Plot',
+                'contribution': 'Prime Contributions',
+                'gapDist': 'Gap Distribution',
+                'primeCount': 'Prime Counting π(x)',
+                'density': 'Prime Density Analysis',
+                'gapHistogram': 'Prime Gaps Histogram',
+                'sacksSpiral': 'Sacks Spiral',
+                'zetaZeros': 'Riemann Zeta Zeros',
+                'errorAnalysis': 'Error Analysis',
+                'primeRaces': 'Prime Races',
+                'goldbachComet': 'Goldbach Comet',
+                'phasorSum': 'Phasor Sum',
+                'zetaSurface': 'Modular Zeta Surface',
+                'primeSpiral': 'Ulam Spiral',
+                'channelRace': 'Channel Race',
+                'heatmap': 'Prime Density Heatmap',
+                'voronoi': 'Prime Voronoi',
+                'harmonicWave': 'Harmonic Wave'
+            };
+            
+            content.innerHTML = `
+                <h2 style="color: #ffd700; margin-bottom: 25px; text-align: center;">Export Current Visualization</h2>
+                
+                <div style="margin-bottom: 20px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                    <div style="font-size: 0.9em; opacity: 0.8;">Current Visualization:</div>
+                    <div style="font-size: 1.2em; font-weight: bold; color: #4ecdc4;">${vizNames[currentViz] || currentViz}</div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Resolution:</label>
+                    <select id="vizExportResolution" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="1080p">Full HD (1920 x 1080)</option>
+                        <option value="1080p2x">Full HD 2x (3840 x 2160)</option>
+                        <option value="4k">4K (3840 x 2160)</option>
+                        <option value="8k">8K (7680 x 4320)</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Background:</label>
+                    <select id="vizExportBackground" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="black">Black</option>
+                        <option value="white">White</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Format:</label>
+                    <select id="vizExportFormat" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+                        <option value="jpg">JPEG (Smaller file, recommended)</option>
+                        <option value="png">PNG (Lossless, larger file)</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                        <input type="checkbox" id="vizExportWatermark" checked style="width: auto; margin-right: 10px;">
+                        <span>Include watermark by Wessen Getachew</span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button id="vizExportBtn" style="flex: 1; padding: 15px; background: linear-gradient(45deg, #9966ff, #8855ee); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">Export</button>
+                    <button id="vizCancelBtn" style="flex: 1; padding: 15px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">Cancel</button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            document.getElementById('vizCancelBtn').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            document.getElementById('vizExportBtn').onclick = () => {
+                const resolution = document.getElementById('vizExportResolution').value;
+                const background = document.getElementById('vizExportBackground').value;
+                const format = document.getElementById('vizExportFormat').value;
+                const includeWatermark = document.getElementById('vizExportWatermark').checked;
+                
+                document.body.removeChild(modal);
+                
+                performVisualizationExport(currentViz, resolution, background, format, includeWatermark);
             };
         }
         
