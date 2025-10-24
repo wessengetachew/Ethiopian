@@ -780,6 +780,50 @@
             </div>
             
             <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('phasor')">
+                    <h3>Nested Modular Unity & Zeta Surface</h3>
+                    <span class="toggle-icon" id="phasor-icon">▼</span>
+                </div>
+                <div id="phasor-content" class="collapsible-content">
+                    <p><strong>The Zeta Function as a Phasor Sum:</strong></p>
+                    <p>For complex argument s = σ + it, the Riemann zeta function can be written as:</p>
+                    <div class="formula">ζ(s) = Σ n<sup>-σ</sup> e<sup>-it log n</sup></div>
+                    
+                    <p>Each term n<sup>-s</sup> is a <strong>rotating phasor</strong> on the complex plane with:</p>
+                    <div class="formula">
+                        Radius: r<sub>n</sub> = n<sup>-σ</sup><br>
+                        Angle: θ<sub>n</sub> = -t log n
+                    </div>
+                    
+                    <p style="margin-top: 15px;"><strong>Modular Unity Correspondence:</strong></p>
+                    <p>Each residue class k (mod m) corresponds to an m-th root of unity:</p>
+                    <div class="formula">k mod m ↔ e<sup>2πik/m</sup></div>
+                    
+                    <p>This isomorphism connects modular arithmetic to the unit circle geometry. For each modulus m and residue k:</p>
+                    <div class="formula">S<sub>m,k</sub>(s; N) = Σ<sub>n≡k (mod m)</sub> n<sup>-s</sup></div>
+                    
+                    <p style="margin-top: 15px;"><strong>The Critical Line (σ = 1/2):</strong></p>
+                    <p>On the critical line, each contribution rotates at angular velocity ∝ log n. When modular rotations align <strong>destructively</strong>, their vector sum vanishes—precisely the condition for a nontrivial zero:</p>
+                    <div class="formula">ζ(1/2 + iT) = 0</div>
+                    
+                    <p style="margin-top: 15px;"><strong>Nested Modular Surface:</strong></p>
+                    <p>Stacking concentric rings for m = 1, 2, 3, ... creates a <strong>nested modular unity lattice</strong>. Each ring samples the unit circle at m equally-spaced points, and together they approximate the continuous analytic structure of ζ(s). The GCD=1 residues (primitive rotations) form the multiplicative group of units mod m.</p>
+                    
+                    <p style="margin-top: 15px;"><strong>Geometric Interpretation:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Height t:</strong> Controls angular phase of each modular shell (vertical movement on zeta surface)</li>
+                        <li><strong>Real part σ:</strong> Controls radial decay (compression toward critical line)</li>
+                        <li><strong>Modulus m:</strong> Discrete Fourier mode on the complex circle</li>
+                        <li><strong>Primitive residues:</strong> φ(m) independent rotation channels</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        <strong>💡 Key Insight:</strong> The nested modular lattice forms a discrete analogue of the complex-analytic domain of ζ(s). By weighting each ring by n<sup>-σ</sup> and rotating by phase -t log n, we obtain a direct geometric mimic of the Riemann zeta surface.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="info-section">
                 <div class="toggle-section" onclick="toggleSection('credits')">
                     <h3>Credits & Acknowledgments</h3>
                     <span class="toggle-icon" id="credits-icon">▼</span>
@@ -938,6 +982,8 @@
                     <button class="viz-btn" onclick="changeViz('errorAnalysis')">Error Analysis</button>
                     <button class="viz-btn" onclick="changeViz('primeRaces')">Prime Races</button>
                     <button class="viz-btn" onclick="changeViz('goldbachComet')">Goldbach Comet</button>
+                    <button class="viz-btn" onclick="changeViz('phasorSum')">Phasor Sum (Complex Plane)</button>
+                    <button class="viz-btn" onclick="changeViz('zetaSurface')">Modular Zeta Surface</button>
                 </div>
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
@@ -2077,6 +2123,10 @@
                 createPrimeRacesPlot(freshCtx);
             } else if (type === 'goldbachComet') {
                 createGoldbachCometPlot(freshCtx);
+            } else if (type === 'phasorSum') {
+                createPhasorSumPlot(freshCtx);
+            } else if (type === 'zetaSurface') {
+                createZetaSurfacePlot(freshCtx);
             }
         }
         
@@ -2482,6 +2532,10 @@
                         <option value="sacksSpiral">Sacks Spiral</option>
                         <option value="zetaZeros">Riemann Zeta Zeros</option>
                         <option value="errorAnalysis">Error Analysis</option>
+                        <option value="primeRaces">Prime Races</option>
+                        <option value="goldbachComet">Goldbach Comet</option>
+                        <option value="phasorSum">Phasor Sum (Complex Plane)</option>
+                        <option value="zetaSurface">Modular Zeta Surface</option>
                     </select>
                 </div>
                 
@@ -2561,13 +2615,18 @@
             const title = chartType === 'channel' ? `Residue Channel Contributions (mod ${modulus})` :
                          chartType === 'convergence' ? 'Convergence to Exact Value' :
                          chartType === 'contribution' ? 'Individual Prime Contributions' :
+                         chartType === 'gapDist' ? 'Prime Gap Distribution Analysis' :
                          chartType === 'primeCount' ? 'Prime Counting Function π(x)' :
                          chartType === 'density' ? 'Prime Density Analysis' :
                          chartType === 'gapHistogram' ? 'Prime Gaps Histogram' :
                          chartType === 'sacksSpiral' ? 'Sacks Spiral Visualization' :
                          chartType === 'zetaZeros' ? 'Riemann Zeta Function - Non-Trivial Zeros' :
                          chartType === 'errorAnalysis' ? 'Error Analysis - Convergence Rate' :
-                         'Prime Gap Distribution Analysis';
+                         chartType === 'primeRaces' ? `Prime Races (mod ${modulus})` :
+                         chartType === 'goldbachComet' ? 'Goldbach Comet - Prime Pair Partitions' :
+                         chartType === 'phasorSum' ? 'Phasor Sum: ζ(s) as Rotating Vectors' :
+                         chartType === 'zetaSurface' ? 'Modular Zeta Surface - Nested Unity Lattice' :
+                         'Visualization';
             ctx.fillText(title, width / 2, padding + height * 0.045);
             
             // Draw subtitle
@@ -2622,6 +2681,14 @@
                 chartInstance = generateZetaZerosChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'errorAnalysis') {
                 chartInstance = generateErrorAnalysisChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'primeRaces') {
+                chartInstance = generatePrimeRacesChartForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'goldbachComet') {
+                chartInstance = generateGoldbachCometForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'phasorSum') {
+                chartInstance = generatePhasorSumForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'zetaSurface') {
+                chartInstance = generateZetaSurfaceForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -4425,6 +4492,741 @@
                     }
                 }
             });
+        }
+        
+        function createPhasorSumPlot(ctx) {
+            const { primes, exponent, constantType } = computationData;
+            
+            // For complex s = σ + it, compute phasor representation
+            // We'll use σ = exponent/2 (the value we're computing at)
+            const sigma = exponent / 2;
+            
+            // Create interactive t slider
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Phasor Sum Visualization: ζ(s) as Rotating Vectors</h4>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Imaginary Part (t): <span id="tValue">0</span></label>
+                    <input type="range" id="tSlider" min="0" max="200" step="0.1" value="0" 
+                           style="width: 100%; margin-top: 10px;"
+                           oninput="updatePhasorPlot(parseFloat(this.value), parseFloat(document.getElementById('zoomSlider').value))">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <button onclick="document.getElementById('tSlider').value=14.134725; updatePhasorPlot(14.134725, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer;">1st Zero (14.13)</button>
+                        <button onclick="document.getElementById('tSlider').value=21.022040; updatePhasorPlot(21.022040, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(255, 159, 64, 0.3); border: 1px solid #ff9f40; border-radius: 5px; color: #fff; cursor: pointer;">2nd Zero (21.02)</button>
+                        <button onclick="document.getElementById('tSlider').value=25.010858; updatePhasorPlot(25.010858, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(255, 205, 86, 0.3); border: 1px solid #ffcd56; border-radius: 5px; color: #fff; cursor: pointer;">3rd Zero (25.01)</button>
+                        <button onclick="document.getElementById('tSlider').value=100; updatePhasorPlot(100, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer;">High t (100)</button>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Zoom Level: <span id="zoomValue">1.0</span>x</label>
+                    <input type="range" id="zoomSlider" min="0.1" max="10" step="0.1" value="1" 
+                           style="width: 100%; margin-top: 10px;"
+                           oninput="updatePhasorPlot(parseFloat(document.getElementById('tSlider').value), parseFloat(this.value))">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em; opacity: 0.7; margin-top: 5px;">
+                        <span>0.1x (Zoom Out)</span>
+                        <span>1x (Default)</span>
+                        <span>10x (Zoom In)</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Real Part (σ)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${sigma.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes Plotted</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${Math.min(50, primes.length)}</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Sum Magnitude</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;" id="sumMagnitude">--</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Sum Angle</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;" id="sumAngle">--</div>
+                    </div>
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About Phasor Representation:</strong><br>
+                    • Each term n<sup>-s</sup> = n<sup>-σ</sup>e<sup>-it log n</sup> is a <strong>rotating phasor</strong> (vector)<br>
+                    • <strong>Radius:</strong> r<sub>n</sub> = n<sup>-${sigma}</sup> (decays with n)<br>
+                    • <strong>Angle:</strong> θ<sub>n</sub> = -t log(n) (rotates with t)<br>
+                    • The sum ζ(s) is the <strong>vector sum</strong> of all phasors<br>
+                    • When phasors align <strong>destructively</strong>, |ζ(s)| ≈ 0 → nontrivial zero!<br>
+                    • Adjust t to see how the sum changes along the critical line
+                </div>
+            `;
+            
+            // Initial plot at t=0
+            window.updatePhasorPlot = (t, zoom = 1.0) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const width = rect.width;
+                const height = rect.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const scale = Math.min(width, height) * 0.4 * zoom;
+                
+                // Clear canvas
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                freshCtx.fillRect(0, 0, width, height);
+                
+                // Draw axes
+                freshCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                freshCtx.lineWidth = 1;
+                freshCtx.beginPath();
+                freshCtx.moveTo(0, centerY);
+                freshCtx.lineTo(width, centerY);
+                freshCtx.moveTo(centerX, 0);
+                freshCtx.lineTo(centerX, height);
+                freshCtx.stroke();
+                
+                // Draw unit circle
+                freshCtx.beginPath();
+                freshCtx.arc(centerX, centerY, scale, 0, Math.PI * 2);
+                freshCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                freshCtx.stroke();
+                
+                // Compute and draw phasors
+                let sumReal = 0, sumImag = 0;
+                let currentX = centerX, currentY = centerY;
+                
+                const numPhasors = Math.min(50, primes.length);
+                
+                for (let i = 0; i < numPhasors; i++) {
+                    const n = primes[i];
+                    const radius = Math.pow(n, -sigma);
+                    const angle = -t * Math.log(n);
+                    
+                    const real = radius * Math.cos(angle);
+                    const imag = radius * Math.sin(angle);
+                    
+                    sumReal += real;
+                    sumImag += imag;
+                    
+                    // Draw phasor from current position
+                    const nextX = currentX + real * scale;
+                    const nextY = currentY - imag * scale;
+                    
+                    // Color by prime index
+                    const hue = (i / numPhasors) * 280;
+                    freshCtx.strokeStyle = `hsla(${hue}, 80%, 60%, 0.7)`;
+                    freshCtx.lineWidth = 2;
+                    
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(currentX, currentY);
+                    freshCtx.lineTo(nextX, nextY);
+                    freshCtx.stroke();
+                    
+                    // Draw arrowhead
+                    const arrowSize = 5;
+                    const arrowAngle = Math.atan2(-(imag), real);
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(nextX, nextY);
+                    freshCtx.lineTo(
+                        nextX - arrowSize * Math.cos(arrowAngle - Math.PI/6),
+                        nextY - arrowSize * Math.sin(arrowAngle - Math.PI/6)
+                    );
+                    freshCtx.moveTo(nextX, nextY);
+                    freshCtx.lineTo(
+                        nextX - arrowSize * Math.cos(arrowAngle + Math.PI/6),
+                        nextY - arrowSize * Math.sin(arrowAngle + Math.PI/6)
+                    );
+                    freshCtx.stroke();
+                    
+                    currentX = nextX;
+                    currentY = nextY;
+                }
+                
+                // Draw final sum vector from origin
+                const finalX = centerX + sumReal * scale;
+                const finalY = centerY - sumImag * scale;
+                
+                freshCtx.strokeStyle = '#ffd700';
+                freshCtx.lineWidth = 4;
+                freshCtx.beginPath();
+                freshCtx.moveTo(centerX, centerY);
+                freshCtx.lineTo(finalX, finalY);
+                freshCtx.stroke();
+                
+                // Draw sum endpoint
+                freshCtx.fillStyle = '#ffd700';
+                freshCtx.beginPath();
+                freshCtx.arc(finalX, finalY, 6, 0, Math.PI * 2);
+                freshCtx.fill();
+                
+                // Update stats
+                const magnitude = Math.sqrt(sumReal * sumReal + sumImag * sumImag);
+                const angleRad = Math.atan2(sumImag, sumReal);
+                const angleDeg = angleRad * 180 / Math.PI;
+                
+                document.getElementById('tValue').textContent = t.toFixed(2);
+                document.getElementById('zoomValue').textContent = zoom.toFixed(1);
+                document.getElementById('sumMagnitude').textContent = magnitude.toFixed(4);
+                document.getElementById('sumAngle').textContent = angleDeg.toFixed(1) + '°';
+                
+                // Draw labels
+                freshCtx.fillStyle = '#fff';
+                freshCtx.font = '14px Arial';
+                freshCtx.textAlign = 'center';
+                freshCtx.fillText('Re', width - 30, centerY - 10);
+                freshCtx.fillText('Im', centerX + 15, 20);
+                freshCtx.fillText(`ζ(${sigma} + ${t}i) ≈ ${magnitude.toFixed(3)}`, centerX, height - 20);
+            };
+            
+            // Initialize
+            window.updatePhasorPlot(0, 1.0);
+        }
+        
+        function createZetaSurfacePlot(ctx) {
+            const { primes, exponent } = computationData;
+            const sigma = exponent / 2;
+            
+            // Create modular zeta surface
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Modular Zeta Surface: Nested Unity Lattice</h4>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Imaginary Height (t): <span id="tValueSurface">14.13</span></label>
+                    <input type="range" id="tSliderSurface" min="0" max="200" step="0.01" value="14.13" 
+                           style="width: 100%; margin-top: 10px;"
+                           oninput="updateZetaSurface(parseFloat(this.value))">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 10px;">
+                        <button onclick="document.getElementById('tSliderSurface').value=14.134725; updateZetaSurface(14.134725);" style="padding: 6px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 1 (14.13)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=21.022040; updateZetaSurface(21.022040);" style="padding: 6px; background: rgba(255, 159, 64, 0.3); border: 1px solid #ff9f40; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 2 (21.02)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=25.010858; updateZetaSurface(25.010858);" style="padding: 6px; background: rgba(255, 205, 86, 0.3); border: 1px solid #ffcd56; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 3 (25.01)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=30.424876; updateZetaSurface(30.424876);" style="padding: 6px; background: rgba(75, 192, 192, 0.3); border: 1px solid #4bc0c0; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 4 (30.42)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=50; updateZetaSurface(50);" style="padding: 6px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">t = 50</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=100; updateZetaSurface(100);" style="padding: 6px; background: rgba(78, 205, 196, 0.3); border: 1px solid #4ecdc4; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">t = 100</button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Moduli Plotted</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;" id="moduliCount">30</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Total Magnitude</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;" id="surfaceMagnitude">--</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Phase Coherence</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;" id="phaseCoherence">--</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Nearest Zero</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;" id="nearestZero">14.13</div>
+                    </div>
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>About the Modular Zeta Surface:</strong><br>
+                    • Each concentric ring represents modulus m = 1, 2, 3, ..., 30<br>
+                    • Points on each ring: primitive m-th roots of unity e<sup>2πik/m</sup> where gcd(k,m)=1<br>
+                    • Each point contributes: S<sub>m,k</sub>(s) = Σ<sub>n≡k(mod m)</sub> n<sup>-s</sup><br>
+                    • Color brightness = contribution magnitude<br>
+                    • <strong>At zeros:</strong> modular rotations align destructively → dark/zero sum<br>
+                    • <strong>Away from zeros:</strong> constructive interference → bright regions<br>
+                    • First nontrivial zero: t ≈ 14.134725 (try this value!)
+                </div>
+            `;
+            
+            // Initialize at first zero
+            window.updateZetaSurface = (t) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const width = rect.width;
+                const height = rect.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const maxRadius = Math.min(width, height) * 0.45;
+                
+                // Clear canvas
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, width, height);
+                
+                const maxModulus = 30;
+                const radiusStep = maxRadius / (maxModulus + 1);
+                
+                let totalMagnitude = 0;
+                let totalReal = 0, totalImag = 0;
+                let contributionCount = 0;
+                
+                // For each modulus
+                for (let m = 1; m <= maxModulus; m++) {
+                    const radius = m * radiusStep;
+                    const coprimeResidues = getCoprimeResidues(m);
+                    
+                    // For each primitive residue
+                    for (const k of coprimeResidues) {
+                        // Compute S_{m,k}(s)
+                        let sumReal = 0, sumImag = 0;
+                        
+                        for (const p of primes) {
+                            if (p % m === k) {
+                                const r = Math.pow(p, -sigma);
+                                const theta = -t * Math.log(p);
+                                sumReal += r * Math.cos(theta);
+                                sumImag += r * Math.sin(theta);
+                            }
+                        }
+                        
+                        const magnitude = Math.sqrt(sumReal * sumReal + sumImag * sumImag);
+                        totalMagnitude += magnitude;
+                        totalReal += sumReal;
+                        totalImag += sumImag;
+                        contributionCount++;
+                        
+                        // Position on ring
+                        const angle = 2 * Math.PI * k / m;
+                        const x = centerX + radius * Math.cos(angle);
+                        const y = centerY + radius * Math.sin(angle);
+                        
+                        // Color by magnitude
+                        const brightness = Math.min(255, magnitude * 500);
+                        const hue = (k / m) * 360;
+                        freshCtx.fillStyle = `hsla(${hue}, 80%, ${brightness/4}%, ${Math.min(1, magnitude * 2)})`;
+                        
+                        // Size by magnitude
+                        const pointSize = 2 + magnitude * 10;
+                        freshCtx.beginPath();
+                        freshCtx.arc(x, y, pointSize, 0, Math.PI * 2);
+                        freshCtx.fill();
+                        
+                        // Glow effect
+                        if (magnitude > 0.01) {
+                            const gradient = freshCtx.createRadialGradient(x, y, 0, x, y, pointSize * 2);
+                            gradient.addColorStop(0, `hsla(${hue}, 100%, 70%, ${magnitude})`);
+                            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                            freshCtx.fillStyle = gradient;
+                            freshCtx.beginPath();
+                            freshCtx.arc(x, y, pointSize * 2, 0, Math.PI * 2);
+                            freshCtx.fill();
+                        }
+                    }
+                    
+                    // Draw ring outline
+                    freshCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                    freshCtx.lineWidth = 1;
+                    freshCtx.beginPath();
+                    freshCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    freshCtx.stroke();
+                }
+                
+                // Calculate phase coherence
+                const vectorMagnitude = Math.sqrt(totalReal * totalReal + totalImag * totalImag);
+                const coherence = vectorMagnitude / totalMagnitude;
+                
+                // Update stats
+                document.getElementById('tValueSurface').textContent = t.toFixed(3);
+                document.getElementById('surfaceMagnitude').textContent = vectorMagnitude.toFixed(4);
+                document.getElementById('phaseCoherence').textContent = (coherence * 100).toFixed(2) + '%';
+                
+                // Find nearest known zero
+                const knownZeros = [14.134725, 21.022040, 25.010858, 30.424876, 32.935062];
+                let nearest = knownZeros[0];
+                let minDist = Math.abs(t - nearest);
+                for (const z of knownZeros) {
+                    const dist = Math.abs(t - z);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = z;
+                    }
+                }
+                document.getElementById('nearestZero').textContent = nearest.toFixed(3);
+                
+                // Draw center marker
+                freshCtx.fillStyle = '#4ecdc4';
+                freshCtx.beginPath();
+                freshCtx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+                freshCtx.fill();
+                
+                // Draw info text
+                freshCtx.fillStyle = coherence < 0.1 ? '#ff6384' : '#4ecdc4';
+                freshCtx.font = 'bold 16px Arial';
+                freshCtx.textAlign = 'center';
+                const statusText = coherence < 0.1 ? 'Near Zero! (Destructive)' : 'Constructive Interference';
+                freshCtx.fillText(statusText, centerX, height - 20);
+            };
+            
+            // Initialize at first zero
+            window.updateZetaSurface(14.134725);
+        }
+        
+        function generatePrimeRacesChartForExport(ctx, width, height, background) {
+            const { primes, modulus } = computationData;
+            const actualModulus = modulus;
+            const coprimeResidues = getCoprimeResidues(actualModulus);
+            const residues = coprimeResidues.slice(0, Math.min(8, coprimeResidues.length));
+            
+            const counts = {};
+            residues.forEach(r => counts[r] = 0);
+            
+            const raceData = [];
+            
+            for (const p of primes) {
+                if (p < actualModulus) continue;
+                const residue = p % actualModulus;
+                if (residues.includes(residue)) {
+                    counts[residue]++;
+                }
+                
+                const dataPoint = { x: p };
+                residues.forEach(r => dataPoint[`count_${r}`] = counts[r]);
+                if (residues.length >= 2) {
+                    dataPoint.diff = counts[residues[0]] - counts[residues[1]];
+                }
+                raceData.push(dataPoint);
+            }
+            
+            const lineColors = ['rgba(78, 205, 196, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 215, 0, 1)', 
+                              'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(75, 192, 192, 1)',
+                              'rgba(255, 99, 71, 1)', 'rgba(147, 112, 219, 1)'];
+            
+            const datasets = residues.map((r, idx) => ({
+                label: `≡ ${r} (mod ${actualModulus})`,
+                data: raceData.map(d => ({ x: d.x, y: d[`count_${r}`] })),
+                borderColor: background === 'white' ? lineColors[idx].replace('1)', '0.8)') : lineColors[idx],
+                backgroundColor: background === 'white' ? lineColors[idx].replace('1)', '0.1)') : lineColors[idx].replace('1)', '0.1)'),
+                borderWidth: 4,
+                fill: false,
+                tension: 0,
+                pointRadius: 0
+            }));
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: { datasets: datasets },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'x (prime value)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Count of Primes', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generateGoldbachCometForExport(ctx, width, height, background) {
+            const { primes } = computationData;
+            const primeSet = new Set(primes);
+            const maxN = primes[primes.length - 1];
+            const goldbachData = [];
+            
+            for (let n = 4; n <= maxN; n += 2) {
+                let count = 0;
+                for (const p of primes) {
+                    if (p > n / 2) break;
+                    const q = n - p;
+                    if (q >= 2 && primeSet.has(q)) {
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    goldbachData.push({ n: n, count: count });
+                }
+            }
+            
+            const maxCount = Math.max(...goldbachData.map(d => d.count));
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            return new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Goldbach Partitions',
+                        data: goldbachData.map(d => ({ x: d.n, y: d.count })),
+                        backgroundColor: function(context) {
+                            const count = context.raw.y;
+                            const ratio = count / maxCount;
+                            const hue = ratio * 240;
+                            return background === 'white' ? `hsla(${hue}, 70%, 50%, 0.7)` : `hsla(${hue}, 80%, 60%, 0.7)`;
+                        },
+                        borderColor: background === 'white' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(78, 205, 196, 0.3)',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: 'n (even number)', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'G(n) - Number of Prime Pair Partitions', 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.03) }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                font: { size: Math.floor(height * 0.025) }
+                            },
+                            grid: { color: background === 'white' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function generatePhasorSumForExport(ctx, width, height, background) {
+            const { primes, exponent } = computationData;
+            const sigma = exponent / 2;
+            const t = 14.134725; // First zero for export
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const scale = Math.min(width, height) * 0.4;
+            
+            // Draw on canvas directly
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#000000';
+            }
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw axes
+            ctx.strokeStyle = background === 'white' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(width, centerY);
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, height);
+            ctx.stroke();
+            
+            // Draw unit circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, scale, 0, Math.PI * 2);
+            ctx.strokeStyle = background === 'white' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Compute and draw phasors
+            let sumReal = 0, sumImag = 0;
+            let currentX = centerX, currentY = centerY;
+            const numPhasors = Math.min(50, primes.length);
+            
+            for (let i = 0; i < numPhasors; i++) {
+                const n = primes[i];
+                const radius = Math.pow(n, -sigma);
+                const angle = -t * Math.log(n);
+                
+                const real = radius * Math.cos(angle);
+                const imag = radius * Math.sin(angle);
+                
+                sumReal += real;
+                sumImag += imag;
+                
+                const nextX = currentX + real * scale;
+                const nextY = centerY - imag * scale;
+                
+                const hue = (i / numPhasors) * 280;
+                ctx.strokeStyle = background === 'white' ? `hsla(${hue}, 70%, 45%, 0.7)` : `hsla(${hue}, 80%, 60%, 0.7)`;
+                ctx.lineWidth = 3;
+                
+                ctx.beginPath();
+                ctx.moveTo(currentX, currentY);
+                ctx.lineTo(nextX, nextY);
+                ctx.stroke();
+                
+                currentX = nextX;
+                currentY = nextY;
+            }
+            
+            // Draw final sum
+            const finalX = centerX + sumReal * scale;
+            const finalY = centerY - sumImag * scale;
+            
+            ctx.strokeStyle = background === 'white' ? '#d4af37' : '#ffd700';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(finalX, finalY);
+            ctx.stroke();
+            
+            ctx.fillStyle = background === 'white' ? '#d4af37' : '#ffd700';
+            ctx.beginPath();
+            ctx.arc(finalX, finalY, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Labels
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            ctx.fillStyle = textColor;
+            ctx.font = `${height * 0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('Re', width - 40, centerY - 15);
+            ctx.fillText('Im', centerX + 20, 30);
+            
+            const magnitude = Math.sqrt(sumReal * sumReal + sumImag * sumImag);
+            ctx.font = `bold ${height * 0.03}px Arial`;
+            ctx.fillText(`ζ(${sigma} + ${t.toFixed(2)}i) ≈ ${magnitude.toFixed(3)}`, centerX, height - 30);
+            
+            return { destroy: () => {} };
+        }
+        
+        function generateZetaSurfaceForExport(ctx, width, height, background) {
+            const { primes, exponent } = computationData;
+            const sigma = exponent / 2;
+            const t = 14.134725; // First zero
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = Math.min(width, height) * 0.45;
+            
+            // Clear canvas
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#000000';
+            }
+            ctx.fillRect(0, 0, width, height);
+            
+            const maxModulus = 30;
+            const radiusStep = maxRadius / (maxModulus + 1);
+            
+            // For each modulus
+            for (let m = 1; m <= maxModulus; m++) {
+                const radius = m * radiusStep;
+                const coprimeResidues = getCoprimeResidues(m);
+                
+                // For each primitive residue
+                for (const k of coprimeResidues) {
+                    let sumReal = 0, sumImag = 0;
+                    
+                    for (const p of primes) {
+                        if (p % m === k) {
+                            const r = Math.pow(p, -sigma);
+                            const theta = -t * Math.log(p);
+                            sumReal += r * Math.cos(theta);
+                            sumImag += r * Math.sin(theta);
+                        }
+                    }
+                    
+                    const magnitude = Math.sqrt(sumReal * sumReal + sumImag * sumImag);
+                    
+                    const angle = 2 * Math.PI * k / m;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    
+                    const brightness = Math.min(255, magnitude * 500);
+                    const hue = (k / m) * 360;
+                    
+                    if (background === 'white') {
+                        ctx.fillStyle = `hsla(${hue}, 80%, ${30 + brightness/8}%, ${Math.min(1, magnitude * 2)})`;
+                    } else {
+                        ctx.fillStyle = `hsla(${hue}, 80%, ${brightness/4}%, ${Math.min(1, magnitude * 2)})`;
+                    }
+                    
+                    const pointSize = 3 + magnitude * 12;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pointSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    if (magnitude > 0.01) {
+                        const gradient = ctx.createRadialGradient(x, y, 0, x, y, pointSize * 2);
+                        if (background === 'white') {
+                            gradient.addColorStop(0, `hsla(${hue}, 90%, 50%, ${magnitude * 0.8})`);
+                        } else {
+                            gradient.addColorStop(0, `hsla(${hue}, 100%, 70%, ${magnitude})`);
+                        }
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(x, y, pointSize * 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                // Draw ring outline
+                ctx.strokeStyle = background === 'white' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Draw center
+            ctx.fillStyle = background === 'white' ? '#1e3c72' : '#4ecdc4';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Title
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${height * 0.03}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText(`Modular Zeta Surface at t = ${t.toFixed(3)} (First Zero)`, centerX, height - 30);
+            
+            return { destroy: () => {} };
         }
         
         function createGoldbachCometPlot(ctx) {
