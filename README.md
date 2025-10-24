@@ -3415,8 +3415,7 @@
             
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const baseScale = Math.min(canvas.width, canvas.height) / (2 * maxR) * 0.85;
-            const scale = baseScale * universalZoom;
+            const scale = Math.min(canvas.width, canvas.height) / (2 * maxR) * 0.85;
             
             // Clear canvas
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
@@ -3424,30 +3423,28 @@
             
             // Draw composite numbers first (background)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-            const pointSize = Math.max(1, 1.5 * universalZoom);
             for (const point of compositePoints) {
                 const screenX = centerX + point.x * scale;
                 const screenY = centerY + point.y * scale;
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, pointSize, 0, Math.PI * 2);
+                ctx.arc(screenX, screenY, 1.5, 0, Math.PI * 2);
                 ctx.fill();
             }
             
             // Draw primes (foreground)
             ctx.fillStyle = '#ffd700';
-            const primePointSize = Math.max(2, 2.5 * universalZoom);
             for (const point of primePoints) {
                 const screenX = centerX + point.x * scale;
                 const screenY = centerY + point.y * scale;
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, primePointSize, 0, Math.PI * 2);
+                ctx.arc(screenX, screenY, 2.5, 0, Math.PI * 2);
                 ctx.fill();
             }
             
             // Draw center marker
             ctx.fillStyle = '#4ecdc4';
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 4 * universalZoom, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
             ctx.fill();
             
             // Add hover interaction
@@ -4264,6 +4261,14 @@
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Density Heatmap</h4>
                 <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Visualization Mode:</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
+                        <button onclick="setHeatmapMode('square')" id="heatmapSquare" style="padding: 8px; background: rgba(78, 205, 196, 0.3); border: 2px solid #4ecdc4; border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.85em;">Square Grid</button>
+                        <button onclick="setHeatmapMode('circle')" id="heatmapCircle" style="padding: 8px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.85em;">Circular</button>
+                        <button onclick="setHeatmapMode('hexagon')" id="heatmapHexagon" style="padding: 8px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.85em;">Hexagonal</button>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Grid Size: <span id="heatmapGrid">50</span>x<span id="heatmapGridY">50</span></label>
                     <input type="range" id="heatmapGridSlider" min="20" max="100" step="5" value="50" 
                            style="width: 100%; margin-top: 8px;"
@@ -4273,6 +4278,30 @@
                     Red = High prime density | Blue = Low density. Hover to see exact counts.
                 </div>
             `;
+            
+            let heatmapMode = 'square';
+            
+            window.setHeatmapMode = (mode) => {
+                heatmapMode = mode;
+                
+                // Update button styles
+                ['heatmapSquare', 'heatmapCircle', 'heatmapHexagon'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) {
+                        if ((mode === 'square' && id === 'heatmapSquare') ||
+                            (mode === 'circle' && id === 'heatmapCircle') ||
+                            (mode === 'hexagon' && id === 'heatmapHexagon')) {
+                            btn.style.background = 'rgba(78, 205, 196, 0.3)';
+                            btn.style.borderColor = '#4ecdc4';
+                        } else {
+                            btn.style.background = 'rgba(255, 255, 255, 0.1)';
+                            btn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        }
+                    }
+                });
+                
+                updateHeatmap(parseInt(document.getElementById('heatmapGridSlider').value));
+            };
             
             window.updateHeatmap = (gridSize = 50) => {
                 const canvas = document.getElementById('vizCanvas');
@@ -4308,30 +4337,64 @@
                     }
                 }
                 
-                // Draw heatmap
+                // Draw heatmap based on mode
                 for (let i = 0; i < gridSize; i++) {
                     for (let j = 0; j < gridSize; j++) {
                         const density = densityGrid[i][j];
                         const ratio = density / maxDensity;
                         
-                        // Color from blue (low) to red (high)
                         const hue = (1 - ratio) * 240;
                         freshCtx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
                         
                         const screenX = offsetX + j * cellSize;
                         const screenY = offsetY + i * cellSize;
-                        freshCtx.fillRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                        
+                        if (heatmapMode === 'square') {
+                            freshCtx.fillRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                        } else if (heatmapMode === 'circle') {
+                            freshCtx.beginPath();
+                            freshCtx.arc(screenX + cellSize/2, screenY + cellSize/2, cellSize/2 - 1, 0, Math.PI * 2);
+                            freshCtx.fill();
+                        } else if (heatmapMode === 'hexagon') {
+                            drawHexagon(freshCtx, screenX + cellSize/2, screenY + cellSize/2, cellSize/2 - 1);
+                        }
                     }
                 }
                 
                 document.getElementById('heatmapGrid').textContent = gridSize;
                 document.getElementById('heatmapGridY').textContent = gridSize;
                 
-                // Hover
+                // Smart hover with adaptive tooltip positioning
                 canvas.onmousemove = (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    const mouseX = e.clientX - rect.left;
-                    const mouseY = e.clientY - rect.top;
+                    // Redraw
+                    freshCtx.fillStyle = '#000';
+                    freshCtx.fillRect(0, 0, rect.width, rect.height);
+                    
+                    for (let i = 0; i < gridSize; i++) {
+                        for (let j = 0; j < gridSize; j++) {
+                            const density = densityGrid[i][j];
+                            const ratio = density / maxDensity;
+                            const hue = (1 - ratio) * 240;
+                            freshCtx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
+                            
+                            const screenX = offsetX + j * cellSize;
+                            const screenY = offsetY + i * cellSize;
+                            
+                            if (heatmapMode === 'square') {
+                                freshCtx.fillRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                            } else if (heatmapMode === 'circle') {
+                                freshCtx.beginPath();
+                                freshCtx.arc(screenX + cellSize/2, screenY + cellSize/2, cellSize/2 - 1, 0, Math.PI * 2);
+                                freshCtx.fill();
+                            } else if (heatmapMode === 'hexagon') {
+                                drawHexagon(freshCtx, screenX + cellSize/2, screenY + cellSize/2, cellSize/2 - 1);
+                            }
+                        }
+                    }
+                    
+                    const rect2 = canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect2.left;
+                    const mouseY = e.clientY - rect2.top;
                     
                     const j = Math.floor((mouseX - offsetX) / cellSize);
                     const i = Math.floor((mouseY - offsetY) / cellSize);
@@ -4344,19 +4407,74 @@
                         const screenX = offsetX + j * cellSize;
                         const screenY = offsetY + i * cellSize;
                         
+                        // Highlight cell
                         freshCtx.strokeStyle = '#fff';
-                        freshCtx.lineWidth = 2;
-                        freshCtx.strokeRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                        freshCtx.lineWidth = 3;
+                        if (heatmapMode === 'square') {
+                            freshCtx.strokeRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                        } else if (heatmapMode === 'circle') {
+                            freshCtx.beginPath();
+                            freshCtx.arc(screenX + cellSize/2, screenY + cellSize/2, cellSize/2 - 1, 0, Math.PI * 2);
+                            freshCtx.stroke();
+                        } else if (heatmapMode === 'hexagon') {
+                            drawHexagon(freshCtx, screenX + cellSize/2, screenY + cellSize/2, cellSize/2 - 1, true);
+                        }
                         
-                        freshCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-                        freshCtx.fillRect(mouseX + 10, mouseY - 40, 180, 35);
+                        // Smart tooltip positioning
+                        const tooltipWidth = 200;
+                        const tooltipHeight = 50;
+                        let tooltipX = mouseX + 15;
+                        let tooltipY = mouseY - 40;
+                        
+                        // If in top half, show below
+                        if (mouseY < rect.height / 2) {
+                            tooltipY = mouseY + 15;
+                        }
+                        
+                        // If too far right, move left
+                        if (tooltipX + tooltipWidth > rect.width) {
+                            tooltipX = mouseX - tooltipWidth - 15;
+                        }
+                        
+                        // If too far down, move up
+                        if (tooltipY + tooltipHeight > rect.height) {
+                            tooltipY = rect.height - tooltipHeight - 10;
+                        }
+                        
+                        // Draw tooltip
+                        freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                        freshCtx.fillRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+                        freshCtx.strokeStyle = '#4ecdc4';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.strokeRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
+                        
                         freshCtx.fillStyle = '#fff';
-                        freshCtx.font = '13px Arial';
-                        freshCtx.fillText(`Range: [${rangeStart}, ${rangeEnd})`, mouseX + 15, mouseY - 22);
-                        freshCtx.fillText(`Primes: ${density}`, mouseX + 15, mouseY - 8);
+                        freshCtx.font = 'bold 13px Arial';
+                        freshCtx.fillText(`Range: [${rangeStart}, ${rangeEnd})`, tooltipX + 10, tooltipY + 20);
+                        freshCtx.fillText(`Primes: ${density}`, tooltipX + 10, tooltipY + 38);
                     }
                 };
             };
+            
+            function drawHexagon(ctx, x, y, radius, strokeOnly = false) {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    const hx = x + radius * Math.cos(angle);
+                    const hy = y + radius * Math.sin(angle);
+                    if (i === 0) {
+                        ctx.moveTo(hx, hy);
+                    } else {
+                        ctx.lineTo(hx, hy);
+                    }
+                }
+                ctx.closePath();
+                if (strokeOnly) {
+                    ctx.stroke();
+                } else {
+                    ctx.fill();
+                }
+            }
             
             window.updateHeatmap(50);
         }
@@ -5996,8 +6114,8 @@
                             return `hsla(${hue}, 80%, 60%, 0.7)`;
                         },
                         borderColor: 'rgba(78, 205, 196, 0.3)',
-                        pointRadius: 3 * universalZoom,
-                        pointHoverRadius: 6 * universalZoom
+                        pointRadius: 3,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
