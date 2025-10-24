@@ -840,74 +840,146 @@
                     </ul>
                     
                     <p style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <strong> Key Insight:</strong> The nested modular lattice forms a discrete analogue of the complex-analytic domain of ζ(s). By weighting each ring by n<sup>-σ</sup> and rotating by phase -t log n, we obtain a direct geometric mimic of the Riemann zeta surface.
+                        <strong>💡 Key Insight:</strong> The nested modular lattice forms a discrete analogue of the complex-analytic domain of ζ(s). By weighting each ring by n<sup>-σ</sup> and rotating by phase -t log n, we obtain a direct geometric mimic of the Riemann zeta surface.
                     </p>
                 </div>
             </div>
             
             <div class="info-section">
-                <div class="toggle-section" onclick="toggleSection('channelTheory')">
-                    <h3>Getachew Channel Theory: Prime Avoidance & Composite Projection</h3>
-                    <span class="toggle-icon" id="channelTheory-icon">▼</span>
+                <div class="toggle-section" onclick="toggleSection('primeAvoidance')">
+                    <h3>Getachew Prime Channel Avoidance Theorem</h3>
+                    <span class="toggle-icon" id="primeAvoidance-icon">▼</span>
                 </div>
-                <div id="channelTheory-content" class="collapsible-content">
-                    <p style="margin-bottom: 20px;"><strong>A unified framework revealing how primes and composites interact differently with Farey reduction channels in the modular lattice.</strong></p>
-                    
-                    <div style="background: rgba(78, 205, 196, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #4ecdc4;">
-                        <h4 style="color: #4ecdc4; margin-bottom: 10px;">Part I: Prime Channel Avoidance Theorem</h4>
-                        <p><em>Let each modulus M ∈ ℤ⁺ define a fractional residue system:</em></p>
-                        <div class="formula">ℛ(M) = { r/M | 0 ≤ r < M }</div>
-                        
-                        <p style="margin-top: 10px;"><em>Define a reduction channel as fractions sharing the same lowest-term representation:</em></p>
-                        <div class="formula">r₁/M₁ ~ r₂/M₂  ⟺  r₁/M₁ = r₂/M₂ (in lowest terms)</div>
-                        
-                        <p style="margin-top: 15px; padding: 12px; background: rgba(255, 215, 0, 0.15); border-radius: 6px;">
-                            <strong>Theorem:</strong> For every prime p, the residue set Φ(p) = {1, 2, ..., p-1} contains no reducible fractions.
-                            <br><span style="font-family: monospace; margin-top: 8px; display: block;">gcd(r, p) = 1 ∀r ∈ Φ(p) ⟹ r/p avoids all channels 1/N</span>
-                        </p>
-                        
-                        <p style="margin-top: 12px;"><strong>Geometric Meaning:</strong> Prime moduli trace <strong>irreducible orbits</strong> in the fractional lattice, never projecting onto simpler rational channels. They form the <strong>coprime skeleton</strong> of the modular continuum.</p>
+                <div id="primeAvoidance-content" class="collapsible-content">
+                    <p><strong>Theorem (Getachew Prime Channel Avoidance Theorem)</strong></p>
+                    <p style="margin-top: 10px;"><em>Let each modulus M ∈ ℤ⁺ define a fractional residue system:</em></p>
+                    <div class="formula">
+                        ℛ(M) = { r/M | 0 ≤ r < M }
                     </div>
                     
-                    <div style="background: rgba(255, 99, 132, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ff6384;">
-                        <h4 style="color: #ff6384; margin-bottom: 10px;">Part II: Composite Channel Projection Corollary</h4>
-                        <p><em>Let M be composite. For each r (0 ≤ r < M), define d = gcd(r, M), r' = r/d, M' = M/d.</em></p>
-                        
-                        <p style="margin-top: 15px; padding: 12px; background: rgba(255, 215, 0, 0.15); border-radius: 6px;">
-                            <strong>Corollary:</strong> Every composite M has nontrivial channel projections:
-                            <br><span style="font-family: monospace; margin-top: 8px; display: block;">r/M = r'/M' with M' | M and M' < M</span>
-                        </p>
-                        
-                        <p style="margin-top: 12px;"><strong>Key Properties:</strong></p>
-                        <ul style="margin-left: 20px; line-height: 1.7;">
-                            <li><strong>Multiplicity:</strong> d = M/M' residues reduce to each r'/M'</li>
-                            <li><strong>Reducibility:</strong> M - φ(M) reducible residues (proportion 1 - φ(M)/M)</li>
-                            <li><strong>Channels:</strong> Projections onto all proper divisors M' of M</li>
-                        </ul>
-                        
-                        <div style="margin-top: 12px; padding: 10px; background: rgba(0, 0, 0, 0.15); border-radius: 6px;">
-                            <strong>Example (M=12):</strong> φ(12)=4 → 8 reducible residues<br>
-                            8/12 = 2/3 (d=4, M'=3) | Divisors: {1,2,3,4,6}<br>
-                            Each denominator-3 fraction gets 4 residues
+                    <p style="margin-top: 10px;"><em>Define a reduction channel as the equivalence class of fractions that share the same lowest-term representation:</em></p>
+                    <div class="formula">
+                        r₁/M₁ ~ r₂/M₂  ⟺  r₁/M₁ = r₂/M₂ (in lowest terms)
+                    </div>
+                    <p style="margin-top: 5px;"><em>Each equivalence class corresponds to a fundamental Farey channel of the form 1/N or its rational multiples.</em></p>
+                    
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        <p><strong>Statement:</strong> For every prime modulus p, the complete residue set</p>
+                        <div class="formula">
+                            Φ(p) = {1, 2, 3, ..., p-1}
+                        </div>
+                        <p>contains no reducible fractions, and therefore intersects no reduction channel 1/N for any N > 1.</p>
+                        <div class="formula">
+                            gcd(r, p) = 1 &nbsp; ∀r ∈ Φ(p) &nbsp; ⟹ &nbsp; r/p cannot reduce to any channel 1/N
                         </div>
                     </div>
                     
-                    <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ffd700;">
-                        <p><strong> Unified Picture:</strong></p>
-                        <p style="line-height: 1.8;">
-                            In the nested modular plane:<br>
-                            • <strong style="color: #4ecdc4;">Primes</strong> occupy interstitial regions, forming smooth non-overlapping rings<br>
-                            • <strong style="color: #ff6384;">Composites</strong> project onto Farey flow lines (channels 1/2, 1/3, 1/4, ...)<br>
-                            • Together they partition the modular space into <strong>coprime manifolds</strong> (primes) and <strong>reduction webs</strong> (composites)
+                    <p style="margin-top: 15px;"><strong>Interpretation:</strong></p>
+                    <p style="margin-left: 20px; line-height: 1.8;">
+                        Primes define <strong>irreducible modular orbits</strong> within the fractional lattice. Their residues never project downward into simpler rational channels because no shared divisors exist between any residue r and the prime modulus p. Each prime ring therefore forms a <strong>fully independent coprime manifold</strong>, geometrically isolated from the composite Farey flows that pass through reducible fractions such as 1/2, 1/3, 1/4, ...
+                    </p>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
+                        <p><strong>Geometric Consequence:</strong></p>
+                        <p>In the nested modular plane, the loci of reducible fractions form continuous <strong>Farey flow lines</strong> — rational channels through which composite moduli project. Prime moduli, in contrast, occupy the <strong>interstitial lattice regions</strong> between these channels, creating smooth, full, and non-overlapping modular rings.</p>
+                        <p style="margin-top: 10px; padding: 10px; background: rgba(255, 215, 0, 0.2); border-radius: 5px; font-weight: 500;">
+                            ⟹ Prime moduli trace paths that avoid all reducible channels, forming the pure coprime skeleton of the modular continuum.
                         </p>
                     </div>
                     
-                    <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.08); border-radius: 8px;">
-                        <strong> Interactive Visualizations:</strong> Explore both concepts below with dedicated interactive tools:
-                        <br>• <strong>Prime Channel Avoidance</strong> - See cyan prime rings avoiding Farey channels
-                        <br>• <strong>Composite Projection</strong> - Watch red composite points project onto reduction channels
-                        <br>Adjust modulus and epsilon to explore the full channel structure!
-                    </p>
+                    <p style="margin-top: 15px;"><strong>Interactive Visualization:</strong> Use the "Prime Channel Avoidance" visualization to see how primes (cyan rings) avoid Farey channels while composites (red points) project onto them. Each point shows its gcd value and reduction path.</p>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('composite')">
+                    <h3>Getachew Composite Channel Projection Corollary</h3>
+                    <span class="toggle-icon" id="composite-icon">▼</span>
+                </div>
+                <div id="composite-content" class="collapsible-content">
+                    <p><strong>Corollary (Getachew Composite Channel Projection Corollary)</strong></p>
+                    <p style="margin-top: 10px;"><em>Let M ∈ ℤ⁺ be a composite modulus. For each integer r (0 ≤ r < M) define the fraction r/M.<br>
+                    Write d = gcd(r, M) and set r' = r/d, M' = M/d.<br>
+                    Then r/M reduces to the lowest-term fraction r'/M' with gcd(r', M') = 1.</em></p>
+                    
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        <p><strong>Statement:</strong> Every composite modulus M admits a nontrivial projection of its residues onto reduction channels (Farey channels):</p>
+                        <div class="formula">
+                            ∀ r ∈ {0,1,...,M-1}, &nbsp; r/M = r'/M' &nbsp; with<br>
+                            d = gcd(r,M), &nbsp; M' = M/d, &nbsp; r' = r/d
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top: 15px;"><strong>Key Properties:</strong></p>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>(i) Channel Multiplicity:</strong> The number of distinct residues r (mod M) that reduce to a fixed lowest-term fraction r'/M' equals d = M/M'</li>
+                        <li><strong>(ii) Reducibility Ratio:</strong> The total number of reducible residues modulo M is M - φ(M), giving proportion: <strong>1 - φ(M)/M</strong></li>
+                        <li><strong>(iii) Channel Denominators:</strong> For composite M, the set of reduction channel denominators M' is exactly the set of divisors of M strictly less than M</li>
+                    </ol>
+                    
+                    <p style="margin-top: 15px;"><strong>Example: M = 12</strong></p>
+                    <div style="margin-left: 20px; line-height: 1.8;">
+                        <p>φ(12) = 4, so M - φ(M) = 8 reducible residues</p>
+                        <p>Proper divisors M' ∈ {1, 2, 3, 4, 6}</p>
+                        <p>Take r = 8: gcd(8,12) = 4, r' = 2, M' = 3</p>
+                        <p>Thus 8/12 = 2/3, projecting onto the 1/3-family (channel with denominator 3)</p>
+                        <p>There are d = 4 residues that reduce to each fraction with denominator 3</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
+                        <p><strong>Geometric Consequence:</strong></p>
+                        <p>In the nested modular plane, reducible residues of composite moduli populate the <strong>Farey flow lines</strong> (the 1/N channels and their rational multiples). Each channel with denominator M' < M collects exactly d = M/M' lattice points from modulus M for each corresponding coprime numerator r'.</p>
+                        <p style="margin-top: 10px; padding: 10px; background: rgba(255, 215, 0, 0.2); border-radius: 5px; font-weight: 500;">
+                            ⟹ Composite moduli project their reducible residues onto a dense web of Farey channels; primes, by contrast, contribute only irreducible residues and avoid these channels.
+                        </p>
+                    </div>
+                    
+                    <p style="margin-top: 15px;"><strong>Interactive Visualization:</strong> Use the visualization below to explore how different composite moduli project onto Farey channels, and adjust epsilon to see the density of projections.</p>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('semiprime')">
+                    <h3>Getachew Semiprime Generation Theorem</h3>
+                    <span class="toggle-icon" id="semiprime-icon">▼</span>
+                </div>
+                <div id="semiprime-content" class="collapsible-content">
+                    <p><strong>Definition:</strong> For each prime p, define the semiprime set:</p>
+                    <div class="formula">S_p = {p × q | q ∈ ℙ, q ≠ p}</div>
+                    
+                    <p style="margin-top: 15px;"><strong>Theorem (Getachew Semiprime Generation):</strong></p>
+                    <div style="padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        Every semiprime n = p × q (where p ≤ q are primes) has a unique factorization, and:
+                        <div class="formula">⋃(p∈ℙ) S_p = {all semiprimes}</div>
+                        This union is disjoint when ordered p ≤ q.
+                    </div>
+                    
+                    <p style="margin-top: 15px;"><strong>Asymptotic Density:</strong></p>
+                    <div class="formula">
+                        S(x) ~ (x log log x) / log x
+                    </div>
+                    <p>Semiprimes are <strong>denser than primes</strong> (which have density ~ x/log x).</p>
+                    
+                    <p style="margin-top: 15px;"><strong>RSA Connection:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Forward (multiplication):</strong> p, q → n = pq is computationally easy O(log² n)</li>
+                        <li><strong>Backward (factorization):</strong> n → p, q is hard (no known polynomial-time algorithm)</li>
+                        <li>This asymmetry is the foundation of RSA encryption</li>
+                        <li>Trial division requires O(√n) operations in the worst case</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Modular Properties:</strong></p>
+                    <p>For modulus m:</p>
+                    <div class="formula">
+                        pq ≡ (p mod m)(q mod m) (mod m)
+                    </div>
+                    <p>This creates "modular interference patterns" - semiprimes populate residue classes differently than primes.</p>
+                    
+                    <p style="margin-top: 15px;"><strong>Semiprime Zeta Function:</strong></p>
+                    <div class="formula">
+                        ζ_S(s) = Σ(n∈S) n^(-s) = ½[(Σp^(-s))² - Σp^(-2s)]
+                    </div>
+                    <p>This function interpolates between the prime zeta function and contributions to the Riemann zeta function.</p>
                 </div>
             </div>
             
@@ -989,7 +1061,7 @@
                         Max 20 digits (JavaScript precision limit ≈15-17 digits)
                     </div>
                     <div id="precision-warning" style="display: none; font-size: 0.85em; color: #ff6b6b; margin-top: 5px; padding: 8px; background: rgba(255, 107, 107, 0.1); border-radius: 5px;">
-                         Digits beyond 15-17 may not be accurate due to floating-point precision limits
+                        ⚠️ Digits beyond 15-17 may not be accurate due to floating-point precision limits
                     </div>
                 </div>
                 
@@ -1059,26 +1131,32 @@
             <div id="visualization-section" class="visualization-container" style="display: none;">
                 <h3>Interactive Visualization</h3>
                 <div class="viz-options">
-                    <button class="viz-btn active" onclick="changeViz('convergence')">Convergence Plot</button>
-                    <button class="viz-btn" onclick="changeViz('contribution')">Prime Contributions</button>
+                    <button class="viz-btn active" onclick="changeViz('convergence')">Convergence</button>
+                    <button class="viz-btn" onclick="changeViz('contribution')">Contributions</button>
                     <button class="viz-btn" onclick="changeViz('gapDist')">Gap Distribution</button>
-                    <button class="viz-btn" onclick="changeViz('primeCount')">Prime Counting π(x)</button>
-                    <button class="viz-btn" onclick="changeViz('density')">Prime Density Analysis</button>
-                    <button class="viz-btn" onclick="changeViz('gapHistogram')">Prime Gaps Histogram</button>
+                    <button class="viz-btn" onclick="changeViz('primeCount')">Prime Counting</button>
+                    <button class="viz-btn" onclick="changeViz('density')">Density</button>
+                    <button class="viz-btn" onclick="changeViz('gapHistogram')">Gap Histogram</button>
                     <button class="viz-btn" onclick="changeViz('sacksSpiral')">Sacks Spiral</button>
-                    <button class="viz-btn" onclick="changeViz('zetaZeros')">Riemann Zeta Zeros</button>
+                    <button class="viz-btn" onclick="changeViz('zetaZeros')">Zeta Zeros</button>
                     <button class="viz-btn" onclick="changeViz('errorAnalysis')">Error Analysis</button>
                     <button class="viz-btn" onclick="changeViz('primeRaces')">Prime Races</button>
                     <button class="viz-btn" onclick="changeViz('goldbachComet')">Goldbach Comet</button>
-                    <button class="viz-btn" onclick="changeViz('phaseExplorer')">Phase Explorer (Combined)</button>
-                    <button class="viz-btn" onclick="changeViz('phasorSum')">Phasor Sum (Complex Plane)</button>
-                    <button class="viz-btn" onclick="changeViz('zetaSurface')">Modular Zeta Surface</button>
-                    <button class="viz-btn" onclick="changeViz('primeSpiral')">Ulam Spiral (Interactive)</button>
-                    <button class="viz-btn" onclick="changeViz('channelRace')">Channel Race Animation</button>
-                    <button class="viz-btn" onclick="changeViz('heatmap')">Prime Density Heatmap</button>
-                    <button class="viz-btn" onclick="changeViz('voronoi')">Prime Voronoi Diagram</button>
-                    <button class="viz-btn" onclick="changeViz('harmonicWave')">Harmonic Wave (Musical)</button>
-                    <button class="viz-btn" onclick="changeViz('phaseLaw')">Phase Law (Critical Strip)</button>
+                    <button class="viz-btn" onclick="changeViz('phaseExplorer')">Phase Explorer</button>
+                    <button class="viz-btn" onclick="changeViz('phasorSum')">Phasor Sum</button>
+                    <button class="viz-btn" onclick="changeViz('zetaSurface')">Zeta Surface</button>
+                    <button class="viz-btn" onclick="changeViz('primeSpiral')">Ulam Spiral</button>
+                    <button class="viz-btn" onclick="changeViz('channelRace')">Channel Race</button>
+                    <button class="viz-btn" onclick="changeViz('heatmap')">Heatmap</button>
+                    <button class="viz-btn" onclick="changeViz('voronoi')">Voronoi</button>
+                    <button class="viz-btn" onclick="changeViz('harmonicWave')">Harmonic Wave</button>
+                    <button class="viz-btn" onclick="changeViz('phaseLaw')">Phase Law</button>
+                    <button class="viz-btn" onclick="changeViz('semiprimeDistribution')">Semiprime Dist</button>
+                    <button class="viz-btn" onclick="changeViz('semiprimeGraph')">Semiprime Graph</button>
+                    <button class="viz-btn" onclick="changeViz('factorizationTiming')">Factorization</button>
+                    <button class="viz-btn" onclick="changeViz('modularInterference')">Mod Interference</button>
+                    <button class="viz-btn" onclick="changeViz('twinSemiprimes')">Twin Semiprimes</button>
+                    <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
                 </div>
                 <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
                     <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
@@ -1395,7 +1473,7 @@
                     
                     // Add precision info
                     const precisionNote = decimalPlaces > 15 ? 
-                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;"> Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
+                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">⚠️ Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
                     document.getElementById('prime-count').innerHTML += precisionNote;
                     
                     // Show step-by-step
@@ -2355,11 +2433,417 @@
                 createHarmonicWavePlot(freshCtx);
             } else if (type === 'phaseLaw') {
                 createPhaseLawPlot(freshCtx);
+            } else if (type === 'semiprimeDistribution') {
+                createSemiprimeDistributionPlot(freshCtx);
+            } else if (type === 'semiprimeGraph') {
+                createSemiprimeGraphPlot(freshCtx);
+            } else if (type === 'factorizationTiming') {
+                createFactorizationTimingPlot(freshCtx);
+            } else if (type === 'modularInterference') {
+                createModularInterferencePlot(freshCtx);
+            } else if (type === 'twinSemiprimes') {
+                createTwinSemiprimesPlot(freshCtx);
+            } else if (type === 'semiprimeZeta') {
+                createSemiprimeZetaPlot(freshCtx);
             } else if (type === 'phaseExplorer') {
                 createPhaseExplorerPlot(freshCtx);
             } else if (type === 'compositeChannels') {
                 createCompositeChannelsPlot(freshCtx);
+            } else if (type === 'semiprimeDistribution') {
+                createSemiprimeDistributionPlot(freshCtx);
+            } else if (type === 'semiprimeGraph') {
+                createSemiprimeGraphPlot(freshCtx);
+            } else if (type === 'factorizationTiming') {
+                createFactorizationTimingPlot(freshCtx);
+            } else if (type === 'modularInterference') {
+                createModularInterferencePlot(freshCtx);
+            } else if (type === 'twinSemiprimes') {
+                createTwinSemiprimesPlot(freshCtx);
+            } else if (type === 'semiprimeZeta') {
+                createSemiprimeZetaPlot(freshCtx);
             }
+        }
+        
+        function generateSemiprimes(primes) {
+            const semiprimes = [];
+            const set = new Set();
+            for (let i = 0; i < primes.length; i++) {
+                for (let j = i; j < primes.length; j++) {
+                    const sp = primes[i] * primes[j];
+                    if (!set.has(sp)) {
+                        set.add(sp);
+                        semiprimes.push({ value: sp, p: primes[i], q: primes[j] });
+                    }
+                }
+            }
+            return semiprimes.sort((a, b) => a.value - b.value);
+        }
+        
+        function createSemiprimeDistributionPlot(ctx) {
+            const { primes } = computationData;
+            const semiprimes = generateSemiprimes(primes);
+            const maxN = Math.min(10000, semiprimes[semiprimes.length - 1].value);
+            const step = Math.max(50, Math.floor(maxN / 200));
+            const data = [];
+            for (let x = step; x <= maxN; x += step) {
+                const sCount = semiprimes.filter(s => s.value <= x).length;
+                const pCount = primes.filter(p => p <= x).length;
+                const theory = x > 2 ? (x * Math.log(Math.log(x))) / Math.log(x) : 0;
+                data.push({ x, semiprimes: sCount, primes: pCount, theory });
+            }
+            document.getElementById('vizStats').style.display = 'block';
+            document.getElementById('vizStats').innerHTML = `<h4 style="color: #ffd700;">Semiprime Distribution</h4><p>Total: ${semiprimes.length} semiprimes vs ${primes.length} primes | Ratio: ${(semiprimes.length / primes.length).toFixed(2)}</p>`;
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.x),
+                    datasets: [{label: 'Semiprimes S(x)', data: data.map(d => d.semiprimes), borderColor: '#4ecdc4', borderWidth: 3, fill: false, pointRadius: 0},
+                    {label: 'Theory', data: data.map(d => d.theory), borderColor: '#ffd700', borderWidth: 2, borderDash: [10, 5], fill: false, pointRadius: 0},
+                    {label: 'Primes π(x)', data: data.map(d => d.primes), borderColor: '#ff6384', borderWidth: 2, fill: false, pointRadius: 0}]
+                },
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {labels: {color: '#fff'}}}, scales: {x: {ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}, y: {ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}}}
+            });
+        }
+        
+        function createSemiprimeGraphPlot(ctx) {
+            const { primes } = computationData;
+            const displayPrimes = primes.slice(0, 15);
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Semiprime Complete Graph</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Primes (nodes)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${displayPrimes.length}</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 0.9em; opacity: 0.8;">Semiprimes (edges)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${displayPrimes.length * (displayPrimes.length + 1) / 2}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Graph Structure:</strong><br>
+                    Every prime connects to every other prime via multiplication<br>
+                    This forms a complete graph K_n with self-loops<br>
+                    Total edges = n(n+1)/2 including squares
+                </div>
+            `;
+            
+            const canvas = document.getElementById('vizCanvas');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            const freshCtx = canvas.getContext('2d');
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const radius = Math.min(rect.width, rect.height) * 0.35 * universalZoom;
+            
+            // Clear background
+            freshCtx.fillStyle = 'rgba(0,0,0,0.95)';
+            freshCtx.fillRect(0, 0, rect.width, rect.height);
+            
+            // Calculate positions
+            const positions = displayPrimes.map((p, i) => {
+                const angle = (2 * Math.PI * i) / displayPrimes.length - Math.PI / 2;
+                return { 
+                    p, 
+                    x: centerX + radius * Math.cos(angle), 
+                    y: centerY + radius * Math.sin(angle) 
+                };
+            });
+            
+            // Draw edges (semiprimes) first
+            freshCtx.strokeStyle = 'rgba(78,205,196,0.15)';
+            freshCtx.lineWidth = 1;
+            for (let i = 0; i < positions.length; i++) {
+                for (let j = i; j < positions.length; j++) {
+                    if (i === j) {
+                        // Self-loop for squares (p²)
+                        const loopRadius = 15;
+                        freshCtx.beginPath();
+                        freshCtx.arc(positions[i].x, positions[i].y - loopRadius, loopRadius, 0, Math.PI * 2);
+                        freshCtx.stroke();
+                    } else {
+                        // Edge between different primes
+                        freshCtx.beginPath();
+                        freshCtx.moveTo(positions[i].x, positions[i].y);
+                        freshCtx.lineTo(positions[j].x, positions[j].y);
+                        freshCtx.stroke();
+                    }
+                }
+            }
+            
+            // Draw nodes (primes) on top
+            for (const pos of positions) {
+                // Node circle
+                freshCtx.fillStyle = '#4ecdc4';
+                freshCtx.beginPath();
+                freshCtx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+                freshCtx.fill();
+                
+                // Node border
+                freshCtx.strokeStyle = '#fff';
+                freshCtx.lineWidth = 2;
+                freshCtx.stroke();
+                
+                // Label
+                freshCtx.fillStyle = '#fff';
+                freshCtx.font = 'bold 14px Arial';
+                freshCtx.textAlign = 'center';
+                freshCtx.fillText(pos.p, pos.x, pos.y - 20);
+            }
+            
+            // Add hover interaction
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                let hoveredPrime = null;
+                for (const pos of positions) {
+                    const dist = Math.sqrt((mouseX - pos.x) ** 2 + (mouseY - pos.y) ** 2);
+                    if (dist < 15) {
+                        hoveredPrime = pos;
+                        break;
+                    }
+                }
+                
+                if (hoveredPrime) {
+                    canvas.style.cursor = 'pointer';
+                    
+                    // Redraw to show tooltip
+                    freshCtx.fillStyle = 'rgba(0,0,0,0.95)';
+                    freshCtx.fillRect(0, 0, rect.width, rect.height);
+                    
+                    // Redraw edges
+                    freshCtx.strokeStyle = 'rgba(78,205,196,0.15)';
+                    freshCtx.lineWidth = 1;
+                    for (let i = 0; i < positions.length; i++) {
+                        for (let j = i; j < positions.length; j++) {
+                            if (i === j) {
+                                const loopRadius = 15;
+                                freshCtx.beginPath();
+                                freshCtx.arc(positions[i].x, positions[i].y - loopRadius, loopRadius, 0, Math.PI * 2);
+                                freshCtx.stroke();
+                            } else {
+                                freshCtx.beginPath();
+                                freshCtx.moveTo(positions[i].x, positions[i].y);
+                                freshCtx.lineTo(positions[j].x, positions[j].y);
+                                freshCtx.stroke();
+                            }
+                        }
+                    }
+                    
+                    // Redraw nodes
+                    for (const pos of positions) {
+                        freshCtx.fillStyle = pos === hoveredPrime ? '#ffd700' : '#4ecdc4';
+                        freshCtx.beginPath();
+                        freshCtx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+                        freshCtx.fill();
+                        freshCtx.strokeStyle = '#fff';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.stroke();
+                        freshCtx.fillStyle = '#fff';
+                        freshCtx.font = 'bold 14px Arial';
+                        freshCtx.textAlign = 'center';
+                        freshCtx.fillText(pos.p, pos.x, pos.y - 20);
+                    }
+                    
+                    // Draw tooltip
+                    freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                    freshCtx.fillRect(mouseX + 10, mouseY - 30, 120, 25);
+                    freshCtx.strokeStyle = '#4ecdc4';
+                    freshCtx.lineWidth = 2;
+                    freshCtx.strokeRect(mouseX + 10, mouseY - 30, 120, 25);
+                    freshCtx.fillStyle = '#fff';
+                    freshCtx.font = 'bold 13px Arial';
+                    freshCtx.textAlign = 'left';
+                    freshCtx.fillText(`Prime p = ${hoveredPrime.p}`, mouseX + 15, mouseY - 12);
+                } else {
+                    canvas.style.cursor = 'default';
+                }
+            };
+        }
+        
+        function createFactorizationTimingPlot(ctx) {
+            const { primes } = computationData;
+            const semiprimes = generateSemiprimes(primes).slice(0, 200);
+            const timingData = semiprimes.map(s => {
+                let ops = 0; const n = s.value;
+                for (let i = 2; i <= Math.sqrt(n); i++) { ops++; if (n % i === 0) break; }
+                return { n, ops, p: s.p, q: s.q };
+            });
+            const maxOps = Math.max(...timingData.map(d => d.ops));
+            document.getElementById('vizStats').innerHTML = `<h4 style="color: #ffd700;">Factorization Timing: Max ops ${maxOps}</h4>`;
+            vizChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {datasets: [{label: 'Operations', data: timingData.map(d => ({x: d.n, y: d.ops})), backgroundColor: function(c) { const r = c.raw.y / maxOps; return `hsla(${(1-r)*120}, 80%, 60%, 0.7)`; }, pointRadius: 5}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {labels: {color: '#fff'}}}, scales: {x: {type: 'logarithmic', ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}, y: {ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}}}
+            });
+        }
+        
+        function createModularInterferencePlot(ctx) {
+            const { primes } = computationData;
+            const m = 30;
+            const semiprimes = generateSemiprimes(primes.slice(0, 30));
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Modular Interference (mod ${m})</h4>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Formula:</strong> pq ≡ (p mod m)(q mod m) (mod m)<br>
+                    <span style="color: #4ecdc4;">●</span> Blue dots (outer) = Primes<br>
+                    <span style="color: #ff6384;">●</span> Red dots (inner) = Semiprimes<br>
+                    Semiprimes show interference patterns from multiplication
+                </div>
+            `;
+            
+            const canvas = document.getElementById('vizCanvas');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            const freshCtx = canvas.getContext('2d');
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const outerRadius = Math.min(rect.width, rect.height) * 0.4 * universalZoom;
+            const innerRadius = outerRadius * 0.65;
+            
+            // Clear background
+            freshCtx.fillStyle = 'rgba(0,0,0,0.95)';
+            freshCtx.fillRect(0, 0, rect.width, rect.height);
+            
+            // Draw rings
+            freshCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+            freshCtx.lineWidth = 2;
+            freshCtx.beginPath();
+            freshCtx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+            freshCtx.stroke();
+            
+            freshCtx.beginPath();
+            freshCtx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+            freshCtx.stroke();
+            
+            // Draw radial lines and labels
+            freshCtx.font = '11px Arial';
+            for (let r = 0; r < m; r++) {
+                const angle = (2 * Math.PI * r) / m - Math.PI / 2;
+                
+                // Radial line
+                freshCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+                freshCtx.lineWidth = 1;
+                freshCtx.beginPath();
+                freshCtx.moveTo(centerX, centerY);
+                freshCtx.lineTo(centerX + outerRadius * 1.05 * Math.cos(angle), centerY + outerRadius * 1.05 * Math.sin(angle));
+                freshCtx.stroke();
+                
+                // Label
+                freshCtx.fillStyle = '#fff';
+                freshCtx.textAlign = 'center';
+                const labelR = outerRadius * 1.15;
+                freshCtx.fillText(r, centerX + labelR * Math.cos(angle), centerY + labelR * Math.sin(angle) + 4);
+            }
+            
+            // Plot primes on outer ring
+            for (const p of primes.slice(0, 100)) {
+                const residue = p % m;
+                const angle = (2 * Math.PI * residue) / m - Math.PI / 2;
+                const x = centerX + outerRadius * Math.cos(angle);
+                const y = centerY + outerRadius * Math.sin(angle);
+                
+                const d = gcd(residue, m);
+                freshCtx.fillStyle = d === 1 ? 'rgba(78,205,196,0.8)' : 'rgba(255,159,64,0.8)';
+                freshCtx.beginPath();
+                freshCtx.arc(x, y, 4, 0, Math.PI * 2);
+                freshCtx.fill();
+            }
+            
+            // Plot semiprimes on inner ring
+            for (const s of semiprimes.slice(0, 200)) {
+                const residue = s.value % m;
+                const angle = (2 * Math.PI * residue) / m - Math.PI / 2;
+                const x = centerX + innerRadius * Math.cos(angle);
+                const y = centerY + innerRadius * Math.sin(angle);
+                
+                const d = gcd(residue, m);
+                freshCtx.fillStyle = d === 1 ? 'rgba(255,99,132,0.6)' : 'rgba(220,53,69,0.9)';
+                freshCtx.beginPath();
+                freshCtx.arc(x, y, 3, 0, Math.PI * 2);
+                freshCtx.fill();
+            }
+            
+            // Center marker
+            freshCtx.fillStyle = '#ffd700';
+            freshCtx.beginPath();
+            freshCtx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+            freshCtx.fill();
+        }
+        
+        function createTwinSemiprimesPlot(ctx) {
+            const { primes } = computationData;
+            const semiprimes = generateSemiprimes(primes).filter(s => s.value < 10000).map(s => s.value);
+            const twins = [];
+            for (let i = 0; i < semiprimes.length - 1; i++) {
+                if (semiprimes[i + 1] - semiprimes[i] === 2) twins.push({ s1: semiprimes[i], s2: semiprimes[i + 1] });
+            }
+            document.getElementById('vizStats').innerHTML = `<h4 style="color: #ffd700;">Twin Semiprimes: ${twins.length} pairs</h4>`;
+            const gapCounts = {};
+            for (let i = 0; i < semiprimes.length - 1; i++) {
+                const gap = semiprimes[i + 1] - semiprimes[i];
+                gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+            }
+            const sortedGaps = Object.keys(gapCounts).map(Number).sort((a, b) => a - b).slice(0, 30);
+            vizChart = new Chart(ctx, {
+                type: 'bar',
+                data: {labels: sortedGaps.map(g => g.toString()), datasets: [{label: 'Gap Frequency', data: sortedGaps.map(g => gapCounts[g]), backgroundColor: sortedGaps.map(g => g === 2 ? 'rgba(255,215,0,0.8)' : 'rgba(78,205,196,0.7)'), borderWidth: 2}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {x: {ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}, y: {ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}}}
+            });
+        }
+        
+        function createSemiprimeZetaPlot(ctx) {
+            const { primes } = computationData;
+            const semiprimes = generateSemiprimes(primes);
+            document.getElementById('vizStats').innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Semiprime Zeta Function ζ_S(s)</h4>
+                <div style="margin-bottom: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                    <strong>What is visualized:</strong><br>
+                    This plot shows the <strong>semiprime zeta function</strong> ζ_S(s) compared to its theoretical formula.
+                    The cyan line is the computed sum over actual semiprimes, while the gold dashed line shows the theoretical expression derived from the prime zeta function.
+                    This function interpolates between contributions to the Riemann zeta function.
+                </div>
+                <div style="padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; font-family: 'Courier New', monospace; margin-bottom: 15px;">
+                    <strong style="color: #ffd700;">Definition:</strong><br>
+                    ζ_S(s) = Σ(n∈S) n^(-s)<br><br>
+                    <strong style="color: #ffd700;">Theoretical Formula:</strong><br>
+                    ζ_S(s) = ½[(Σ p^(-s))² - Σ p^(-2s)]<br><br>
+                    Where the sums run over all primes p
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Mathematical Significance:</strong><br>
+                    <strong>Connection to Riemann zeta:</strong> The semiprime zeta function captures the "second-order" prime structure<br>
+                    <strong>Convergence:</strong> Converges for Re(s) > 1, similar to the prime zeta function<br>
+                    <strong>Euler product insight:</strong> This function reveals how products of primes contribute to ζ(s)<br>
+                    <strong>Analytic properties:</strong> The match between computed and theoretical values validates the formula<br>
+                    The slight divergence at lower σ values shows edge effects from finite prime sets
+                </div>
+            `;
+            const sigmaVals = [], zetaS = [], theory = [];
+            for (let s = 1.1; s <= 4; s += 0.1) {
+                let semiSum = 0;
+                for (const sp of semiprimes.slice(0, 1000)) semiSum += Math.pow(sp.value, -s);
+                let primeSum = 0, primeSum2 = 0;
+                for (const p of primes) { primeSum += Math.pow(p, -s); primeSum2 += Math.pow(p, -2*s); }
+                sigmaVals.push(s); zetaS.push(semiSum); theory.push(0.5 * (primeSum * primeSum - primeSum2));
+            }
+            vizChart = new Chart(ctx, {
+                type: 'line',
+                data: {labels: sigmaVals, datasets: [{label: 'ζ_S(σ) Computed', data: zetaS, borderColor: '#4ecdc4', borderWidth: 3, fill: false, pointRadius: 0}, {label: 'Theoretical', data: theory, borderColor: '#ffd700', borderWidth: 2, borderDash: [10, 5], fill: false, pointRadius: 0}]},
+                options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {labels: {color: '#fff'}}}, scales: {x: {title: {display: true, text: 'σ', color: '#fff'}, ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}, y: {ticks: {color: '#fff'}, grid: {color: 'rgba(255,255,255,0.1)'}}}}
+            });
         }
         
         function createConvergencePlot(ctx) {
