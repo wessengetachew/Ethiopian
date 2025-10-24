@@ -1361,6 +1361,8 @@
                     <button class="viz-btn" onclick="changeViz('modularInterference')">Mod Interference</button>
                     <button class="viz-btn" onclick="changeViz('twinSemiprimes')">Twin Semiprimes</button>
                     <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
+                    <button class="viz-btn" onclick="changeViz('primeAvoidance')">Prime Channel Avoidance</button>
+                    <button class="viz-btn" onclick="changeViz('compositeChannels')">Composite Channels</button>
                 </div>
                 <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
                     <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
@@ -3625,6 +3627,8 @@
                             <option value="heatmap">Heatmap</option>
                             <option value="voronoi">Voronoi</option>
                             <option value="modularInterference">Modular Interference</option>
+                            <option value="primeAvoidance">Prime Channel Avoidance</option>
+                            <option value="compositeChannels">Composite Channels</option>dular Interference</option>
                         </optgroup>
                         <optgroup label="Semiprimes">
                             <option value="semiprimeDistribution">Semiprime Distribution</option>
@@ -5905,6 +5909,415 @@
             };
             
             window.updateHarmonicWave(0);
+        }
+        
+        function createPrimeAvoidancePlot(ctx) {
+            const { primes } = computationData;
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Getachew Prime Channel Avoidance Theorem</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Max Modulus: <span id="avoidanceMaxMod">30</span></label>
+                    <input type="range" id="avoidanceMaxModSlider" min="10" max="100" step="1" value="30" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updatePrimeAvoidance(parseInt(this.value))">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Projection Line Opacity: <span id="avoidanceEpsilon">0.2</span></label>
+                    <input type="range" id="avoidanceEpsilonSlider" min="0.05" max="1" step="0.05" value="0.2" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updatePrimeAvoidance(parseInt(document.getElementById('avoidanceMaxModSlider').value))">
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Theorem Visualization:</strong><br>
+                    <span style="color: #4ecdc4;">● Cyan rings</span> = Prime moduli (avoid all Farey channels)<br>
+                    <span style="color: #ff6384;">● Red points</span> = Composite residues (project onto channels)<br>
+                    <strong>Key Insight:</strong> Prime moduli form complete coprime rings - no residue reduces to a simpler fraction.<br>
+                    Composite moduli have reducible residues that project onto Farey flow lines (1/N channels).<br>
+                    This geometric separation reveals the fundamental difference between primes and composites.
+                </div>
+            `;
+            
+            window.updatePrimeAvoidance = (maxMod = 30) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const maxRadius = Math.min(rect.width, rect.height) * 0.42;
+                
+                const epsilon = parseFloat(document.getElementById('avoidanceEpsilonSlider').value);
+                
+                // Generate primes up to maxMod
+                const modPrimes = sieveOfEratosthenes(maxMod);
+                const primeSet = new Set(modPrimes);
+                
+                // Create list of all moduli
+                const moduli = [];
+                for (let m = 2; m <= maxMod; m++) {
+                    moduli.push({ M: m, isPrime: primeSet.has(m) });
+                }
+                
+                // Clear canvas
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                // Calculate all residues and their reduction paths
+                const allResidues = [];
+                for (const mod of moduli) {
+                    const M = mod.M;
+                    const radius = (M / maxMod) * maxRadius;
+                    
+                    for (let r = 1; r < M; r++) {
+                        const d = gcd(r, M);
+                        const rPrime = r / d;
+                        const mPrime = M / d;
+                        const isReducible = d > 1;
+                        
+                        // Position on outer ring
+                        const angle = (2 * Math.PI * r) / M;
+                        const x = centerX + radius * Math.cos(angle);
+                        const y = centerY + radius * Math.sin(angle);
+                        
+                        // Position of reduction channel (if reducible)
+                        let channelX = centerX;
+                        let channelY = centerY;
+                        if (isReducible) {
+                            const channelRadius = (mPrime / maxMod) * maxRadius;
+                            const channelAngle = (2 * Math.PI * rPrime) / mPrime;
+                            channelX = centerX + channelRadius * Math.cos(channelAngle);
+                            channelY = centerY + channelRadius * Math.sin(channelAngle);
+                        }
+                        
+                        allResidues.push({
+                            M, r, d, isPrime: mod.isPrime, isReducible,
+                            x, y, channelX, channelY
+                        });
+                    }
+                }
+                
+                // Draw projection lines for reducible fractions
+                const lineOpacity = Math.max(0.1, epsilon * 0.5);
+                for (const res of allResidues) {
+                    if (res.isReducible) {
+                        freshCtx.strokeStyle = `rgba(255, 99, 132, ${lineOpacity})`;
+                        freshCtx.lineWidth = 1;
+                        freshCtx.beginPath();
+                        freshCtx.moveTo(res.x, res.y);
+                        freshCtx.lineTo(res.channelX, res.channelY);
+                        freshCtx.stroke();
+                    }
+                }
+                
+                // Draw modulus rings
+                for (const mod of moduli) {
+                    const radius = (mod.M / maxMod) * maxRadius;
+                    freshCtx.strokeStyle = mod.isPrime ? 'rgba(78, 205, 196, 0.5)' : 'rgba(255, 99, 132, 0.3)';
+                    freshCtx.lineWidth = mod.isPrime ? 4 : 2;
+                    freshCtx.beginPath();
+                    freshCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    freshCtx.stroke();
+                }
+                
+                // Draw residue points
+                for (const res of allResidues) {
+                    let pointColor;
+                    if (res.isPrime) {
+                        pointColor = 'rgba(78, 205, 196, 0.9)';
+                    } else {
+                        pointColor = res.isReducible ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 159, 64, 0.8)';
+                    }
+                    
+                    freshCtx.fillStyle = pointColor;
+                    freshCtx.beginPath();
+                    freshCtx.arc(res.x, res.y, 4, 0, Math.PI * 2);
+                    freshCtx.fill();
+                }
+                
+                // Draw center
+                freshCtx.fillStyle = '#fff';
+                freshCtx.beginPath();
+                freshCtx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+                freshCtx.fill();
+                
+                // Update display
+                document.getElementById('avoidanceMaxMod').textContent = maxMod;
+                document.getElementById('avoidanceEpsilon').textContent = epsilon.toFixed(2);
+                
+                // Add hover
+                canvas.onmousemove = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    let closestRes = null;
+                    let minDist = 10;
+                    
+                    for (const res of allResidues) {
+                        const dist = Math.sqrt((mouseX - res.x) ** 2 + (mouseY - res.y) ** 2);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestRes = res;
+                        }
+                    }
+                    
+                    if (closestRes) {
+                        // Redraw
+                        updatePrimeAvoidance(maxMod);
+                        
+                        // Highlight
+                        freshCtx.strokeStyle = '#ffd700';
+                        freshCtx.lineWidth = 3;
+                        freshCtx.beginPath();
+                        freshCtx.arc(closestRes.x, closestRes.y, 7, 0, Math.PI * 2);
+                        freshCtx.stroke();
+                        
+                        // Tooltip
+                        const lines = [
+                            `M = ${closestRes.M} ${closestRes.isPrime ? '(PRIME)' : '(composite)'}`,
+                            `r = ${closestRes.r}`,
+                            `gcd(r, M) = ${closestRes.d}`,
+                            closestRes.isReducible ? `Reduces to ${closestRes.r/closestRes.d}/${closestRes.M/closestRes.d}` : 'Irreducible (coprime)'
+                        ];
+                        
+                        freshCtx.font = '13px Arial';
+                        const lineHeight = 18;
+                        const padding = 10;
+                        const maxWidth = Math.max(...lines.map(line => freshCtx.measureText(line).width));
+                        
+                        freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                        freshCtx.fillRect(mouseX + 15, mouseY - 30, maxWidth + padding * 2, lines.length * lineHeight + padding * 2);
+                        freshCtx.strokeStyle = closestRes.isPrime ? '#4ecdc4' : '#ff6384';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.strokeRect(mouseX + 15, mouseY - 30, maxWidth + padding * 2, lines.length * lineHeight + padding * 2);
+                        
+                        freshCtx.fillStyle = '#fff';
+                        lines.forEach((line, idx) => {
+                            freshCtx.fillText(line, mouseX + 15 + padding, mouseY - 30 + padding + idx * lineHeight + 13);
+                        });
+                    }
+                };
+            };
+            
+            window.updatePrimeAvoidance(30);
+        }
+        
+        function createCompositeChannelsPlot(ctx) {
+            const { primes } = computationData;
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Getachew Composite Channel Projection Corollary</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Composite Modulus (M): <span id="compositeMValue">12</span></label>
+                    <input type="range" id="compositeMSlider" min="4" max="60" step="1" value="12" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updateCompositeChannels(parseInt(this.value))">
+                    <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px;">
+                        <button onclick="document.getElementById('compositeMSlider').value=6; updateCompositeChannels(6);" style="padding: 6px; background: rgba(78, 205, 196, 0.3); border: 1px solid #4ecdc4; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 6</button>
+                        <button onclick="document.getElementById('compositeMSlider').value=12; updateCompositeChannels(12);" style="padding: 6px; background: rgba(255, 215, 0, 0.3); border: 1px solid #ffd700; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 12</button>
+                        <button onclick="document.getElementById('compositeMSlider').value=30; updateCompositeChannels(30);" style="padding: 6px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 30</button>
+                        <button onclick="document.getElementById('compositeMSlider').value=60; updateCompositeChannels(60);" style="padding: 6px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 60</button>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Projection Line Opacity: <span id="compositeEpsilon">0.1</span></label>
+                    <input type="range" id="compositeEpsilonSlider" min="0.05" max="1" step="0.05" value="0.1" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updateCompositeChannels(parseInt(document.getElementById('compositeMSlider').value))">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Display Mode:</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px;">
+                        <button onclick="setCompositeMode('projection')" id="compositeModeProj" style="padding: 8px; background: rgba(78, 205, 196, 0.3); border: 2px solid #4ecdc4; border-radius: 6px; color: #fff; cursor: pointer;">Projection Lines</button>
+                        <button onclick="setCompositeMode('rings')" id="compositeModeRings" style="padding: 8px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; cursor: pointer;">Ring View</button>
+                    </div>
+                </div>
+                <div id="compositeStats"></div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6; margin-top: 15px;">
+                    <strong>Corollary Visualization:</strong><br>
+                    <span style="color: #4ecdc4;">● Cyan points</span> = Irreducible residues (gcd = 1)<br>
+                    <span style="color: #ff6384;">● Red points</span> = Reducible residues (gcd > 1)<br>
+                    <span style="color: #ffd700;">● Gold rings</span> = Farey channels (reduction targets)<br>
+                    <strong>Key Result:</strong> Every composite M has reducible residues that project onto simpler Farey channels.<br>
+                    The number projecting to each channel M' is exactly d = M/M' (channel multiplicity).
+                </div>
+            `;
+            
+            let compositeDisplayMode = 'projection';
+            
+            window.setCompositeMode = (mode) => {
+                compositeDisplayMode = mode;
+                
+                ['compositeModeProj', 'compositeModeRings'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) {
+                        if ((mode === 'projection' && id === 'compositeModeProj') ||
+                            (mode === 'rings' && id === 'compositeModeRings')) {
+                            btn.style.background = 'rgba(78, 205, 196, 0.3)';
+                            btn.style.borderColor = '#4ecdc4';
+                        } else {
+                            btn.style.background = 'rgba(255, 255, 255, 0.1)';
+                            btn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        }
+                    }
+                });
+                
+                updateCompositeChannels(parseInt(document.getElementById('compositeMSlider').value));
+            };
+            
+            window.updateCompositeChannels = (M = 12) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const divisors = [];
+                for (let d = 1; d < M; d++) {
+                    if (M % d === 0) {
+                        divisors.push(d);
+                    }
+                }
+                
+                const phiM = eulerPhi(M);
+                const maxRadius = Math.min(rect.width, rect.height) * 0.4;
+                const epsilon = parseFloat(document.getElementById('compositeEpsilonSlider').value);
+                
+                const residueData = [];
+                for (let r = 0; r < M; r++) {
+                    const d = gcd(r, M);
+                    const rPrime = r / d;
+                    const mPrime = M / d;
+                    const isReducible = d > 1;
+                    
+                    const outerAngle = (2 * Math.PI * r) / M;
+                    const outerX = centerX + maxRadius * Math.cos(outerAngle);
+                    const outerY = centerY + maxRadius * Math.sin(outerAngle);
+                    
+                    const innerRadius = (mPrime / M) * maxRadius;
+                    const innerAngle = (2 * Math.PI * rPrime) / mPrime;
+                    const innerX = centerX + innerRadius * Math.cos(innerAngle);
+                    const innerY = centerY + innerRadius * Math.sin(innerAngle);
+                    
+                    residueData.push({
+                        r, rPrime, mPrime, d,
+                        isReducible,
+                        outerX, outerY,
+                        innerX, innerY,
+                        outerRadius: maxRadius,
+                        innerRadius
+                    });
+                }
+                
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                if (compositeDisplayMode === 'projection') {
+                    freshCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    freshCtx.lineWidth = 3;
+                    freshCtx.beginPath();
+                    freshCtx.arc(centerX, centerY, maxRadius, 0, Math.PI * 2);
+                    freshCtx.stroke();
+                    
+                    const uniqueMPrimes = [...new Set(residueData.map(d => d.mPrime))].sort((a, b) => a - b);
+                    for (const mPrime of uniqueMPrimes) {
+                        if (mPrime === M) continue;
+                        const radius = (mPrime / M) * maxRadius;
+                        freshCtx.strokeStyle = 'rgba(255, 215, 0, 0.2)';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.beginPath();
+                        freshCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                        freshCtx.stroke();
+                    }
+                    
+                    const lineOpacity = Math.max(0.2, Math.min(1, epsilon * 2));
+                    for (const data of residueData) {
+                        if (data.isReducible) {
+                            freshCtx.strokeStyle = `rgba(255, 99, 132, ${lineOpacity})`;
+                            freshCtx.lineWidth = 2;
+                            freshCtx.beginPath();
+                            freshCtx.moveTo(data.outerX, data.outerY);
+                            freshCtx.lineTo(data.innerX, data.innerY);
+                            freshCtx.stroke();
+                        }
+                    }
+                    
+                    for (const data of residueData) {
+                        freshCtx.fillStyle = data.isReducible ? 'rgba(255, 99, 132, 0.9)' : 'rgba(78, 205, 196, 0.9)';
+                        freshCtx.beginPath();
+                        freshCtx.arc(data.outerX, data.outerY, 5, 0, Math.PI * 2);
+                        freshCtx.fill();
+                        
+                        if (data.isReducible) {
+                            freshCtx.fillStyle = 'rgba(255, 215, 0, 0.8)';
+                            freshCtx.beginPath();
+                            freshCtx.arc(data.innerX, data.innerY, 4, 0, Math.PI * 2);
+                            freshCtx.fill();
+                        }
+                    }
+                } else {
+                    const uniqueMPrimes = [...new Set(residueData.map(d => d.mPrime))].sort((a, b) => a - b);
+                    for (const mPrime of uniqueMPrimes) {
+                        const radius = (mPrime / M) * maxRadius;
+                        freshCtx.strokeStyle = mPrime === M ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 215, 0, 0.3)';
+                        freshCtx.lineWidth = mPrime === M ? 3 : 2;
+                        freshCtx.beginPath();
+                        freshCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                        freshCtx.stroke();
+                    }
+                    
+                    for (const data of residueData) {
+                        freshCtx.fillStyle = data.isReducible ? 'rgba(255, 99, 132, 0.8)' : 'rgba(78, 205, 196, 0.8)';
+                        freshCtx.beginPath();
+                        freshCtx.arc(data.outerX, data.outerY, 4, 0, Math.PI * 2);
+                        freshCtx.fill();
+                    }
+                }
+                
+                freshCtx.fillStyle = '#4ecdc4';
+                freshCtx.beginPath();
+                freshCtx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+                freshCtx.fill();
+                
+                document.getElementById('compositeMValue').textContent = M;
+                document.getElementById('compositeEpsilon').textContent = epsilon.toFixed(2);
+                
+                const reducibleCount = residueData.filter(d => d.isReducible).length;
+                const reducibleRatio = reducibleCount / M;
+                
+                document.getElementById('compositeStats').innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 15px;">
+                        <div style="background: rgba(78, 205, 196, 0.15); padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 0.85em; opacity: 0.8;">φ(${M})</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;">${phiM}</div>
+                        </div>
+                        <div style="background: rgba(255, 99, 132, 0.15); padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 0.85em; opacity: 0.8;">Reducible</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #ff6384;">${reducibleCount}</div>
+                        </div>
+                        <div style="background: rgba(255, 215, 0, 0.15); padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 0.85em; opacity: 0.8;">Ratio</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #ffd700;">${(reducibleRatio * 100).toFixed(1)}%</div>
+                        </div>
+                        <div style="background: rgba(153, 102, 255, 0.15); padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 0.85em; opacity: 0.8;">Channels</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #9966ff;">${divisors.length}</div>
+                        </div>
+                    </div>
+                `;
+            };
+            
+            window.updateCompositeChannels(12);
         }
         
         function createPhaseExplorerPlot(ctx) {
