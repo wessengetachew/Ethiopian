@@ -16,12 +16,161 @@
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: #fff;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            padding-top: 60px;
+        }
+        
+        .sticky-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 60, 114, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 12px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .nav-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd700;
+            white-space: nowrap;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+        }
+        
+        .nav-link.active {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .quick-btn {
+            padding: 6px 12px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 6px;
+            color: #ffd700;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .quick-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-1px);
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            scroll-margin-top: 80px;
+        }
+        
+        .viz-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .category-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .category-btn.active {
+            background: #ffd700;
+            border-color: #ffd700;
+            color: #1e3c72;
+        }
+        
+        .category-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+        }
+        
+        .preset-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .preset-card {
+            background: rgba(78, 205, 196, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(78, 205, 196, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .preset-card:hover {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: #4ecdc4;
+            transform: translateY(-2px);
+        }
+        
+        .preset-title {
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 5px;
+        }
+        
+        .preset-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
         }
         
         .header {
@@ -734,8 +883,26 @@
     </style>
 </head>
 <body>
+    <nav class="sticky-nav">
+        <div class="nav-content">
+            <div class="nav-title">Modular Sieve Calculator</div>
+            <div class="nav-links">
+                <a href="#controls" class="nav-link">Controls</a>
+                <a href="#results" class="nav-link">Results</a>
+                <a href="#gap-analysis" class="nav-link">Gap Analysis</a>
+                <a href="#channel-analysis" class="nav-link">Channels</a>
+                <a href="#visualization-section" class="nav-link">Visualizations</a>
+                <a href="#prime-ring-section" class="nav-link">Prime Rings</a>
+            </div>
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="exportAllData()">Export All</button>
+                <button class="quick-btn" onclick="showPresets()">Presets</button>
+            </div>
+        </div>
+    </nav>
+    
     <div class="container">
-        <div class="header">
+        <div class="header section" id="theory">
             <h1>Modular Sieve Calculator</h1>
             <div class="subtitle">Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions</div>
             <div style="text-align: center; margin-top: 15px; font-size: 0.95em; font-style: italic; opacity: 0.85;">
@@ -1023,7 +1190,35 @@
             </div>
         </div>
         
-        <div class="main-content">
+        <div class="main-content section" id="controls">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Quick Start Presets</h2>
+            <div class="preset-examples" id="presetExamples" style="display: none;">
+                <div class="preset-card" onclick="applyPreset('pi10')">
+                    <div class="preset-title">Compute π to 10 decimals</div>
+                    <div class="preset-desc">Error: 10^-11, ~700 primes</div>
+                </div>
+                <div class="preset-card" onclick="applyPreset('pi15')">
+                    <div class="preset-title">Compute π to 15 decimals</div>
+                    <div class="preset-desc">Error: 10^-16, ~40,000 primes</div>
+                </div>
+                <div class="preset-card" onclick="applyPreset('firstZero')">
+                    <div class="preset-title">Explore First Riemann Zero</div>
+                    <div class="preset-desc">t = 14.134725, Standard setup</div>
+                </div>
+                <div class="preset-card" onclick="applyPreset('mod60')">
+                    <div class="preset-title">Compare mod 60 channels</div>
+                    <div class="preset-desc">16 residue channels</div>
+                </div>
+                <div class="preset-card" onclick="applyPreset('semiprimes')">
+                    <div class="preset-title">Semiprime Analysis</div>
+                    <div class="preset-desc">Focus on RSA structure</div>
+                </div>
+                <div class="preset-card" onclick="applyPreset('highPrecision')">
+                    <div class="preset-title">High Precision ζ(4)</div>
+                    <div class="preset-desc">Error: 10^-12</div>
+                </div>
+            </div>
+            
             <div class="controls">
                 <div class="control-group">
                     <h3>Target Accuracy</h3>
@@ -1090,7 +1285,7 @@
                 </div>
             </div>
             
-            <div id="results" class="results" style="display: none;">
+            <div id="results" class="results section" style="display: none;">
                 <div class="result-card">
                     <h4>Computed Value</h4>
                     <div id="computed-value" class="value"></div>
@@ -1128,8 +1323,17 @@
                 <div class="chart-legend" id="chartLegend"></div>
             </div>
             
-            <div id="visualization-section" class="visualization-container" style="display: none;">
+            <div id="visualization-section" class="visualization-container section" style="display: none;">
                 <h3>Interactive Visualization</h3>
+                
+                <div class="viz-categories">
+                    <button class="category-btn active" onclick="filterVizCategory('all')">All (26)</button>
+                    <button class="category-btn" onclick="filterVizCategory('distribution')">Distribution</button>
+                    <button class="category-btn" onclick="filterVizCategory('complex')">Complex Analysis</button>
+                    <button class="category-btn" onclick="filterVizCategory('modular')">Modular</button>
+                    <button class="category-btn" onclick="filterVizCategory('semiprimes')">Semiprimes</button>
+                </div>
+                
                 <div class="viz-options">
                     <button class="viz-btn active" onclick="changeViz('convergence')">Convergence</button>
                     <button class="viz-btn" onclick="changeViz('contribution')">Contributions</button>
@@ -1301,6 +1505,160 @@
         let currentChannelView = 'cards';
         let channelDataGlobal = null;
         let universalZoom = 1.0;
+        let currentVizCategory = 'all';
+        
+        const vizCategories = {
+            'convergence': 'distribution',
+            'contribution': 'distribution',
+            'gapDist': 'distribution',
+            'primeCount': 'distribution',
+            'density': 'distribution',
+            'gapHistogram': 'distribution',
+            'errorAnalysis': 'distribution',
+            'phasorSum': 'complex',
+            'zetaSurface': 'complex',
+            'zetaZeros': 'complex',
+            'phaseExplorer': 'complex',
+            'phaseLaw': 'complex',
+            'sacksSpiral': 'modular',
+            'primeSpiral': 'modular',
+            'primeRaces': 'modular',
+            'channelRace': 'modular',
+            'heatmap': 'modular',
+            'voronoi': 'modular',
+            'modularInterference': 'modular',
+            'goldbachComet': 'distribution',
+            'harmonicWave': 'complex',
+            'semiprimeDistribution': 'semiprimes',
+            'semiprimeGraph': 'semiprimes',
+            'factorizationTiming': 'semiprimes',
+            'twinSemiprimes': 'semiprimes',
+            'semiprimeZeta': 'semiprimes'
+        };
+        
+        function showPresets() {
+            const presets = document.getElementById('presetExamples');
+            presets.style.display = presets.style.display === 'none' ? 'grid' : 'none';
+        }
+        
+        function applyPreset(presetName) {
+            const presets = {
+                'pi10': { epsilon: 0.00000000001, constant: 'pi', modulus: 30 },
+                'pi15': { epsilon: 0.0000000000000001, constant: 'pi', modulus: 30 },
+                'firstZero': { epsilon: 0.01, constant: 'pi', modulus: 30, viz: 'zetaZeros' },
+                'mod60': { epsilon: 0.01, constant: 'pi', modulus: 60 },
+                'semiprimes': { epsilon: 0.01, constant: 'pi', modulus: 30, viz: 'semiprimeDistribution' },
+                'highPrecision': { epsilon: 0.000000000001, constant: 'zeta4', modulus: 30 }
+            };
+            
+            const preset = presets[presetName];
+            if (preset) {
+                document.getElementById('epsilon').value = preset.epsilon;
+                document.getElementById('constant').value = preset.constant;
+                document.getElementById('modulus').value = preset.modulus;
+                compute();
+                if (preset.viz) {
+                    setTimeout(() => {
+                        document.getElementById('visualization-section').scrollIntoView({ behavior: 'smooth' });
+                        changeViz(preset.viz);
+                    }, 500);
+                }
+            }
+            document.getElementById('presetExamples').style.display = 'none';
+        }
+        
+        function filterVizCategory(category) {
+            currentVizCategory = category;
+            
+            // Update category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter visualization buttons
+            document.querySelectorAll('.viz-btn').forEach(btn => {
+                const vizType = btn.getAttribute('onclick').match(/changeViz\('(.+?)'\)/)[1];
+                const vizCat = vizCategories[vizType] || 'distribution';
+                
+                if (category === 'all' || vizCat === category) {
+                    btn.style.display = 'inline-block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+        
+        function exportAllData() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            const allData = {
+                timestamp: new Date().toISOString(),
+                parameters: {
+                    epsilon: computationData.epsilon,
+                    constantType: computationData.constantType,
+                    method: computationData.method,
+                    modulus: computationData.modulus,
+                    cutoff: computationData.Y
+                },
+                results: {
+                    computedValue: computationData.computedValue,
+                    exactValue: computationData.exactValue,
+                    absoluteError: Math.abs(computationData.computedValue - computationData.exactValue),
+                    relativeError: Math.abs(computationData.computedValue - computationData.exactValue) / computationData.exactValue,
+                    primesUsed: computationData.primes.length
+                },
+                primes: computationData.primes,
+                partialProducts: computationData.partialProducts
+            };
+            
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `modular_sieve_complete_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Smooth scroll for nav links
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        
+                        // Update active state
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+            
+            // Highlight active section on scroll
+            window.addEventListener('scroll', function() {
+                const sections = document.querySelectorAll('.section');
+                const navLinks = document.querySelectorAll('.nav-link');
+                
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
         
         function updateUniversalZoom(zoom) {
             universalZoom = zoom;
