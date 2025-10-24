@@ -3595,21 +3595,44 @@
                 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 500;">Chart Type:</label>
-                    <select id="exportChartType" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
-                        <option value="channel">Residue Channel Contributions</option>
-                        <option value="convergence">Convergence Plot</option>
-                        <option value="contribution">Prime Contributions</option>
-                        <option value="gapDist">Gap Distribution Analysis</option>
-                        <option value="primeCount">Prime Counting π(x)</option>
-                        <option value="density">Prime Density Analysis</option>
-                        <option value="gapHistogram">Prime Gaps Histogram</option>
-                        <option value="sacksSpiral">Sacks Spiral</option>
-                        <option value="zetaZeros">Riemann Zeta Zeros</option>
-                        <option value="errorAnalysis">Error Analysis</option>
-                        <option value="primeRaces">Prime Races</option>
-                        <option value="goldbachComet">Goldbach Comet</option>
-                        <option value="phasorSum">Phasor Sum (Complex Plane)</option>
-                        <option value="zetaSurface">Modular Zeta Surface</option>
+                    <select id="exportChartType" style="width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; max-height: 300px; overflow-y: auto;">
+                        <optgroup label="Core Analysis">
+                            <option value="channel">Residue Channel Contributions</option>
+                            <option value="convergence">Convergence Plot</option>
+                            <option value="contribution">Prime Contributions</option>
+                            <option value="gapDist">Gap Distribution Analysis</option>
+                        </optgroup>
+                        <optgroup label="Distribution">
+                            <option value="primeCount">Prime Counting π(x)</option>
+                            <option value="density">Prime Density Analysis</option>
+                            <option value="gapHistogram">Prime Gaps Histogram</option>
+                            <option value="errorAnalysis">Error Analysis</option>
+                            <option value="goldbachComet">Goldbach Comet</option>
+                        </optgroup>
+                        <optgroup label="Complex Analysis">
+                            <option value="phasorSum">Phasor Sum (Complex Plane)</option>
+                            <option value="zetaSurface">Modular Zeta Surface</option>
+                            <option value="zetaZeros">Riemann Zeta Zeros</option>
+                            <option value="phaseExplorer">Phase Explorer</option>
+                            <option value="phaseLaw">Phase Law</option>
+                            <option value="harmonicWave">Harmonic Wave</option>
+                        </optgroup>
+                        <optgroup label="Modular">
+                            <option value="sacksSpiral">Sacks Spiral</option>
+                            <option value="primeSpiral">Ulam Spiral</option>
+                            <option value="primeRaces">Prime Races</option>
+                            <option value="channelRace">Channel Race</option>
+                            <option value="heatmap">Heatmap</option>
+                            <option value="voronoi">Voronoi</option>
+                            <option value="modularInterference">Modular Interference</option>
+                        </optgroup>
+                        <optgroup label="Semiprimes">
+                            <option value="semiprimeDistribution">Semiprime Distribution</option>
+                            <option value="semiprimeGraph">Semiprime Graph</option>
+                            <option value="factorizationTiming">Factorization Timing</option>
+                            <option value="twinSemiprimes">Twin Semiprimes</option>
+                            <option value="semiprimeZeta">Semiprime ζ_S</option>
+                        </optgroup>
                     </select>
                 </div>
                 
