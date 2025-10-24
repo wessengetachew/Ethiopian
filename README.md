@@ -4972,6 +4972,464 @@
             window.updateHarmonicWave(0);
         }
         
+        function createPhaseExplorerPlot(ctx) {
+            const { primes, exponent, constantType } = computationData;
+            const sigma = exponent / 2;
+            
+            // Use gap-classified primes for phase law side
+            const gapClasses = computeLowestGapClasses(primes);
+            const sortedGaps = Object.keys(gapClasses).map(Number).sort((a, b) => a - b);
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Phase Explorer: Combined Phasor Sum & Phase Law Analysis</h4>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Imaginary Part (t): <span id="explorerT">14.134725</span></label>
+                    <input type="range" id="explorerTSlider" min="0" max="250" step="0.001" value="14.134725" 
+                           style="width: 100%; margin-top: 10px;"
+                           oninput="updatePhaseExplorer(parseFloat(this.value))">
+                    <div style="margin-top: 10px;">
+                        <label style="color: #fff; font-weight: 500; font-size: 0.9em;">Jump to Known Zero:</label>
+                        <select id="explorerZeroSelector" style="width: 100%; padding: 8px; border-radius: 6px; margin-top: 5px; font-size: 14px;" onchange="jumpToExplorerZero(parseFloat(this.value))">
+                            <option value="14.134725">Zero 1: t = 14.134725</option>
+                            <option value="21.022040">Zero 2: t = 21.022040</option>
+                            <option value="25.010858">Zero 3: t = 25.010858</option>
+                            <option value="30.424876">Zero 4: t = 30.424876</option>
+                            <option value="32.935062">Zero 5: t = 32.935062</option>
+                            <option value="37.586178">Zero 6: t = 37.586178</option>
+                            <option value="40.918719">Zero 7: t = 40.918719</option>
+                            <option value="43.327073">Zero 8: t = 43.327073</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">View Mode:</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;">
+                        <button onclick="setExplorerMode('sideBySide')" id="explorerSideBySide" style="padding: 8px; background: rgba(78, 205, 196, 0.3); border: 2px solid #4ecdc4; border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.85em;">Side by Side</button>
+                        <button onclick="setExplorerMode('overlay')" id="explorerOverlay" style="padding: 8px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.85em;">Overlay</button>
+                        <button onclick="setExplorerMode('comparison')" id="explorerComparison" style="padding: 8px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.85em;">Comparison</button>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Decay Parameter (β): <span id="explorerBeta">Auto</span></label>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                            <input type="radio" name="explorerBetaMode" value="auto" checked onchange="updatePhaseExplorer(parseFloat(document.getElementById('explorerTSlider').value))" style="width: auto; margin-right: 5px;">
+                            Auto (β ~ 1/log(t))
+                        </label>
+                        <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                            <input type="radio" name="explorerBetaMode" value="manual" onchange="updatePhaseExplorer(parseFloat(document.getElementById('explorerTSlider').value))" style="width: auto; margin-right: 5px;">
+                            Manual
+                        </label>
+                    </div>
+                    <input type="range" id="explorerBetaSlider" min="0" max="1" step="0.001" value="0.1" 
+                           style="width: 100%; margin-top: 10px; display: none;"
+                           oninput="updatePhaseExplorer(parseFloat(document.getElementById('explorerTSlider').value))">
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Phasor Magnitude</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;" id="explorerPhasorMag">--</div>
+                    </div>
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Phase Law Magnitude</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ffd700;" id="explorerPhaseLawMag">--</div>
+                    </div>
+                    <div style="background: rgba(255, 99, 132, 0.15); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Difference</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ff6384;" id="explorerDiff">--</div>
+                    </div>
+                    <div style="background: rgba(153, 102, 255, 0.15); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Coherence</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #9966ff;" id="explorerCoherence">--</div>
+                    </div>
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Combined Analysis:</strong><br>
+                    <strong>Left (Phasor Sum):</strong> Direct vector sum of n<sup>-s</sup> terms rotating in complex plane<br>
+                    <strong>Right (Phase Law):</strong> Gap-classified Euler product with phase alignment φ(p,t) = t·log(p) - π/2<br>
+                    Both approaches converge to ζ(s) but reveal different structural properties<br>
+                    At Riemann zeros: both show destructive interference (magnitude ≈ 0)<br>
+                    Click mode buttons to switch between side-by-side, overlay, and comparison views
+                </div>
+            `;
+            
+            // Add event listener for beta mode toggle
+            document.querySelectorAll('input[name="explorerBetaMode"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const manualSlider = document.getElementById('explorerBetaSlider');
+                    if (this.value === 'manual') {
+                        manualSlider.style.display = 'block';
+                    } else {
+                        manualSlider.style.display = 'none';
+                    }
+                });
+            });
+            
+            let explorerViewMode = 'sideBySide';
+            
+            window.setExplorerMode = (mode) => {
+                explorerViewMode = mode;
+                
+                // Update button styles
+                ['explorerSideBySide', 'explorerOverlay', 'explorerComparison'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) {
+                        if ((mode === 'sideBySide' && id === 'explorerSideBySide') ||
+                            (mode === 'overlay' && id === 'explorerOverlay') ||
+                            (mode === 'comparison' && id === 'explorerComparison')) {
+                            btn.style.background = 'rgba(78, 205, 196, 0.3)';
+                            btn.style.borderColor = '#4ecdc4';
+                        } else {
+                            btn.style.background = 'rgba(255, 255, 255, 0.1)';
+                            btn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        }
+                    }
+                });
+                
+                updatePhaseExplorer(parseFloat(document.getElementById('explorerTSlider').value));
+            };
+            
+            window.jumpToExplorerZero = (t) => {
+                document.getElementById('explorerTSlider').value = t;
+                updatePhaseExplorer(t);
+            };
+            
+            window.updatePhaseExplorer = (t) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const width = rect.width;
+                const height = rect.height;
+                
+                // Determine beta
+                const betaMode = document.querySelector('input[name="explorerBetaMode"]:checked').value;
+                let beta;
+                if (betaMode === 'auto') {
+                    beta = t > 0 ? 1 / Math.log(Math.max(2, t)) : 0.1;
+                    document.getElementById('explorerBeta').textContent = `${beta.toFixed(4)} (Auto)`;
+                } else {
+                    beta = parseFloat(document.getElementById('explorerBetaSlider').value);
+                    document.getElementById('explorerBeta').textContent = beta.toFixed(4);
+                }
+                
+                // Clear canvas
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, width, height);
+                
+                if (explorerViewMode === 'sideBySide') {
+                    // Split canvas in half
+                    const splitX = width / 2;
+                    
+                    // Left: Phasor Sum
+                    freshCtx.save();
+                    freshCtx.rect(0, 0, splitX, height);
+                    freshCtx.clip();
+                    const phasorMag = drawPhasorSumSection(freshCtx, 0, 0, splitX, height, t, sigma);
+                    freshCtx.restore();
+                    
+                    // Divider line
+                    freshCtx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+                    freshCtx.lineWidth = 3;
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(splitX, 0);
+                    freshCtx.lineTo(splitX, height);
+                    freshCtx.stroke();
+                    
+                    // Right: Phase Law
+                    freshCtx.save();
+                    freshCtx.rect(splitX, 0, splitX, height);
+                    freshCtx.clip();
+                    const phaseLawMag = drawPhaseLawSection(freshCtx, splitX, 0, splitX, height, t, beta, sortedGaps, gapClasses);
+                    freshCtx.restore();
+                    
+                    // Labels
+                    freshCtx.fillStyle = '#4ecdc4';
+                    freshCtx.font = 'bold 16px Arial';
+                    freshCtx.textAlign = 'center';
+                    freshCtx.fillText('Phasor Sum', splitX / 2, 25);
+                    
+                    freshCtx.fillStyle = '#ff6384';
+                    freshCtx.fillText('Phase Law', splitX + splitX / 2, 25);
+                    
+                    updateExplorerStats(phasorMag, phaseLawMag, t);
+                    
+                } else if (explorerViewMode === 'overlay') {
+                    // Draw both on same canvas with transparency
+                    const phasorMag = drawPhasorSumSection(freshCtx, 0, 0, width, height, t, sigma, 0.5);
+                    const phaseLawMag = drawPhaseLawSection(freshCtx, 0, 0, width, height, t, beta, sortedGaps, gapClasses, 0.5);
+                    
+                    // Legend
+                    freshCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                    freshCtx.fillRect(width - 200, 10, 190, 60);
+                    freshCtx.fillStyle = '#4ecdc4';
+                    freshCtx.font = 'bold 14px Arial';
+                    freshCtx.textAlign = 'left';
+                    freshCtx.fillText('Phasor Sum', width - 190, 30);
+                    freshCtx.fillStyle = '#ff6384';
+                    freshCtx.fillText('Phase Law', width - 190, 50);
+                    
+                    updateExplorerStats(phasorMag, phaseLawMag, t);
+                    
+                } else if (explorerViewMode === 'comparison') {
+                    // Draw difference visualization
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const scale = Math.min(width, height) * 0.35;
+                    
+                    // Compute both
+                    let phasorReal = 0, phasorImag = 0;
+                    const numPhasors = Math.min(50, primes.length);
+                    for (let i = 0; i < numPhasors; i++) {
+                        const n = primes[i];
+                        const radius = Math.pow(n, -sigma);
+                        const angle = -t * Math.log(n);
+                        phasorReal += radius * Math.cos(angle);
+                        phasorImag += radius * Math.sin(angle);
+                    }
+                    const phasorMag = Math.sqrt(phasorReal * phasorReal + phasorImag * phasorImag);
+                    
+                    let phaseLawReal = 0, phaseLawImag = 0;
+                    for (const gap of sortedGaps) {
+                        const gapPrimes = gapClasses[gap];
+                        for (const p of gapPrimes) {
+                            const phi = t * Math.log(p) - Math.PI / 2;
+                            const pHalf = Math.pow(p, -0.5);
+                            const decay = Math.exp(-beta * Math.log(p));
+                            
+                            const denomReal = 1 - pHalf * Math.cos(-phi);
+                            const denomImag = -pHalf * Math.sin(-phi);
+                            const denomMagSq = denomReal * denomReal + denomImag * denomImag;
+                            
+                            phaseLawReal += (denomReal / denomMagSq) * decay;
+                            phaseLawImag += (-denomImag / denomMagSq) * decay;
+                        }
+                    }
+                    const phaseLawMag = Math.sqrt(phaseLawReal * phaseLawReal + phaseLawImag * phaseLawImag);
+                    
+                    // Draw comparison vectors
+                    freshCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    freshCtx.lineWidth = 1;
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(0, centerY);
+                    freshCtx.lineTo(width, centerY);
+                    freshCtx.moveTo(centerX, 0);
+                    freshCtx.lineTo(centerX, height);
+                    freshCtx.stroke();
+                    
+                    // Phasor vector
+                    const phasorX = centerX + phasorReal * scale;
+                    const phasorY = centerY - phasorImag * scale;
+                    freshCtx.strokeStyle = '#4ecdc4';
+                    freshCtx.lineWidth = 4;
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(centerX, centerY);
+                    freshCtx.lineTo(phasorX, phasorY);
+                    freshCtx.stroke();
+                    freshCtx.fillStyle = '#4ecdc4';
+                    freshCtx.beginPath();
+                    freshCtx.arc(phasorX, phasorY, 6, 0, Math.PI * 2);
+                    freshCtx.fill();
+                    
+                    // Phase law vector
+                    const phaseLawX = centerX + phaseLawReal * scale;
+                    const phaseLawY = centerY - phaseLawImag * scale;
+                    freshCtx.strokeStyle = '#ff6384';
+                    freshCtx.lineWidth = 4;
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(centerX, centerY);
+                    freshCtx.lineTo(phaseLawX, phaseLawY);
+                    freshCtx.stroke();
+                    freshCtx.fillStyle = '#ff6384';
+                    freshCtx.beginPath();
+                    freshCtx.arc(phaseLawX, phaseLawY, 6, 0, Math.PI * 2);
+                    freshCtx.fill();
+                    
+                    // Difference vector
+                    freshCtx.strokeStyle = '#ffd700';
+                    freshCtx.lineWidth = 2;
+                    freshCtx.setLineDash([5, 5]);
+                    freshCtx.beginPath();
+                    freshCtx.moveTo(phasorX, phasorY);
+                    freshCtx.lineTo(phaseLawX, phaseLawY);
+                    freshCtx.stroke();
+                    freshCtx.setLineDash([]);
+                    
+                    // Labels
+                    freshCtx.fillStyle = '#fff';
+                    freshCtx.font = '14px Arial';
+                    freshCtx.textAlign = 'center';
+                    freshCtx.fillText('Re', width - 30, centerY - 10);
+                    freshCtx.fillText('Im', centerX + 15, 20);
+                    
+                    freshCtx.fillStyle = '#4ecdc4';
+                    freshCtx.font = 'bold 14px Arial';
+                    freshCtx.fillText('Phasor', phasorX, phasorY - 15);
+                    
+                    freshCtx.fillStyle = '#ff6384';
+                    freshCtx.fillText('Phase Law', phaseLawX, phaseLawY + 25);
+                    
+                    updateExplorerStats(phasorMag, phaseLawMag, t);
+                }
+            };
+            
+            function drawPhasorSumSection(ctx, x, y, w, h, t, sigma, alpha = 1) {
+                const centerX = x + w / 2;
+                const centerY = y + h / 2;
+                const scale = Math.min(w, h) * 0.35;
+                
+                // Draw axes
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * alpha})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, centerY);
+                ctx.lineTo(x + w, centerY);
+                ctx.moveTo(centerX, y);
+                ctx.lineTo(centerX, y + h);
+                ctx.stroke();
+                
+                // Draw unit circle
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, scale * 0.8, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Compute and draw phasors
+                let sumReal = 0, sumImag = 0;
+                let currentX = centerX, currentY = centerY;
+                const numPhasors = Math.min(50, primes.length);
+                
+                for (let i = 0; i < numPhasors; i++) {
+                    const n = primes[i];
+                    const radius = Math.pow(n, -sigma);
+                    const angle = -t * Math.log(n);
+                    
+                    const real = radius * Math.cos(angle);
+                    const imag = radius * Math.sin(angle);
+                    
+                    sumReal += real;
+                    sumImag += imag;
+                    
+                    const nextX = currentX + real * scale;
+                    const nextY = currentY - imag * scale;
+                    
+                    const hue = (i / numPhasors) * 280;
+                    ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${0.5 * alpha})`;
+                    ctx.lineWidth = 1.5;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(currentX, currentY);
+                    ctx.lineTo(nextX, nextY);
+                    ctx.stroke();
+                    
+                    currentX = nextX;
+                    currentY = nextY;
+                }
+                
+                // Draw final sum vector
+                const finalX = centerX + sumReal * scale;
+                const finalY = centerY - sumImag * scale;
+                
+                ctx.strokeStyle = `rgba(78, 205, 196, ${alpha})`;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(finalX, finalY);
+                ctx.stroke();
+                
+                ctx.fillStyle = `rgba(78, 205, 196, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(finalX, finalY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                return Math.sqrt(sumReal * sumReal + sumImag * sumImag);
+            }
+            
+            function drawPhaseLawSection(ctx, x, y, w, h, t, beta, sortedGaps, gapClasses, alpha = 1) {
+                const centerX = x + w / 2;
+                const centerY = y + h / 2;
+                
+                // Draw axes
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * alpha})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, centerY);
+                ctx.lineTo(x + w, centerY);
+                ctx.moveTo(centerX, y);
+                ctx.lineTo(centerX, y + h);
+                ctx.stroke();
+                
+                // Compute phase law contributions
+                let totalReal = 0, totalImag = 0;
+                const scale = Math.min(w, h) * 0.4;
+                
+                let cumReal = 0, cumImag = 0;
+                ctx.strokeStyle = `rgba(255, 99, 132, ${0.8 * alpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                
+                sortedGaps.forEach((gap, idx) => {
+                    const gapPrimes = gapClasses[gap];
+                    let gapReal = 0, gapImag = 0;
+                    
+                    for (const p of gapPrimes) {
+                        const phi = t * Math.log(p) - Math.PI / 2;
+                        const pHalf = Math.pow(p, -0.5);
+                        const decay = Math.exp(-beta * Math.log(p));
+                        
+                        const denomReal = 1 - pHalf * Math.cos(-phi);
+                        const denomImag = -pHalf * Math.sin(-phi);
+                        const denomMagSq = denomReal * denomReal + denomImag * denomImag;
+                        
+                        gapReal += (denomReal / denomMagSq) * decay;
+                        gapImag += (-denomImag / denomMagSq) * decay;
+                    }
+                    
+                    cumReal += gapReal;
+                    cumImag += gapImag;
+                    
+                    const plotX = centerX + cumReal * scale;
+                    const plotY = centerY - cumImag * scale;
+                    
+                    ctx.lineTo(plotX, plotY);
+                    
+                    totalReal = cumReal;
+                    totalImag = cumImag;
+                });
+                ctx.stroke();
+                
+                // Draw final point
+                const finalX = centerX + totalReal * scale;
+                const finalY = centerY - totalImag * scale;
+                ctx.fillStyle = `rgba(255, 99, 132, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(finalX, finalY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                return Math.sqrt(totalReal * totalReal + totalImag * totalImag);
+            }
+            
+            function updateExplorerStats(phasorMag, phaseLawMag, t) {
+                document.getElementById('explorerT').textContent = t.toFixed(3);
+                document.getElementById('explorerPhasorMag').textContent = phasorMag.toFixed(6);
+                document.getElementById('explorerPhaseLawMag').textContent = phaseLawMag.toFixed(6);
+                
+                const diff = Math.abs(phasorMag - phaseLawMag);
+                document.getElementById('explorerDiff').textContent = diff.toFixed(6);
+                
+                const avgMag = (phasorMag + phaseLawMag) / 2;
+                const coherence = avgMag > 0.001 ? 1 - (diff / avgMag) : 0;
+                document.getElementById('explorerCoherence').textContent = (coherence * 100).toFixed(2) + '%';
+            }
+            
+            // Initialize
+            window.updatePhaseExplorer(14.134725);
+        }
+        
         function createPhaseLawPlot(ctx) {
             const { primes } = computationData;
             
