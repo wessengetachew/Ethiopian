@@ -1004,6 +1004,7 @@
                     <button class="viz-btn" onclick="changeViz('errorAnalysis')">Error Analysis</button>
                     <button class="viz-btn" onclick="changeViz('primeRaces')">Prime Races</button>
                     <button class="viz-btn" onclick="changeViz('goldbachComet')">Goldbach Comet</button>
+                    <button class="viz-btn" onclick="changeViz('phaseExplorer')">Phase Explorer (Combined)</button>
                     <button class="viz-btn" onclick="changeViz('phasorSum')">Phasor Sum (Complex Plane)</button>
                     <button class="viz-btn" onclick="changeViz('zetaSurface')">Modular Zeta Surface</button>
                     <button class="viz-btn" onclick="changeViz('primeSpiral')">Ulam Spiral (Interactive)</button>
@@ -2288,6 +2289,8 @@
                 createHarmonicWavePlot(freshCtx);
             } else if (type === 'phaseLaw') {
                 createPhaseLawPlot(freshCtx);
+            } else if (type === 'phaseExplorer') {
+                createPhaseExplorerPlot(freshCtx);
             }
         }
         
@@ -3733,16 +3736,16 @@
                         <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${avgSpacing.toFixed(3)}</div>
                     </div>
                 </div>
-                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About Riemann Zeta Zeros:</strong><br>
-                    • The <strong>Riemann Hypothesis</strong> (unproven): All non-trivial zeros lie on the critical line Re(s) = 1/2<br>
-                    • These zeros encode deep information about the distribution of prime numbers<br>
-                    • Von Mangoldt's explicit formula connects zeros to prime counting function π(x)<br>
-                    • The zeros are complex numbers: ρ = 1/2 + it (shown values are the imaginary parts t)<br>
-                    • Average spacing grows like 2π/ln(t) for large t<br>
-                    • Computing over 10 trillion zeros has found <strong>none off the critical line</strong><br>
-                    • Use dropdown to jump to any specific zero for detailed exploration<br>
-                    • Spacing range: ${minSpacing.toFixed(3)} to ${maxSpacing.toFixed(3)}
+                    <strong>The Riemann Hypothesis</strong> (unproven): All non-trivial zeros lie on the critical line Re(s) = 1/2<br>
+                    These zeros encode deep information about the distribution of prime numbers<br>
+                    Von Mangoldt's explicit formula connects zeros to prime counting function π(x)<br>
+                    The zeros are complex numbers: ρ = 1/2 + it (shown values are the imaginary parts t)<br>
+                    Average spacing grows like 2π/ln(t) for large t<br>
+                    Computing over 10 trillion zeros has found <strong>none off the critical line</strong><br>
+                    Use dropdown to jump to any specific zero for detailed exploration<br>
+                    Spacing range: {minSpacing.toFixed(3)} to {maxSpacing.toFixed(3)}
                 </div>
             `;
             
@@ -5792,14 +5795,14 @@
             statsHTML += `</div>
                 <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About Prime Races (mod ${actualModulus}):</strong><br>
-                    • <strong>Chebyshev's Bias:</strong> In prime races, certain residue classes tend to "win" more often than others<br>
-                    • By Dirichlet's theorem, all ${residues.length} coprime residue classes mod ${actualModulus} have equal density asymptotically<br>
-                    • Despite equal density, one class is typically ahead at any given point (for 2-way races)<br>
-                    ${actualModulus === 4 && residues.length === 2 ? `• For mod 4: Primes ≡ 3 (mod 4) lead ~99.6% of the time (classic Chebyshev's bias)<br>
-                    • First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>` : ''}
-                    • The lead changes infinitely often (Littlewood, 1914), but very rarely<br>
-                    • Related to the <strong>Shanks-Rényi race</strong> and Rubinstein-Sarnak's work<br>
-                    • Current computation uses ${primes.length} primes up to ${primes[primes.length-1]}
+                    <strong>Chebyshev's Bias:</strong> In prime races, certain residue classes tend to "win" more often than others<br>
+                    By Dirichlet's theorem, all ${residues.length} coprime residue classes mod ${actualModulus} have equal density asymptotically<br>
+                    Despite equal density, one class is typically ahead at any given point (for 2-way races)<br>
+                    ${actualModulus === 4 && residues.length === 2 ? `For mod 4: Primes ≡ 3 (mod 4) lead approximately 99.6% of the time (classic Chebyshev's bias)<br>
+                    First crossover where 1 (mod 4) takes the lead occurs around x ≈ 26,861<br>` : ''}
+                    The lead changes infinitely often (Littlewood, 1914), but very rarely<br>
+                    Related to the <strong>Shanks-Rényi race</strong> and Rubinstein-Sarnak's work<br>
+                    Current computation uses ${primes.length} primes up to ${primes[primes.length-1]}
                 </div>
             `;
             
@@ -5975,12 +5978,12 @@
                 </div>
                 <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About Phasor Representation:</strong><br>
-                    • Each term n<sup>-s</sup> = n<sup>-σ</sup>e<sup>-it log n</sup> is a <strong>rotating phasor</strong> (vector)<br>
-                    • <strong>Radius:</strong> r<sub>n</sub> = n<sup>-${sigma}</sup> (decays with n)<br>
-                    • <strong>Angle:</strong> θ<sub>n</sub> = -t log(n) (rotates with t)<br>
-                    • The sum ζ(s) is the <strong>vector sum</strong> of all phasors<br>
-                    • When phasors align <strong>destructively</strong>, |ζ(s)| ≈ 0 → nontrivial zero!<br>
-                    • Adjust t to see how the sum changes along the critical line
+                    Each term n<sup>-s</sup> = n<sup>-σ</sup>e<sup>-it log n</sup> is a <strong>rotating phasor</strong> (vector)<br>
+                    <strong>Radius:</strong> r<sub>n</sub> = n<sup>-${sigma}</sup> (decays with n)<br>
+                    <strong>Angle:</strong> θ<sub>n</sub> = -t log(n) (rotates with t)<br>
+                    The sum ζ(s) is the <strong>vector sum</strong> of all phasors<br>
+                    When phasors align <strong>destructively</strong>, |ζ(s)| ≈ 0 → nontrivial zero<br>
+                    Adjust t to see how the sum changes along the critical line
                 </div>
             `;
             
@@ -6172,14 +6175,14 @@
                 </div>
                 <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About the Modular Zeta Surface:</strong><br>
-                    • Each concentric ring represents modulus m = 1, 2, 3, ..., <span id="maxModDisplay">30</span><br>
-                    • Points on each ring: primitive m-th roots of unity e<sup>2πik/m</sup> where gcd(k,m)=1<br>
-                    • Each point contributes: S<sub>m,k</sub>(s) = Σ<sub>n≡k(mod m)</sub> n<sup>-s</sup><br>
-                    • Color brightness = contribution magnitude<br>
-                    • <strong>At zeros:</strong> modular rotations align destructively → dark/zero sum<br>
-                    • <strong>Away from zeros:</strong> constructive interference → bright regions<br>
-                    • <strong>Adjust modulus:</strong> More rings = finer resolution, captures higher-order structure<br>
-                    • First nontrivial zero: t ≈ 14.134725 (try this value!)
+                    Each concentric ring represents modulus m = 1, 2, 3, ..., <span id="maxModDisplay">30</span><br>
+                    Points on each ring: primitive m-th roots of unity e<sup>2πik/m</sup> where gcd(k,m)=1<br>
+                    Each point contributes: S<sub>m,k</sub>(s) = Σ<sub>n≡k(mod m)</sub> n<sup>-s</sup><br>
+                    Color brightness = contribution magnitude<br>
+                    <strong>At zeros:</strong> modular rotations align destructively → dark/zero sum<br>
+                    <strong>Away from zeros:</strong> constructive interference → bright regions<br>
+                    <strong>Adjust modulus:</strong> More rings = finer resolution, captures higher-order structure<br>
+                    First nontrivial zero: t ≈ 14.134725 (try this value)
                 </div>
             `;
             
@@ -6764,13 +6767,13 @@
                 </div>
                 <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About the Goldbach Comet:</strong><br>
-                    • <strong>Goldbach's Conjecture</strong> (1742, unproven): Every even integer > 2 is the sum of two primes<br>
-                    • The "comet" shape emerges when plotting G(n) = number of ways to write n = p + q<br>
-                    • <strong>Dense vertical lines:</strong> Correspond to numbers divisible by small primes (2, 6, 30, etc.)<br>
-                    • <strong>Tail of the comet:</strong> Numbers with many prime partitions (highly composite even numbers)<br>
-                    • Verified for all even numbers up to 4 × 10¹⁸<br>
-                    • Weak Goldbach (every odd > 5 is sum of 3 primes) was proven by Helfgott in 2013<br>
-                    • The function G(n) grows roughly as n/ln²(n) for large n
+                    <strong>Goldbach's Conjecture</strong> (1742, unproven): Every even integer > 2 is the sum of two primes<br>
+                    The "comet" shape emerges when plotting G(n) = number of ways to write n = p + q<br>
+                    <strong>Dense vertical lines:</strong> Correspond to numbers divisible by small primes (2, 6, 30, etc.)<br>
+                    <strong>Tail of the comet:</strong> Numbers with many prime partitions (highly composite even numbers)<br>
+                    Verified for all even numbers up to 4 × 10¹⁸<br>
+                    Weak Goldbach (every odd > 5 is sum of 3 primes) was proven by Helfgott in 2013<br>
+                    The function G(n) grows roughly as n/ln²(n) for large n
                 </div>
             `;
             
@@ -6939,12 +6942,12 @@
                 </div>
                 <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About Error Analysis:</strong><br>
-                    • <strong>Relative Error:</strong> |computed - exact| / |exact| measures accuracy as a percentage<br>
-                    • <strong>Convergence Rate:</strong> Ratio of consecutive errors shows how fast error decreases<br>
-                    • Rate < 1 indicates convergence (smaller = faster)<br>
-                    • <strong>Theoretical Guarantee:</strong> Euler product truncation ensures error ≤ ε<br>
-                    • Log scale reveals exponential convergence behavior<br>
-                    • Each additional prime contributes multiplicatively to accuracy
+                    <strong>Relative Error:</strong> |computed - exact| / |exact| measures accuracy as a percentage<br>
+                    <strong>Convergence Rate:</strong> Ratio of consecutive errors shows how fast error decreases<br>
+                    Rate < 1 indicates convergence (smaller = faster)<br>
+                    <strong>Theoretical Guarantee:</strong> Euler product truncation ensures error ≤ ε<br>
+                    Log scale reveals exponential convergence behavior<br>
+                    Each additional prime contributes multiplicatively to accuracy
                 </div>
             `;
             
