@@ -846,6 +846,72 @@
             </div>
             
             <div class="info-section">
+                <div class="toggle-section" onclick="toggleSection('channelTheory')">
+                    <h3>Getachew Channel Theory: Prime Avoidance & Composite Projection</h3>
+                    <span class="toggle-icon" id="channelTheory-icon">▼</span>
+                </div>
+                <div id="channelTheory-content" class="collapsible-content">
+                    <p style="margin-bottom: 20px;"><strong>A unified framework revealing how primes and composites interact differently with Farey reduction channels in the modular lattice.</strong></p>
+                    
+                    <div style="background: rgba(78, 205, 196, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #4ecdc4;">
+                        <h4 style="color: #4ecdc4; margin-bottom: 10px;">Part I: Prime Channel Avoidance Theorem</h4>
+                        <p><em>Let each modulus M ∈ ℤ⁺ define a fractional residue system:</em></p>
+                        <div class="formula">ℛ(M) = { r/M | 0 ≤ r < M }</div>
+                        
+                        <p style="margin-top: 10px;"><em>Define a reduction channel as fractions sharing the same lowest-term representation:</em></p>
+                        <div class="formula">r₁/M₁ ~ r₂/M₂  ⟺  r₁/M₁ = r₂/M₂ (in lowest terms)</div>
+                        
+                        <p style="margin-top: 15px; padding: 12px; background: rgba(255, 215, 0, 0.15); border-radius: 6px;">
+                            <strong>Theorem:</strong> For every prime p, the residue set Φ(p) = {1, 2, ..., p-1} contains no reducible fractions.
+                            <br><span style="font-family: monospace; margin-top: 8px; display: block;">gcd(r, p) = 1 ∀r ∈ Φ(p) ⟹ r/p avoids all channels 1/N</span>
+                        </p>
+                        
+                        <p style="margin-top: 12px;"><strong>Geometric Meaning:</strong> Prime moduli trace <strong>irreducible orbits</strong> in the fractional lattice, never projecting onto simpler rational channels. They form the <strong>coprime skeleton</strong> of the modular continuum.</p>
+                    </div>
+                    
+                    <div style="background: rgba(255, 99, 132, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ff6384;">
+                        <h4 style="color: #ff6384; margin-bottom: 10px;">Part II: Composite Channel Projection Corollary</h4>
+                        <p><em>Let M be composite. For each r (0 ≤ r < M), define d = gcd(r, M), r' = r/d, M' = M/d.</em></p>
+                        
+                        <p style="margin-top: 15px; padding: 12px; background: rgba(255, 215, 0, 0.15); border-radius: 6px;">
+                            <strong>Corollary:</strong> Every composite M has nontrivial channel projections:
+                            <br><span style="font-family: monospace; margin-top: 8px; display: block;">r/M = r'/M' with M' | M and M' < M</span>
+                        </p>
+                        
+                        <p style="margin-top: 12px;"><strong>Key Properties:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.7;">
+                            <li><strong>Multiplicity:</strong> d = M/M' residues reduce to each r'/M'</li>
+                            <li><strong>Reducibility:</strong> M - φ(M) reducible residues (proportion 1 - φ(M)/M)</li>
+                            <li><strong>Channels:</strong> Projections onto all proper divisors M' of M</li>
+                        </ul>
+                        
+                        <div style="margin-top: 12px; padding: 10px; background: rgba(0, 0, 0, 0.15); border-radius: 6px;">
+                            <strong>Example (M=12):</strong> φ(12)=4 → 8 reducible residues<br>
+                            8/12 = 2/3 (d=4, M'=3) | Divisors: {1,2,3,4,6}<br>
+                            Each denominator-3 fraction gets 4 residues
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ffd700;">
+                        <p><strong>🌟 Unified Picture:</strong></p>
+                        <p style="line-height: 1.8;">
+                            In the nested modular plane:<br>
+                            • <strong style="color: #4ecdc4;">Primes</strong> occupy interstitial regions, forming smooth non-overlapping rings<br>
+                            • <strong style="color: #ff6384;">Composites</strong> project onto Farey flow lines (channels 1/2, 1/3, 1/4, ...)<br>
+                            • Together they partition the modular space into <strong>coprime manifolds</strong> (primes) and <strong>reduction webs</strong> (composites)
+                        </p>
+                    </div>
+                    
+                    <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.08); border-radius: 8px;">
+                        <strong>📊 Interactive Visualizations:</strong> Explore both concepts below with dedicated interactive tools:
+                        <br>• <strong>Prime Channel Avoidance</strong> - See cyan prime rings avoiding Farey channels
+                        <br>• <strong>Composite Projection</strong> - Watch red composite points project onto reduction channels
+                        <br>Adjust modulus and epsilon to explore the full channel structure!
+                    </p>
+                </div>
+            </div>
+            
+            <div class="info-section">
                 <div class="toggle-section" onclick="toggleSection('credits')">
                     <h3>Credits & Acknowledgments</h3>
                     <span class="toggle-icon" id="credits-icon">▼</span>
@@ -2291,6 +2357,8 @@
                 createPhaseLawPlot(freshCtx);
             } else if (type === 'phaseExplorer') {
                 createPhaseExplorerPlot(freshCtx);
+            } else if (type === 'compositeChannels') {
+                createCompositeChannelsPlot(freshCtx);
             }
         }
         
@@ -2853,6 +2921,8 @@
                 chartInstance = generatePhasorSumForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'zetaSurface') {
                 chartInstance = generateZetaSurfaceForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'compositeChannels') {
+                chartInstance = generateCompositeChannelsForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'primeSpiral') {
                 chartInstance = generatePrimeSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'heatmap') {
@@ -7135,6 +7205,258 @@
             ctx.font = `bold ${height * 0.03}px Arial`;
             ctx.textAlign = 'center';
             ctx.fillText(`Modular Zeta Surface at t = ${t.toFixed(3)} (First Zero)`, centerX, height - 30);
+            
+            return { destroy: () => {} };
+        }
+        
+        function generatePrimeAvoidanceForExport(ctx, width, height, background) {
+            const maxMod = parseInt(document.getElementById('avoidanceMaxModSlider')?.value || 30);
+            const epsilon = parseFloat(document.getElementById('avoidanceEpsilonSlider')?.value || 0.2);
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = Math.min(width, height) * 0.42;
+            
+            const primes = sieveOfEratosthenes(maxMod);
+            const primeSet = new Set(primes);
+            const moduli = [];
+            for (let m = 2; m <= maxMod; m++) {
+                moduli.push({ M: m, isPrime: primeSet.has(m) });
+            }
+            
+            const allResidues = [];
+            for (const mod of moduli) {
+                const M = mod.M;
+                const radius = (M / maxMod) * maxRadius;
+                
+                for (let r = 1; r < M; r++) {
+                    const d = gcd(r, M);
+                    const rPrime = r / d;
+                    const mPrime = M / d;
+                    const isReducible = d > 1;
+                    
+                    const angle = (2 * Math.PI * r) / M;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    
+                    let channelX = centerX, channelY = centerY;
+                    if (isReducible) {
+                        const channelRadius = (mPrime / maxMod) * maxRadius;
+                        const channelAngle = (2 * Math.PI * rPrime) / mPrime;
+                        channelX = centerX + channelRadius * Math.cos(channelAngle);
+                        channelY = centerY + channelRadius * Math.sin(channelAngle);
+                    }
+                    
+                    allResidues.push({
+                        M, r, d, isPrime: mod.isPrime, isReducible,
+                        x, y, channelX, channelY
+                    });
+                }
+            }
+            
+            // Clear
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#000000';
+            }
+            ctx.fillRect(0, 0, width, height);
+            
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            // Draw projection lines
+            const lineOpacity = Math.max(0.1, epsilon * 0.5);
+            for (const res of allResidues) {
+                if (res.isReducible) {
+                    ctx.strokeStyle = background === 'white' ? 
+                        `rgba(220, 53, 69, ${lineOpacity})` : 
+                        `rgba(255, 99, 132, ${lineOpacity})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(res.x, res.y);
+                    ctx.lineTo(res.channelX, res.channelY);
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw rings
+            for (const mod of moduli) {
+                const radius = (mod.M / maxMod) * maxRadius;
+                if (background === 'white') {
+                    ctx.strokeStyle = mod.isPrime ? 'rgba(30, 60, 114, 0.5)' : 'rgba(220, 53, 69, 0.3)';
+                } else {
+                    ctx.strokeStyle = mod.isPrime ? 'rgba(78, 205, 196, 0.5)' : 'rgba(255, 99, 132, 0.3)';
+                }
+                ctx.lineWidth = mod.isPrime ? 4 : 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Draw points
+            for (const res of allResidues) {
+                let pointColor;
+                if (res.isPrime) {
+                    pointColor = background === 'white' ? 'rgba(30, 60, 114, 0.9)' : 'rgba(78, 205, 196, 0.9)';
+                } else {
+                    pointColor = background === 'white' ?
+                        (res.isReducible ? 'rgba(220, 53, 69, 0.8)' : 'rgba(255, 159, 64, 0.8)') :
+                        (res.isReducible ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 159, 64, 0.8)');
+                }
+                
+                ctx.fillStyle = pointColor;
+                ctx.beginPath();
+                ctx.arc(res.x, res.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Center
+            ctx.fillStyle = background === 'white' ? '#1e3c72' : '#fff';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Labels
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${height * 0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText(`Prime Channel Avoidance: Max Modulus = ${maxMod}`, centerX, height * 0.05);
+            
+            ctx.font = `${height * 0.02}px Arial`;
+            const primeCount = moduli.filter(m => m.isPrime).length;
+            ctx.fillText(`${primeCount} primes (cyan) avoid all Farey channels | ${moduli.length - primeCount} composites (red) project onto channels`, 
+                        centerX, height * 0.95);
+            
+            return { destroy: () => {} };
+        }
+        
+        function generateCompositeChannelsForExport(ctx, width, height, background) {
+            // Use current settings or defaults
+            const M = parseInt(document.getElementById('compositeMSlider')?.value || 12);
+            const epsilon = parseFloat(document.getElementById('compositeEpsilonSlider')?.value || 0.1);
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Calculate proper divisors
+            const divisors = [];
+            for (let d = 1; d < M; d++) {
+                if (M % d === 0) {
+                    divisors.push(d);
+                }
+            }
+            
+            const phiM = eulerPhi(M);
+            const maxRadius = Math.min(width, height) * 0.4;
+            
+            // Compute all residues and their projections
+            const residueData = [];
+            for (let r = 0; r < M; r++) {
+                const d = gcd(r, M);
+                const rPrime = r / d;
+                const mPrime = M / d;
+                const isReducible = d > 1;
+                
+                const outerAngle = (2 * Math.PI * r) / M;
+                const outerX = centerX + maxRadius * Math.cos(outerAngle);
+                const outerY = centerY + maxRadius * Math.sin(outerAngle);
+                
+                const innerRadius = (mPrime / M) * maxRadius;
+                const innerAngle = (2 * Math.PI * rPrime) / mPrime;
+                const innerX = centerX + innerRadius * Math.cos(innerAngle);
+                const innerY = centerY + innerRadius * Math.sin(innerAngle);
+                
+                residueData.push({
+                    r, rPrime, mPrime, d,
+                    isReducible,
+                    outerX, outerY,
+                    innerX, innerY,
+                    outerRadius: maxRadius,
+                    innerRadius
+                });
+            }
+            
+            // Clear canvas
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#000000';
+            }
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw using projection lines mode (most informative for export)
+            const textColor = background === 'white' ? '#000000' : '#ffffff';
+            
+            // Draw outer ring
+            ctx.strokeStyle = background === 'white' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, maxRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Draw reduction rings
+            const uniqueMPrimes = [...new Set(residueData.map(d => d.mPrime))].sort((a, b) => a - b);
+            for (const mPrime of uniqueMPrimes) {
+                if (mPrime === M) continue;
+                const radius = (mPrime / M) * maxRadius;
+                ctx.strokeStyle = background === 'white' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 215, 0, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Draw projection lines
+            const lineOpacity = Math.max(0.2, Math.min(1, epsilon * 2));
+            for (const data of residueData) {
+                if (data.isReducible) {
+                    ctx.strokeStyle = background === 'white' ? 
+                        `rgba(220, 53, 69, ${lineOpacity})` : 
+                        `rgba(255, 99, 132, ${lineOpacity})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(data.outerX, data.outerY);
+                    ctx.lineTo(data.innerX, data.innerY);
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw residue points
+            for (const data of residueData) {
+                // Outer point
+                if (background === 'white') {
+                    ctx.fillStyle = data.isReducible ? 'rgba(220, 53, 69, 0.9)' : 'rgba(30, 60, 114, 0.9)';
+                } else {
+                    ctx.fillStyle = data.isReducible ? 'rgba(255, 99, 132, 0.9)' : 'rgba(78, 205, 196, 0.9)';
+                }
+                ctx.beginPath();
+                ctx.arc(data.outerX, data.outerY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Inner point
+                if (data.isReducible) {
+                    ctx.fillStyle = background === 'white' ? 'rgba(212, 175, 55, 0.8)' : 'rgba(255, 215, 0, 0.8)';
+                    ctx.beginPath();
+                    ctx.arc(data.innerX, data.innerY, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Center marker
+            ctx.fillStyle = background === 'white' ? '#1e3c72' : '#4ecdc4';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Labels
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${height * 0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText(`Composite Channel Projection: M = ${M}`, centerX, height * 0.05);
+            
+            ctx.font = `${height * 0.02}px Arial`;
+            ctx.fillText(`φ(${M}) = ${phiM} irreducible, ${M - phiM} reducible (${((M - phiM) / M * 100).toFixed(1)}%)`, 
+                        centerX, height * 0.95);
             
             return { destroy: () => {} };
         }
