@@ -984,6 +984,24 @@
                     <button class="viz-btn" onclick="changeViz('goldbachComet')">Goldbach Comet</button>
                     <button class="viz-btn" onclick="changeViz('phasorSum')">Phasor Sum (Complex Plane)</button>
                     <button class="viz-btn" onclick="changeViz('zetaSurface')">Modular Zeta Surface</button>
+                    <button class="viz-btn" onclick="changeViz('primeSpiral')">Ulam Spiral (Interactive)</button>
+                    <button class="viz-btn" onclick="changeViz('channelRace')">Channel Race Animation</button>
+                    <button class="viz-btn" onclick="changeViz('heatmap')">Prime Density Heatmap</button>
+                    <button class="viz-btn" onclick="changeViz('voronoi')">Prime Voronoi Diagram</button>
+                    <button class="viz-btn" onclick="changeViz('harmonicWave')">Harmonic Wave (Musical)</button>
+                </div>
+                <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                    <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
+                        🔍 Universal Zoom: <span id="universalZoomLevel">1.0</span>x
+                    </label>
+                    <input type="range" id="universalZoomSlider" min="0.5" max="5" step="0.1" value="1" 
+                           style="width: 100%;"
+                           oninput="updateUniversalZoom(parseFloat(this.value))">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; opacity: 0.7; margin-top: 5px;">
+                        <span>0.5x (Zoom Out)</span>
+                        <span>1x (Default)</span>
+                        <span>5x (Zoom In)</span>
+                    </div>
                 </div>
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
@@ -1114,6 +1132,13 @@
         let currentViz = 'convergence';
         let currentChannelView = 'cards';
         let channelDataGlobal = null;
+        let universalZoom = 1.0;
+        
+        function updateUniversalZoom(zoom) {
+            universalZoom = zoom;
+            document.getElementById('universalZoomLevel').textContent = zoom.toFixed(1);
+            updateVisualization(currentViz);
+        }
         
         function setEpsilon(value) {
             document.getElementById('epsilon').value = value;
@@ -1447,10 +1472,7 @@
             
             for (const gap of sortedGaps) {
                 const gapPrimes = gapClasses[gap];
-                const contribution = computeTruncatedProduct(gapPrimes, exponent);
-                const logContrib = Math.log(contribution);
-                
-                // Calculate cumulative product steps
+                // Calculate cumulative product steps FIRST
                 let cumulativeSteps = [];
                 let cumProduct = 1;
                 for (const p of gapPrimes) {
@@ -1462,6 +1484,10 @@
                         cumulative: cumProduct
                     });
                 }
+                
+                // Final contribution is the last cumulative value
+                const contribution = cumProduct;
+                const logContrib = Math.log(contribution);
                 
                 html += `
                     <div class="gap-item" onclick="toggleGap(${gap})">
@@ -1481,9 +1507,11 @@
                         <div class="gap-primes-list" id="gap-primes-${gap}">
                             <h4 style="color: #ffd700; margin-bottom: 10px;">All ${gapPrimes.length} Primes in Gap ${gap}:</h4>
                             <div class="gap-primes-container">${gapPrimes.map((p, idx) => {
-                                const nextP = gapPrimes[idx + 1];
-                                const prevP = idx > 0 ? gapPrimes[idx - 1] : (gap === 2 && p === 3 ? 2 : primes[primes.indexOf(p) - 1]);
-                                return `p = ${p} (gap: ${p} - ${prevP} = ${gap})`;
+                                // Find the actual previous prime in the full primes array
+                                const primeIndex = primes.indexOf(p);
+                                const prevP = primeIndex > 0 ? primes[primeIndex - 1] : 0;
+                                const actualGap = p - prevP;
+                                return `p = ${p} (gap: ${p} - ${prevP} = ${actualGap})`;
                             }).join('<br>')}</div>
                             
                             <div class="gap-cumulative-section">
@@ -2127,6 +2155,16 @@
                 createPhasorSumPlot(freshCtx);
             } else if (type === 'zetaSurface') {
                 createZetaSurfacePlot(freshCtx);
+            } else if (type === 'primeSpiral') {
+                createPrimeSpiralPlot(freshCtx);
+            } else if (type === 'channelRace') {
+                createChannelRacePlot(freshCtx);
+            } else if (type === 'heatmap') {
+                createHeatmapPlot(freshCtx);
+            } else if (type === 'voronoi') {
+                createVoronoiPlot(freshCtx);
+            } else if (type === 'harmonicWave') {
+                createHarmonicWavePlot(freshCtx);
             }
         }
         
@@ -2689,6 +2727,12 @@
                 chartInstance = generatePhasorSumForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             } else if (chartType === 'zetaSurface') {
                 chartInstance = generateZetaSurfaceForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'primeSpiral') {
+                chartInstance = generatePrimeSpiralForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'heatmap') {
+                chartInstance = generateHeatmapForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
+            } else if (chartType === 'voronoi') {
+                chartInstance = generateVoronoiForExport(tempCtx, tempCanvas.width, tempCanvas.height, background);
             }
             
             // Wait for chart to render with longer delay
@@ -3371,7 +3415,8 @@
             
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const scale = Math.min(canvas.width, canvas.height) / (2 * maxR) * 0.85;
+            const baseScale = Math.min(canvas.width, canvas.height) / (2 * maxR) * 0.85;
+            const scale = baseScale * universalZoom;
             
             // Clear canvas
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
@@ -3379,28 +3424,30 @@
             
             // Draw composite numbers first (background)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            const pointSize = Math.max(1, 1.5 * universalZoom);
             for (const point of compositePoints) {
                 const screenX = centerX + point.x * scale;
                 const screenY = centerY + point.y * scale;
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, 1.5, 0, Math.PI * 2);
+                ctx.arc(screenX, screenY, pointSize, 0, Math.PI * 2);
                 ctx.fill();
             }
             
             // Draw primes (foreground)
             ctx.fillStyle = '#ffd700';
+            const primePointSize = Math.max(2, 2.5 * universalZoom);
             for (const point of primePoints) {
                 const screenX = centerX + point.x * scale;
                 const screenY = centerY + point.y * scale;
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, 2.5, 0, Math.PI * 2);
+                ctx.arc(screenX, screenY, primePointSize, 0, Math.PI * 2);
                 ctx.fill();
             }
             
             // Draw center marker
             ctx.fillStyle = '#4ecdc4';
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, 4 * universalZoom, 0, Math.PI * 2);
             ctx.fill();
             
             // Add hover interaction
@@ -3498,8 +3545,7 @@
         }
         
         function createZetaZerosPlot(ctx) {
-            // First 50 non-trivial zeros of Riemann zeta function (imaginary parts)
-            // These are on the critical line Re(s) = 1/2
+            // Extended list of first 100 non-trivial zeros of Riemann zeta function
             const zetaZeros = [
                 14.134725, 21.022040, 25.010858, 30.424876, 32.935062,
                 37.586178, 40.918719, 43.327073, 48.005151, 49.773832,
@@ -3510,8 +3556,21 @@
                 103.725538, 105.446623, 107.168611, 111.029536, 111.874659,
                 114.320220, 116.226680, 118.790782, 121.370125, 122.946829,
                 124.256819, 127.516683, 129.578704, 131.087688, 133.497737,
-                134.756509, 138.116042, 139.736209, 141.123707, 143.111846
+                134.756509, 138.116042, 139.736209, 141.123707, 143.111846,
+                146.000982, 147.422765, 150.053183, 150.925257, 153.024693,
+                156.112909, 157.597592, 158.849988, 161.188964, 163.030709,
+                165.537069, 167.184439, 169.094515, 169.911976, 173.411536,
+                174.754191, 176.441434, 178.377407, 179.916484, 182.207078,
+                184.874467, 185.598783, 187.228922, 189.416158, 192.026656,
+                193.079726, 195.265396, 196.876481, 198.015309, 201.264751,
+                202.493594, 204.189671, 205.394697, 207.906258, 209.576509,
+                211.690862, 213.347919, 214.547044, 216.169538, 219.067596,
+                220.714918, 221.430705, 224.007000, 224.983324, 227.421444,
+                229.337413, 231.250188, 231.987235, 233.693404, 236.524229
             ];
+            
+            // Store globally for other visualizations
+            window.allKnownZeros = zetaZeros;
             
             // Calculate statistics
             const avgSpacing = zetaZeros.slice(1).map((z, i) => z - zetaZeros[i]).reduce((a, b) => a + b) / (zetaZeros.length - 1);
@@ -3522,10 +3581,16 @@
             const statsDiv = document.getElementById('vizStats');
             statsDiv.style.display = 'block';
             statsDiv.innerHTML = `
-                <h4 style="color: #ffd700; margin-bottom: 15px;">Riemann Zeta Function - Non-Trivial Zeros</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Riemann Zeta Function - Non-Trivial Zeros (First 100)</h4>
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Select Zero to Explore: </label>
+                    <select id="zeroSelector" style="width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 16px;" onchange="jumpToZero(parseFloat(this.value))">
+                        ${zetaZeros.map((z, idx) => `<option value="${z}">Zero #${idx + 1}: t = ${z.toFixed(6)}</option>`).join('')}
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
                     <div style="background: rgba(78, 205, 196, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Zeros Shown</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">Zeros Catalogued</div>
                         <div style="font-size: 1.4em; font-weight: bold; color: #4ecdc4;">${zetaZeros.length}</div>
                     </div>
                     <div style="background: rgba(255, 215, 0, 0.15); padding: 12px; border-radius: 8px;">
@@ -3533,15 +3598,15 @@
                         <div style="font-size: 1.4em; font-weight: bold; color: #ffd700;">${zetaZeros[0].toFixed(6)}</div>
                     </div>
                     <div style="background: rgba(255, 99, 132, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Spacing</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${avgSpacing.toFixed(3)}</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">Last Zero (in list)</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #ff6384;">${zetaZeros[zetaZeros.length-1].toFixed(6)}</div>
                     </div>
                     <div style="background: rgba(153, 102, 255, 0.15); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 0.9em; opacity: 0.8;">Spacing Range</div>
-                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${minSpacing.toFixed(3)} - ${maxSpacing.toFixed(3)}</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">Avg Spacing</div>
+                        <div style="font-size: 1.4em; font-weight: bold; color: #9966ff;">${avgSpacing.toFixed(3)}</div>
                     </div>
                 </div>
-                <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About Riemann Zeta Zeros:</strong><br>
                     • The <strong>Riemann Hypothesis</strong> (unproven): All non-trivial zeros lie on the critical line Re(s) = 1/2<br>
                     • These zeros encode deep information about the distribution of prime numbers<br>
@@ -3549,7 +3614,8 @@
                     • The zeros are complex numbers: ρ = 1/2 + it (shown values are the imaginary parts t)<br>
                     • Average spacing grows like 2π/ln(t) for large t<br>
                     • Computing over 10 trillion zeros has found <strong>none off the critical line</strong><br>
-                    • The chart shows zeros on critical line at Re(s) = 1/2
+                    • Use dropdown to jump to any specific zero for detailed exploration<br>
+                    • Spacing range: ${minSpacing.toFixed(3)} to ${maxSpacing.toFixed(3)}
                 </div>
             `;
             
@@ -3586,12 +3652,15 @@
                                     const idx = context.dataIndex;
                                     const t = zetaZeros[idx];
                                     const nextT = idx < zetaZeros.length - 1 ? zetaZeros[idx + 1] : null;
+                                    const prevT = idx > 0 ? zetaZeros[idx - 1] : null;
                                     const spacing = nextT ? (nextT - t).toFixed(3) : 'N/A';
+                                    const prevSpacing = prevT ? (t - prevT).toFixed(3) : 'N/A';
                                     return [
                                         `Zero #${idx + 1}`,
                                         `ρ = 1/2 + ${t.toFixed(6)}i`,
                                         `Im(ρ) = ${t.toFixed(6)}`,
-                                        `Spacing to next: ${spacing}`
+                                        `Prev spacing: ${prevSpacing}`,
+                                        `Next spacing: ${spacing}`
                                     ];
                                 }
                             }
@@ -3633,6 +3702,32 @@
                     }
                 }
             });
+            
+            // Function to jump to a specific zero in other visualizations
+            window.jumpToZero = function(t) {
+                // Update Phasor Sum if it exists
+                if (document.getElementById('tSlider')) {
+                    document.getElementById('tSlider').value = t;
+                    if (window.updatePhasorPlot) {
+                        window.updatePhasorPlot(t, parseFloat(document.getElementById('zoomSlider')?.value || 1));
+                    }
+                }
+                
+                // Update Zeta Surface if it exists
+                if (document.getElementById('tSliderSurface')) {
+                    document.getElementById('tSliderSurface').value = t;
+                    if (window.updateZetaSurface) {
+                        window.updateZetaSurface(t);
+                    }
+                }
+                
+                // Visual feedback
+                const selector = document.getElementById('zeroSelector');
+                selector.style.background = 'rgba(78, 205, 196, 0.3)';
+                setTimeout(() => {
+                    selector.style.background = '';
+                }, 500);
+            };
         }
         
         function createPrimeCountingPlot(ctx) {
@@ -3896,6 +3991,536 @@
                     }
                 }
             });
+        }
+        
+        function createPrimeSpiralPlot(ctx) {
+            const { primes } = computationData;
+            const primeSet = new Set(primes);
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Interactive Ulam Spiral</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Spiral Size: <span id="spiralSize">50</span>x<span id="spiralSizeY">50</span></label>
+                    <input type="range" id="spiralSizeSlider" min="30" max="150" step="10" value="50" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updatePrimeSpiral(parseInt(this.value), parseInt(document.getElementById('spiralStartSlider').value))">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Starting Number: <span id="spiralStart">1</span></label>
+                    <input type="range" id="spiralStartSlider" min="1" max="1000" step="1" value="1" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updatePrimeSpiral(parseInt(document.getElementById('spiralSizeSlider').value), parseInt(this.value))">
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px;">
+                    <div style="background: rgba(255, 215, 0, 0.15); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Numbers Shown</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ffd700;" id="spiralTotal">2500</div>
+                    </div>
+                    <div style="background: rgba(78, 205, 196, 0.15); padding: 10px; border-radius: 8px;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Primes Found</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;" id="spiralPrimes">0</div>
+                    </div>
+                </div>
+                <div style="padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.5; font-size: 0.9em;">
+                    <strong>Ulam Spiral:</strong> Discovered by Stanisław Ulam in 1963, reveals diagonal patterns where primes cluster.
+                    Click on any square to see the number. Adjust size and starting point to explore different ranges!
+                </div>
+            `;
+            
+            window.updatePrimeSpiral = (size = 50, start = 1) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const baseCellSize = Math.min(rect.width / size, rect.height / size);
+                const cellSize = baseCellSize * universalZoom;
+                const offsetX = (rect.width - size * cellSize) / 2;
+                const offsetY = (rect.height - size * cellSize) / 2;
+                
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                // Generate Ulam spiral using correct algorithm
+                const spiral = [];
+                let x = Math.floor(size / 2);
+                let y = Math.floor(size / 2);
+                let num = start;
+                let primeCount = 0;
+                
+                // Direction vectors: right, up, left, down
+                const directions = [[1, 0], [0, -1], [-1, 0], [0, 1]];
+                let dirIndex = 0;
+                let steps = 1;
+                let stepsTaken = 0;
+                let stepsInDirection = 0;
+                
+                for (let i = 0; i < size * size; i++) {
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        const isPrime = primeSet.has(num);
+                        if (isPrime) primeCount++;
+                        spiral.push({ x, y, num, isPrime });
+                        
+                        // Draw cell
+                        const screenX = offsetX + x * cellSize;
+                        const screenY = offsetY + y * cellSize;
+                        
+                        freshCtx.fillStyle = isPrime ? '#ffd700' : 'rgba(255, 255, 255, 0.08)';
+                        freshCtx.fillRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                    }
+                    
+                    // Move in current direction
+                    x += directions[dirIndex][0];
+                    y += directions[dirIndex][1];
+                    stepsInDirection++;
+                    
+                    // Check if we need to turn
+                    if (stepsInDirection === steps) {
+                        stepsInDirection = 0;
+                        dirIndex = (dirIndex + 1) % 4;
+                        stepsTaken++;
+                        
+                        // Increase steps every 2 direction changes
+                        if (stepsTaken % 2 === 0) {
+                            steps++;
+                        }
+                    }
+                    
+                    num++;
+                }
+                
+                document.getElementById('spiralSize').textContent = size;
+                document.getElementById('spiralSizeY').textContent = size;
+                document.getElementById('spiralStart').textContent = start;
+                document.getElementById('spiralTotal').textContent = (size * size).toLocaleString();
+                document.getElementById('spiralPrimes').textContent = primeCount;
+                
+                // Hover interaction
+                canvas.onmousemove = (e) => {
+                    // Redraw to clear previous hover
+                    freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                    freshCtx.fillRect(0, 0, rect.width, rect.height);
+                    
+                    for (const cell of spiral) {
+                        const screenX = offsetX + cell.x * cellSize;
+                        const screenY = offsetY + cell.y * cellSize;
+                        freshCtx.fillStyle = cell.isPrime ? '#ffd700' : 'rgba(255, 255, 255, 0.08)';
+                        freshCtx.fillRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                    }
+                    
+                    const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+                    const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+                    
+                    const gridX = Math.floor((mouseX - offsetX) / cellSize);
+                    const gridY = Math.floor((mouseY - offsetY) / cellSize);
+                    
+                    const cell = spiral.find(c => c.x === gridX && c.y === gridY);
+                    
+                    if (cell) {
+                        const screenX = offsetX + gridX * cellSize;
+                        const screenY = offsetY + gridY * cellSize;
+                        
+                        freshCtx.strokeStyle = '#ff6384';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.strokeRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                        
+                        // Tooltip
+                        freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                        freshCtx.fillRect(mouseX + 10, mouseY - 35, 160, 30);
+                        freshCtx.strokeStyle = cell.isPrime ? '#ffd700' : 'rgba(255, 255, 255, 0.5)';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.strokeRect(mouseX + 10, mouseY - 35, 160, 30);
+                        
+                        freshCtx.fillStyle = cell.isPrime ? '#ffd700' : '#fff';
+                        freshCtx.font = 'bold 14px Arial';
+                        freshCtx.fillText(`${cell.num} ${cell.isPrime ? '(PRIME)' : ''}`, mouseX + 15, mouseY - 15);
+                    }
+                };
+            };
+            
+            window.updatePrimeSpiral(50, 1);
+        }
+        
+        function createChannelRacePlot(ctx) {
+            const { primes, modulus } = computationData;
+            const coprimeResidues = getCoprimeResidues(modulus);
+            const channels = computeResidueChannels(primes, modulus);
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Channel Race Animation (mod ${modulus})</h4>
+                <div style="margin-bottom: 15px;">
+                    <button id="racePlayBtn" onclick="toggleRaceAnimation()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">▶ Play Race</button>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Animation Speed: <span id="raceSpeed">1</span>x</label>
+                    <input type="range" id="raceSpeedSlider" min="0.1" max="5" step="0.1" value="1" 
+                           style="width: 100%; margin-top: 8px;">
+                </div>
+                <div id="raceStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.5; font-size: 0.9em;">
+                    Watch residue channels compete in real-time as primes are added sequentially!
+                </div>
+            `;
+            
+            let raceAnimationId = null;
+            let raceIndex = 0;
+            let isRacePlaying = false;
+            
+            window.toggleRaceAnimation = () => {
+                isRacePlaying = !isRacePlaying;
+                const btn = document.getElementById('racePlayBtn');
+                
+                if (isRacePlaying) {
+                    btn.innerHTML = '⏸ Pause';
+                    btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
+                    startRaceAnimation();
+                } else {
+                    btn.innerHTML = '▶ Play Race';
+                    btn.style.background = 'linear-gradient(45deg, #4ecdc4, #44a8a3)';
+                    if (raceAnimationId) cancelAnimationFrame(raceAnimationId);
+                }
+            };
+            
+            function startRaceAnimation() {
+                if (!isRacePlaying) return;
+                
+                const speed = parseFloat(document.getElementById('raceSpeedSlider').value);
+                
+                if (raceIndex >= primes.length) {
+                    raceIndex = 0;
+                }
+                
+                // Update every N frames based on speed
+                if (Math.random() < speed * 0.1) {
+                    raceIndex++;
+                    drawRace();
+                }
+                
+                raceAnimationId = requestAnimationFrame(startRaceAnimation);
+            }
+            
+            function drawRace() {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                // Count primes per channel up to raceIndex
+                const counts = {};
+                coprimeResidues.forEach(r => counts[r] = 0);
+                
+                for (let i = 0; i < raceIndex && i < primes.length; i++) {
+                    const p = primes[i];
+                    if (p >= modulus) {
+                        const residue = p % modulus;
+                        if (coprimeResidues.includes(residue)) {
+                            counts[residue]++;
+                        }
+                    }
+                }
+                
+                const maxCount = Math.max(...Object.values(counts), 1);
+                const barHeight = rect.height / (coprimeResidues.length + 1);
+                
+                coprimeResidues.forEach((r, idx) => {
+                    const count = counts[r];
+                    const barWidth = (count / maxCount) * rect.width * 0.8;
+                    const y = idx * barHeight + barHeight / 4;
+                    
+                    const hue = (idx / coprimeResidues.length) * 280;
+                    freshCtx.fillStyle = `hsla(${hue}, 80%, 60%, 0.8)`;
+                    freshCtx.fillRect(50, y, barWidth, barHeight * 0.6);
+                    
+                    freshCtx.fillStyle = '#fff';
+                    freshCtx.font = 'bold 16px Arial';
+                    freshCtx.fillText(`≡ ${r} (mod ${modulus})`, 10, y + barHeight * 0.4);
+                    freshCtx.fillText(count, barWidth + 60, y + barHeight * 0.4);
+                }); 
+                
+                // Progress indicator
+                freshCtx.fillStyle = '#4ecdc4';
+                freshCtx.font = 'bold 20px Arial';
+                freshCtx.fillText(`Prime #${raceIndex} / ${primes.length}`, rect.width / 2 - 80, rect.height - 20);
+            }
+            
+            drawRace();
+        }
+        
+        function createHeatmapPlot(ctx) {
+            const { primes } = computationData;
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Density Heatmap</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Grid Size: <span id="heatmapGrid">50</span>x<span id="heatmapGridY">50</span></label>
+                    <input type="range" id="heatmapGridSlider" min="20" max="100" step="5" value="50" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updateHeatmap(parseInt(this.value))">
+                </div>
+                <div style="padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.5; font-size: 0.9em;">
+                    Red = High prime density | Blue = Low density. Hover to see exact counts.
+                </div>
+            `;
+            
+            window.updateHeatmap = (gridSize = 50) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                const baseCellSize = Math.min(rect.width / gridSize, rect.height / gridSize);
+                const cellSize = baseCellSize * universalZoom;
+                const visibleSize = Math.min(rect.width / cellSize, rect.height / cellSize);
+                const offsetX = (rect.width - visibleSize * cellSize) / 2;
+                const offsetY = (rect.height - visibleSize * cellSize) / 2;
+                
+                const maxPrime = primes[primes.length - 1];
+                const rangePerCell = maxPrime / gridSize;
+                
+                freshCtx.fillStyle = '#000';
+                freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                // Calculate density grid
+                const densityGrid = [];
+                let maxDensity = 0;
+                
+                for (let i = 0; i < gridSize; i++) {
+                    densityGrid[i] = [];
+                    for (let j = 0; j < gridSize; j++) {
+                        const rangeStart = (i * gridSize + j) * rangePerCell;
+                        const rangeEnd = rangeStart + rangePerCell;
+                        const count = primes.filter(p => p >= rangeStart && p < rangeEnd).length;
+                        densityGrid[i][j] = count;
+                        maxDensity = Math.max(maxDensity, count);
+                    }
+                }
+                
+                // Draw heatmap
+                for (let i = 0; i < gridSize; i++) {
+                    for (let j = 0; j < gridSize; j++) {
+                        const density = densityGrid[i][j];
+                        const ratio = density / maxDensity;
+                        
+                        // Color from blue (low) to red (high)
+                        const hue = (1 - ratio) * 240;
+                        freshCtx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
+                        
+                        const screenX = offsetX + j * cellSize;
+                        const screenY = offsetY + i * cellSize;
+                        freshCtx.fillRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                    }
+                }
+                
+                document.getElementById('heatmapGrid').textContent = gridSize;
+                document.getElementById('heatmapGridY').textContent = gridSize;
+                
+                // Hover
+                canvas.onmousemove = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    const j = Math.floor((mouseX - offsetX) / cellSize);
+                    const i = Math.floor((mouseY - offsetY) / cellSize);
+                    
+                    if (i >= 0 && i < gridSize && j >= 0 && j < gridSize) {
+                        const density = densityGrid[i][j];
+                        const rangeStart = Math.floor((i * gridSize + j) * rangePerCell);
+                        const rangeEnd = Math.floor(rangeStart + rangePerCell);
+                        
+                        const screenX = offsetX + j * cellSize;
+                        const screenY = offsetY + i * cellSize;
+                        
+                        freshCtx.strokeStyle = '#fff';
+                        freshCtx.lineWidth = 2;
+                        freshCtx.strokeRect(screenX, screenY, cellSize - 1, cellSize - 1);
+                        
+                        freshCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                        freshCtx.fillRect(mouseX + 10, mouseY - 40, 180, 35);
+                        freshCtx.fillStyle = '#fff';
+                        freshCtx.font = '13px Arial';
+                        freshCtx.fillText(`Range: [${rangeStart}, ${rangeEnd})`, mouseX + 15, mouseY - 22);
+                        freshCtx.fillText(`Primes: ${density}`, mouseX + 15, mouseY - 8);
+                    }
+                };
+            };
+            
+            window.updateHeatmap(50);
+        }
+        
+        function createVoronoiPlot(ctx) {
+            const { primes } = computationData;
+            const sampledPrimes = primes.filter((_, i) => i % Math.max(1, Math.floor(primes.length / 200)) === 0);
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Prime Voronoi Diagram</h4>
+                <div style="padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.5; font-size: 0.9em; margin-bottom: 15px;">
+                    Each region shows numbers closest to a specific prime. Color indicates prime size.
+                    Uses logarithmic spiral mapping for visualization.
+                </div>
+                <div style="background: rgba(78, 205, 196, 0.15); padding: 10px; border-radius: 8px;">
+                    <div style="font-size: 0.85em; opacity: 0.8;">Primes Sampled</div>
+                    <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;">${sampledPrimes.length}</div>
+                </div>
+            `;
+            
+            const canvas = document.getElementById('vizCanvas');
+            const freshCtx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const baseScale = Math.min(rect.width, rect.height) * 0.4;
+            const scale = baseScale * universalZoom;
+            
+            freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+            freshCtx.fillRect(0, 0, rect.width, rect.height);
+            
+            // Map primes to spiral positions
+            const primePositions = sampledPrimes.map(p => {
+                const angle = 2 * Math.PI * Math.sqrt(p);
+                const radius = Math.sqrt(p) / Math.sqrt(sampledPrimes[sampledPrimes.length - 1]) * scale;
+                return {
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle),
+                    prime: p
+                };
+            });
+            
+            // Draw Voronoi cells with adjusted resolution
+            const step = Math.max(1, Math.floor(4 / universalZoom));
+            for (let x = 0; x < rect.width; x += step) {
+                for (let y = 0; y < rect.height; y += step) {
+                    let closest = primePositions[0];
+                    let minDist = Infinity;
+                    
+                    for (const pos of primePositions) {
+                        const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closest = pos;
+                        }
+                    }
+                    
+                    const ratio = closest.prime / sampledPrimes[sampledPrimes.length - 1];
+                    const hue = ratio * 280;
+                    freshCtx.fillStyle = `hsla(${hue}, 70%, 50%, 0.6)`;
+                    freshCtx.fillRect(x, y, step, step);
+                }
+            }
+            
+            // Draw prime points
+            const pointSize = 3 * universalZoom;
+            for (const pos of primePositions) {
+                freshCtx.fillStyle = '#fff';
+                freshCtx.beginPath();
+                freshCtx.arc(pos.x, pos.y, pointSize, 0, Math.PI * 2);
+                freshCtx.fill();
+                
+                freshCtx.strokeStyle = '#000';
+                freshCtx.lineWidth = 1;
+                freshCtx.stroke();
+            }
+        }
+        
+        function createHarmonicWavePlot(ctx) {
+            const { primes } = computationData;
+            const topPrimes = primes.slice(0, Math.min(20, primes.length));
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Harmonic Prime Waves (Musical)</h4>
+                <div style="margin-bottom: 15px;">
+                    <button id="playHarmonicBtn" onclick="playHarmonic()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #9966ff, #8855ee); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🎵 Play Harmonic</button>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Wave Phase: <span id="wavePhase">0</span>°</label>
+                    <input type="range" id="wavePhaseSlider" min="0" max="360" step="1" value="0" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="updateHarmonicWave(parseFloat(this.value))">
+                </div>
+                <div style="padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.5; font-size: 0.9em;">
+                    Each prime generates a sine wave with frequency proportional to the prime.
+                    The sum creates a unique "prime signature" sound and pattern!
+                </div>
+            `;
+            
+            window.playHarmonic = () => {
+                // Simple audio feedback (browser APIs)
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                topPrimes.slice(0, 5).forEach((p, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.frequency.value = 200 + p * 2;
+                    gain.gain.value = 0.1 / (i + 1);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 1);
+                });
+            };
+            
+            window.updateHarmonicWave = (phase = 0) => {
+                const canvas = document.getElementById('vizCanvas');
+                const freshCtx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                const centerY = rect.height / 2;
+                const baseAmplitude = rect.height * 0.3 / topPrimes.length;
+                const amplitude = baseAmplitude * universalZoom;
+                
+                topPrimes.forEach((p, idx) => {
+                    freshCtx.beginPath();
+                    freshCtx.strokeStyle = `hsla(${(idx / topPrimes.length) * 280}, 80%, 60%, 0.8)`;
+                    freshCtx.lineWidth = 2 * universalZoom;
+                    
+                    for (let x = 0; x < rect.width; x++) {
+                        const freq = p / 100;
+                        const y = centerY + amplitude * Math.sin(freq * x * 0.05 + phase * Math.PI / 180);
+                        
+                        if (x === 0) {
+                            freshCtx.moveTo(x, y);
+                        } else {
+                            freshCtx.lineTo(x, y);
+                        }
+                    }
+                    freshCtx.stroke();
+                    
+                    // Label
+                    freshCtx.fillStyle = '#fff';
+                    freshCtx.font = `${12 * Math.min(universalZoom, 1.5)}px Arial`;
+                    freshCtx.fillText(`p=${p}`, 10, 20 + idx * 15 * Math.min(universalZoom, 1.5));
+                });
+                
+                document.getElementById('wavePhase').textContent = phase.toFixed(0);
+            };
+            
+            window.updateHarmonicWave(0);
         }
         
         function generatePrimeCountChartForExport(ctx, width, height, background) {
@@ -4508,14 +5133,24 @@
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Phasor Sum Visualization: ζ(s) as Rotating Vectors</h4>
                 <div style="margin-bottom: 20px;">
                     <label style="color: #fff; font-weight: 500;">Imaginary Part (t): <span id="tValue">0</span></label>
-                    <input type="range" id="tSlider" min="0" max="200" step="0.1" value="0" 
+                    <input type="range" id="tSlider" min="0" max="250" step="0.001" value="0" 
                            style="width: 100%; margin-top: 10px;"
                            oninput="updatePhasorPlot(parseFloat(this.value), parseFloat(document.getElementById('zoomSlider').value))">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                        <button onclick="document.getElementById('tSlider').value=14.134725; updatePhasorPlot(14.134725, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer;">1st Zero (14.13)</button>
-                        <button onclick="document.getElementById('tSlider').value=21.022040; updatePhasorPlot(21.022040, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(255, 159, 64, 0.3); border: 1px solid #ff9f40; border-radius: 5px; color: #fff; cursor: pointer;">2nd Zero (21.02)</button>
-                        <button onclick="document.getElementById('tSlider').value=25.010858; updatePhasorPlot(25.010858, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(255, 205, 86, 0.3); border: 1px solid #ffcd56; border-radius: 5px; color: #fff; cursor: pointer;">3rd Zero (25.01)</button>
-                        <button onclick="document.getElementById('tSlider').value=100; updatePhasorPlot(100, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer;">High t (100)</button>
+                    <div style="margin-top: 10px;">
+                        <label style="color: #fff; font-weight: 500; font-size: 0.9em;">Quick Jump to Known Zero:</label>
+                        <select id="phasorZeroSelector" style="width: 100%; padding: 8px; border-radius: 6px; margin-top: 5px; font-size: 14px;" onchange="jumpToPhasorZero(parseFloat(this.value))">
+                            <option value="0">Custom value (use slider)</option>
+                            ${window.allKnownZeros ? window.allKnownZeros.map((z, idx) => `<option value="${z}">Zero #${idx + 1}: ${z.toFixed(6)}</option>`).join('') : `
+                                <option value="14.134725">Zero #1: 14.134725</option>
+                                <option value="21.022040">Zero #2: 21.022040</option>
+                                <option value="25.010858">Zero #3: 25.010858</option>
+                                <option value="30.424876">Zero #4: 30.424876</option>
+                            `}
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+                        <button onclick="document.getElementById('tSlider').value=0; document.getElementById('phasorZeroSelector').value=0; updatePhasorPlot(0, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(78, 205, 196, 0.3); border: 1px solid #4ecdc4; border-radius: 5px; color: #fff; cursor: pointer;">t = 0</button>
+                        <button onclick="document.getElementById('tSlider').value=100; document.getElementById('phasorZeroSelector').value=0; updatePhasorPlot(100, parseFloat(document.getElementById('zoomSlider').value));" style="padding: 8px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer;">t = 100</button>
                     </div>
                 </div>
                 <div style="margin-bottom: 20px;">
@@ -4679,6 +5314,14 @@
                 freshCtx.fillText(`ζ(${sigma} + ${t}i) ≈ ${magnitude.toFixed(3)}`, centerX, height - 20);
             };
             
+            // Function to jump to zero from dropdown
+            window.jumpToPhasorZero = function(t) {
+                if (t > 0) {
+                    document.getElementById('tSlider').value = t;
+                    updatePhasorPlot(t, parseFloat(document.getElementById('zoomSlider').value));
+                }
+            };
+            
             // Initialize
             window.updatePhasorPlot(0, 1.0);
         }
@@ -4693,17 +5336,28 @@
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Modular Zeta Surface: Nested Unity Lattice</h4>
                 <div style="margin-bottom: 20px;">
+                    <label style="color: #fff; font-weight: 500;">Max Modulus: <span id="maxModSurface">30</span></label>
+                    <input type="range" id="maxModSlider" min="10" max="100" step="1" value="30" 
+                           style="width: 100%; margin-top: 10px;"
+                           oninput="updateZetaSurface(parseFloat(document.getElementById('tSliderSurface').value), parseInt(this.value))">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em; opacity: 0.7; margin-top: 5px;">
+                        <span>10 rings (minimal)</span>
+                        <span>30 rings (default)</span>
+                        <span>100 rings (dense)</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
                     <label style="color: #fff; font-weight: 500;">Imaginary Height (t): <span id="tValueSurface">14.13</span></label>
                     <input type="range" id="tSliderSurface" min="0" max="200" step="0.01" value="14.13" 
                            style="width: 100%; margin-top: 10px;"
-                           oninput="updateZetaSurface(parseFloat(this.value))">
+                           oninput="updateZetaSurface(parseFloat(this.value), parseInt(document.getElementById('maxModSlider').value))">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 10px;">
-                        <button onclick="document.getElementById('tSliderSurface').value=14.134725; updateZetaSurface(14.134725);" style="padding: 6px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 1 (14.13)</button>
-                        <button onclick="document.getElementById('tSliderSurface').value=21.022040; updateZetaSurface(21.022040);" style="padding: 6px; background: rgba(255, 159, 64, 0.3); border: 1px solid #ff9f40; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 2 (21.02)</button>
-                        <button onclick="document.getElementById('tSliderSurface').value=25.010858; updateZetaSurface(25.010858);" style="padding: 6px; background: rgba(255, 205, 86, 0.3); border: 1px solid #ffcd56; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 3 (25.01)</button>
-                        <button onclick="document.getElementById('tSliderSurface').value=30.424876; updateZetaSurface(30.424876);" style="padding: 6px; background: rgba(75, 192, 192, 0.3); border: 1px solid #4bc0c0; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 4 (30.42)</button>
-                        <button onclick="document.getElementById('tSliderSurface').value=50; updateZetaSurface(50);" style="padding: 6px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">t = 50</button>
-                        <button onclick="document.getElementById('tSliderSurface').value=100; updateZetaSurface(100);" style="padding: 6px; background: rgba(78, 205, 196, 0.3); border: 1px solid #4ecdc4; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">t = 100</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=14.134725; updateZetaSurface(14.134725, parseInt(document.getElementById('maxModSlider').value));" style="padding: 6px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 1 (14.13)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=21.022040; updateZetaSurface(21.022040, parseInt(document.getElementById('maxModSlider').value));" style="padding: 6px; background: rgba(255, 159, 64, 0.3); border: 1px solid #ff9f40; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 2 (21.02)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=25.010858; updateZetaSurface(25.010858, parseInt(document.getElementById('maxModSlider').value));" style="padding: 6px; background: rgba(255, 205, 86, 0.3); border: 1px solid #ffcd56; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 3 (25.01)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=30.424876; updateZetaSurface(30.424876, parseInt(document.getElementById('maxModSlider').value));" style="padding: 6px; background: rgba(75, 192, 192, 0.3); border: 1px solid #4bc0c0; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">Zero 4 (30.42)</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=50; updateZetaSurface(50, parseInt(document.getElementById('maxModSlider').value));" style="padding: 6px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">t = 50</button>
+                        <button onclick="document.getElementById('tSliderSurface').value=100; updateZetaSurface(100, parseInt(document.getElementById('maxModSlider').value));" style="padding: 6px; background: rgba(78, 205, 196, 0.3); border: 1px solid #4ecdc4; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">t = 100</button>
                     </div>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
@@ -4726,18 +5380,19 @@
                 </div>
                 <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>About the Modular Zeta Surface:</strong><br>
-                    • Each concentric ring represents modulus m = 1, 2, 3, ..., 30<br>
+                    • Each concentric ring represents modulus m = 1, 2, 3, ..., <span id="maxModDisplay">30</span><br>
                     • Points on each ring: primitive m-th roots of unity e<sup>2πik/m</sup> where gcd(k,m)=1<br>
                     • Each point contributes: S<sub>m,k</sub>(s) = Σ<sub>n≡k(mod m)</sub> n<sup>-s</sup><br>
                     • Color brightness = contribution magnitude<br>
                     • <strong>At zeros:</strong> modular rotations align destructively → dark/zero sum<br>
                     • <strong>Away from zeros:</strong> constructive interference → bright regions<br>
+                    • <strong>Adjust modulus:</strong> More rings = finer resolution, captures higher-order structure<br>
                     • First nontrivial zero: t ≈ 14.134725 (try this value!)
                 </div>
             `;
             
             // Initialize at first zero
-            window.updateZetaSurface = (t) => {
+            window.updateZetaSurface = (t, maxModulus = 30) => {
                 const canvas = document.getElementById('vizCanvas');
                 const freshCtx = canvas.getContext('2d');
                 const rect = canvas.getBoundingClientRect();
@@ -4754,7 +5409,6 @@
                 freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
                 freshCtx.fillRect(0, 0, width, height);
                 
-                const maxModulus = 30;
                 const radiusStep = maxRadius / (maxModulus + 1);
                 
                 let totalMagnitude = 0;
@@ -4828,10 +5482,13 @@
                 
                 // Update stats
                 document.getElementById('tValueSurface').textContent = t.toFixed(3);
+                document.getElementById('maxModSurface').textContent = maxModulus;
+                document.getElementById('moduliCount').textContent = maxModulus;
                 document.getElementById('surfaceMagnitude').textContent = vectorMagnitude.toFixed(4);
                 document.getElementById('phaseCoherence').textContent = (coherence * 100).toFixed(2) + '%';
                 
-                // Find nearest known zero
+                // Update description display
+                document.getElementById('maxModDisplay').textContent = maxModulus;
                 const knownZeros = [14.134725, 21.022040, 25.010858, 30.424876, 32.935062];
                 let nearest = knownZeros[0];
                 let minDist = Math.abs(t - nearest);
@@ -4858,8 +5515,8 @@
                 freshCtx.fillText(statusText, centerX, height - 20);
             };
             
-            // Initialize at first zero
-            window.updateZetaSurface(14.134725);
+            // Initialize at first zero with default modulus
+            window.updateZetaSurface(14.134725, 30);
         }
         
         function generatePrimeRacesChartForExport(ctx, width, height, background) {
@@ -5339,8 +5996,8 @@
                             return `hsla(${hue}, 80%, 60%, 0.7)`;
                         },
                         borderColor: 'rgba(78, 205, 196, 0.3)',
-                        pointRadius: 3,
-                        pointHoverRadius: 6
+                        pointRadius: 3 * universalZoom,
+                        pointHoverRadius: 6 * universalZoom
                     }]
                 },
                 options: {
