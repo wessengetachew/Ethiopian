@@ -840,7 +840,7 @@
                     </ul>
                     
                     <p style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <strong>💡 Key Insight:</strong> The nested modular lattice forms a discrete analogue of the complex-analytic domain of ζ(s). By weighting each ring by n<sup>-σ</sup> and rotating by phase -t log n, we obtain a direct geometric mimic of the Riemann zeta surface.
+                        <strong> Key Insight:</strong> The nested modular lattice forms a discrete analogue of the complex-analytic domain of ζ(s). By weighting each ring by n<sup>-σ</sup> and rotating by phase -t log n, we obtain a direct geometric mimic of the Riemann zeta surface.
                     </p>
                 </div>
             </div>
@@ -893,7 +893,7 @@
                     </div>
                     
                     <div style="background: rgba(255, 215, 0, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #ffd700;">
-                        <p><strong>🌟 Unified Picture:</strong></p>
+                        <p><strong> Unified Picture:</strong></p>
                         <p style="line-height: 1.8;">
                             In the nested modular plane:<br>
                             • <strong style="color: #4ecdc4;">Primes</strong> occupy interstitial regions, forming smooth non-overlapping rings<br>
@@ -903,7 +903,7 @@
                     </div>
                     
                     <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.08); border-radius: 8px;">
-                        <strong>📊 Interactive Visualizations:</strong> Explore both concepts below with dedicated interactive tools:
+                        <strong> Interactive Visualizations:</strong> Explore both concepts below with dedicated interactive tools:
                         <br>• <strong>Prime Channel Avoidance</strong> - See cyan prime rings avoiding Farey channels
                         <br>• <strong>Composite Projection</strong> - Watch red composite points project onto reduction channels
                         <br>Adjust modulus and epsilon to explore the full channel structure!
@@ -989,7 +989,7 @@
                         Max 20 digits (JavaScript precision limit ≈15-17 digits)
                     </div>
                     <div id="precision-warning" style="display: none; font-size: 0.85em; color: #ff6b6b; margin-top: 5px; padding: 8px; background: rgba(255, 107, 107, 0.1); border-radius: 5px;">
-                        ⚠️ Digits beyond 15-17 may not be accurate due to floating-point precision limits
+                         Digits beyond 15-17 may not be accurate due to floating-point precision limits
                     </div>
                 </div>
                 
@@ -1395,7 +1395,7 @@
                     
                     // Add precision info
                     const precisionNote = decimalPlaces > 15 ? 
-                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">⚠️ Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
+                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;"> Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
                     document.getElementById('prime-count').innerHTML += precisionNote;
                     
                     // Show step-by-step
