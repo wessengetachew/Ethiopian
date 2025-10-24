@@ -992,7 +992,7 @@
                 </div>
                 <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
                     <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
-                        🔍 Universal Zoom: <span id="universalZoomLevel">1.0</span>x
+                        Universal Zoom: <span id="universalZoomLevel">1.0</span>x
                     </label>
                     <input type="range" id="universalZoomSlider" min="0.5" max="5" step="0.1" value="1" 
                            style="width: 100%;"
@@ -4151,7 +4151,7 @@
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Channel Race Animation (mod ${modulus})</h4>
                 <div style="margin-bottom: 15px;">
-                    <button id="racePlayBtn" onclick="toggleRaceAnimation()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">▶ Play Race</button>
+                    <button id="racePlayBtn" onclick="toggleRaceAnimation()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Play Race</button>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Animation Speed: <span id="raceSpeed">1</span>x</label>
@@ -4174,11 +4174,11 @@
                 const btn = document.getElementById('racePlayBtn');
                 
                 if (isRacePlaying) {
-                    btn.innerHTML = '⏸ Pause';
+                    btn.innerHTML = 'Pause';
                     btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
                     startRaceAnimation();
                 } else {
-                    btn.innerHTML = '▶ Play Race';
+                    btn.innerHTML = 'Play Race';
                     btn.style.background = 'linear-gradient(45deg, #4ecdc4, #44a8a3)';
                     if (raceAnimationId) cancelAnimationFrame(raceAnimationId);
                 }
@@ -4567,7 +4567,7 @@
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Harmonic Prime Waves (Musical)</h4>
                 <div style="margin-bottom: 15px;">
-                    <button id="playHarmonicBtn" onclick="playHarmonic()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #9966ff, #8855ee); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🎵 Play Harmonic</button>
+                    <button id="playHarmonicBtn" onclick="playHarmonic()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #9966ff, #8855ee); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Play Harmonic</button>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Wave Phase: <span id="wavePhase">0</span>°</label>
