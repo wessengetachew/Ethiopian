@@ -4149,7 +4149,7 @@
             const statsDiv = document.getElementById('vizStats');
             statsDiv.style.display = 'block';
             statsDiv.innerHTML = `
-                <h4 style="color: #ffd700; margin-bottom: 15px;">Channel Race Animation (mod ${modulus})</h4>
+                <h4 style="color: #ffd700; margin-bottom: 15px;">Channel Race Animation with Harmonic Music (mod ${modulus})</h4>
                 <div style="margin-bottom: 15px;">
                     <button id="racePlayBtn" onclick="toggleRaceAnimation()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Play Race</button>
                 </div>
@@ -4158,16 +4158,53 @@
                     <input type="range" id="raceSpeedSlider" min="0.1" max="5" step="0.1" value="1" 
                            style="width: 100%; margin-top: 8px;">
                 </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                    <div style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                            <input type="checkbox" id="musicEnabledCheckbox" checked style="width: auto; margin-right: 10px;">
+                            <span style="font-weight: 500;">Enable Musical Harmonics</span>
+                        </label>
+                    </div>
+                    <div id="audioControls" style="display: block;">
+                        <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">Master Volume: <span id="masterVolume">50</span>%</label>
+                        <input type="range" id="masterVolumeSlider" min="0" max="100" step="1" value="50" 
+                               style="width: 100%; margin-bottom: 15px;">
+                        <div style="max-height: 200px; overflow-y: auto; background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px;">
+                            <div style="font-size: 0.9em; color: #fff; margin-bottom: 8px; font-weight: 500;">Individual Channels:</div>
+                            <div id="channelToggles"></div>
+                        </div>
+                    </div>
+                </div>
                 <div id="raceStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
                 </div>
                 <div style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.5; font-size: 0.9em;">
                     Watch residue channels compete in real-time as primes are added sequentially!
+                    Each channel generates a harmonic tone - the leading channel plays louder.
                 </div>
             `;
+            
+            // Generate channel toggle checkboxes
+            let channelTogglesHTML = '';
+            coprimeResidues.forEach((r, idx) => {
+                const hue = (idx / coprimeResidues.length) * 280;
+                channelTogglesHTML += `
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer; padding: 4px 0;">
+                        <input type="checkbox" id="channelToggle${idx}" checked style="width: auto; margin-right: 8px;">
+                        <span style="color: hsla(${hue}, 80%, 60%, 1); font-weight: 500;">≡ ${r} (mod ${modulus})</span>
+                        <span style="margin-left: auto; font-size: 0.85em; opacity: 0.7;">${200 + r * 50}Hz</span>
+                    </label>
+                `;
+            });
+            document.getElementById('channelToggles').innerHTML = channelTogglesHTML;
             
             let raceAnimationId = null;
             let raceIndex = 0;
             let isRacePlaying = false;
+            let audioContext = null;
+            let oscillators = [];
+            let gainNodes = [];
+            let masterGainNode = null;
+            let channelMuted = [];
             
             window.toggleRaceAnimation = () => {
                 isRacePlaying = !isRacePlaying;
@@ -4177,12 +4214,90 @@
                     btn.innerHTML = 'Pause';
                     btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
                     startRaceAnimation();
+                    
+                    // Initialize audio if music is enabled
+                    if (document.getElementById('musicEnabledCheckbox').checked) {
+                        initAudio();
+                    }
                 } else {
                     btn.innerHTML = 'Play Race';
                     btn.style.background = 'linear-gradient(45deg, #4ecdc4, #44a8a3)';
                     if (raceAnimationId) cancelAnimationFrame(raceAnimationId);
+                    stopAudio();
                 }
             };
+            
+            function initAudio() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Create master gain node
+                masterGainNode = audioContext.createGain();
+                masterGainNode.connect(audioContext.destination);
+                masterGainNode.gain.value = parseFloat(document.getElementById('masterVolumeSlider').value) / 100;
+                
+                // Create oscillator and gain node for each channel
+                oscillators = [];
+                gainNodes = [];
+                channelMuted = new Array(coprimeResidues.length).fill(false);
+                
+                coprimeResidues.forEach((r, idx) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(masterGainNode);
+                    
+                    // Frequency based on residue class
+                    osc.frequency.value = 200 + r * 50;
+                    osc.type = 'sine';
+                    
+                    // Start silent
+                    gain.gain.value = 0;
+                    
+                    osc.start();
+                    
+                    oscillators.push(osc);
+                    gainNodes.push(gain);
+                });
+                
+                // Add master volume listener
+                document.getElementById('masterVolumeSlider').oninput = function() {
+                    document.getElementById('masterVolume').textContent = this.value;
+                    if (masterGainNode) {
+                        masterGainNode.gain.linearRampToValueAtTime(
+                            parseFloat(this.value) / 100,
+                            audioContext.currentTime + 0.05
+                        );
+                    }
+                };
+                
+                // Add channel toggle listeners
+                coprimeResidues.forEach((r, idx) => {
+                    document.getElementById(`channelToggle${idx}`).onchange = function() {
+                        channelMuted[idx] = !this.checked;
+                        if (channelMuted[idx] && gainNodes[idx]) {
+                            gainNodes[idx].gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.05);
+                        }
+                    };
+                });
+            }
+            
+            function stopAudio() {
+                oscillators.forEach(osc => {
+                    try {
+                        osc.stop();
+                    } catch(e) {}
+                });
+                oscillators = [];
+                gainNodes = [];
+                
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                }
+            }
             
             function startRaceAnimation() {
                 if (!isRacePlaying) return;
@@ -4227,11 +4342,18 @@
                 }
                 
                 const maxCount = Math.max(...Object.values(counts), 1);
+                
+                // Split canvas: left side for bars, right side for waveforms
+                const splitX = rect.width * 0.5;
                 const barHeight = rect.height / (coprimeResidues.length + 1);
                 
+                // Update audio volumes based on counts
+                const musicEnabled = document.getElementById('musicEnabledCheckbox').checked;
+                
+                // Draw bars on left side
                 coprimeResidues.forEach((r, idx) => {
                     const count = counts[r];
-                    const barWidth = (count / maxCount) * rect.width * 0.8;
+                    const barWidth = (count / maxCount) * splitX * 0.8;
                     const y = idx * barHeight + barHeight / 4;
                     
                     const hue = (idx / coprimeResidues.length) * 280;
@@ -4239,15 +4361,84 @@
                     freshCtx.fillRect(50, y, barWidth, barHeight * 0.6);
                     
                     freshCtx.fillStyle = '#fff';
-                    freshCtx.font = 'bold 16px Arial';
+                    freshCtx.font = 'bold 14px Arial';
                     freshCtx.fillText(`≡ ${r} (mod ${modulus})`, 10, y + barHeight * 0.4);
                     freshCtx.fillText(count, barWidth + 60, y + barHeight * 0.4);
-                }); 
+                    
+                    // Update audio gain based on count ratio
+                    if (musicEnabled && gainNodes[idx] && !channelMuted[idx]) {
+                        const ratio = count / maxCount;
+                        const targetGain = ratio * 0.15;
+                        
+                        gainNodes[idx].gain.linearRampToValueAtTime(
+                            targetGain, 
+                            audioContext.currentTime + 0.1
+                        );
+                    } else if (gainNodes[idx] && channelMuted[idx]) {
+                        gainNodes[idx].gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.05);
+                    }
+                });
+                
+                // Draw waveforms on right side
+                if (musicEnabled) {
+                    const waveStartX = splitX + 20;
+                    const waveWidth = rect.width - waveStartX - 20;
+                    const waveHeight = barHeight * 0.5;
+                    const time = Date.now() / 1000;
+                    
+                    coprimeResidues.forEach((r, idx) => {
+                        const count = counts[r];
+                        const ratio = count / maxCount;
+                        const amplitude = ratio * waveHeight * 0.4;
+                        const y = idx * barHeight + barHeight / 2;
+                        const frequency = 200 + r * 50;
+                        
+                        // Check if channel is muted
+                        const isMuted = channelMuted[idx] || false;
+                        
+                        if (amplitude > 0.01 && !isMuted) {
+                            const hue = (idx / coprimeResidues.length) * 280;
+                            freshCtx.strokeStyle = `hsla(${hue}, 80%, 60%, ${0.3 + ratio * 0.7})`;
+                            freshCtx.lineWidth = 2 + ratio * 3;
+                            
+                            freshCtx.beginPath();
+                            for (let x = 0; x < waveWidth; x += 2) {
+                                const angle = (x / waveWidth) * Math.PI * 4 + time * frequency / 50;
+                                const waveY = y + Math.sin(angle) * amplitude;
+                                
+                                if (x === 0) {
+                                    freshCtx.moveTo(waveStartX + x, waveY);
+                                } else {
+                                    freshCtx.lineTo(waveStartX + x, waveY);
+                                }
+                            }
+                            freshCtx.stroke();
+                            
+                            // Draw frequency label
+                            freshCtx.fillStyle = `hsla(${hue}, 80%, 60%, 0.8)`;
+                            freshCtx.font = '11px Arial';
+                            freshCtx.fillText(`${frequency}Hz`, waveStartX + waveWidth + 5, y + 4);
+                        }
+                    });
+                    
+                    // Draw waveform section label
+                    freshCtx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    freshCtx.font = 'bold 14px Arial';
+                    freshCtx.fillText('Live Waveforms', splitX + 20, 20);
+                }
+                
+                // Draw divider line
+                freshCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                freshCtx.lineWidth = 2;
+                freshCtx.beginPath();
+                freshCtx.moveTo(splitX, 0);
+                freshCtx.lineTo(splitX, rect.height);
+                freshCtx.stroke();
                 
                 // Progress indicator
                 freshCtx.fillStyle = '#4ecdc4';
-                freshCtx.font = 'bold 20px Arial';
-                freshCtx.fillText(`Prime #${raceIndex} / ${primes.length}`, rect.width / 2 - 80, rect.height - 20);
+                freshCtx.font = 'bold 18px Arial';
+                freshCtx.fillText(`Prime #${raceIndex} / ${primes.length}`, 50, rect.height - 15);
             }
             
             drawRace();
