@@ -934,7 +934,7 @@
                         ζ(s) = ∏<sub>g</sub> P<sub>g</sub>(s)<br>
                         P<sub>g</sub>(s) = ∏<sub>p ∈ (gap g)</sub> 1/(1 - p<sup>-s</sup>)
                     </div>
-                    <p style="margin-top: 10px;">Meaning: Multiply primes grouped by their next gap g. Each gap contributes multiplicatively.</p>
+                    <p style="margin-top: 10px;">Each prime p belongs to gap class g = (next prime) - p. We group primes by their forward gap.</p>
                     
                     <p style="margin-top: 15px;"><strong>Basel & π Reconstruction:</strong> Since ζ(2) = π²/6:</p>
                     <div class="formula">π = √(6 · ∏<sub>g</sub> P<sub>g</sub>(2))</div>
@@ -956,7 +956,7 @@
                     
                     <p style="margin-top: 15px;"><strong>Two Decomposition Methods:</strong></p>
                     <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li><strong>Gap-Class:</strong> Groups primes by their forward gaps (next prime - current prime)</li>
+                        <li><strong>Gap-Class:</strong> Groups primes p by their forward gap g = p<sub>next</sub> - p</li>
                         <li><strong>Residue Channels:</strong> Splits primes by residue classes mod m, giving φ(m) independent channels for gcd(a,m)=1. Default uses m=30 with 8 channels, but supports any modulus.</li>
                     </ul>
                     
@@ -1988,47 +1988,21 @@
             document.getElementById('step-by-step').style.display = 'block';
         }
         
-        // Compute gap classes using lowest valid even gap method (forward gaps)
+        // Compute gap classes using standard forward gap method
         function computeLowestGapClasses(primes) {
             const gapClasses = {};
-            const primeSet = new Set(primes);
             
-            for (let i = 0; i < primes.length; i++) {
+            for (let i = 0; i < primes.length - 1; i++) {
                 const p = primes[i];
+                const nextPrime = primes[i + 1];
+                const gap = nextPrime - p;
                 
-                if (p === 2) {
-                    // Special case: prime 2 has gap 0 (no successor in gap class 0)
-                    if (!gapClasses[0]) gapClasses[0] = [];
-                    gapClasses[0].push(p);
-                    continue;
-                }
-                
-                // Find lowest valid even gap FORWARD (p to next prime)
-                let lowestGap = null;
-                for (let gap = 2; gap <= 1000; gap += 2) {
-                    const candidate = p + gap;
-                    if (primeSet.has(candidate)) {
-                        lowestGap = gap;
-                        break;
-                    }
-                }
-                
-                // If no forward gap found (shouldn't happen unless p is last prime), check backward
-                if (lowestGap === null && i > 0) {
-                    for (let gap = 2; gap <= p; gap += 2) {
-                        const candidate = p - gap;
-                        if (candidate >= 2 && primeSet.has(candidate)) {
-                            lowestGap = gap;
-                            break;
-                        }
-                    }
-                }
-                
-                if (lowestGap !== null) {
-                    if (!gapClasses[lowestGap]) gapClasses[lowestGap] = [];
-                    gapClasses[lowestGap].push(p);
-                }
+                if (!gapClasses[gap]) gapClasses[gap] = [];
+                gapClasses[gap].push(p);
             }
+            
+            // Last prime has no successor, we can assign it to its backward gap or omit
+            // For consistency, we'll omit the last prime from gap classification
             
             return gapClasses;
         }
@@ -2097,18 +2071,19 @@
                 html += `
                     <div class="gap-item" onclick="toggleGap(${gap})">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div><strong>Gap Class g = ${gap}</strong></div>
+                            <div><strong>Gap = ${gap}</strong></div>
                             <div class="gap-value">${gapPrimes.length} primes</div>
                         </div>
                         <div style="margin-top: 10px; font-size: 0.9em;">
-                            <div><strong>Z<sup>(${gap})</sup>(${exponent}):</strong> ${contribution.toFixed(12)}</div>
+                            <div><strong>P<sub>${gap}</sub>(${exponent}):</strong> ${contribution.toFixed(12)}</div>
                             <div><strong>Global Cumulative ζ:</strong> ${cumulative.toFixed(12)}</div>
-                            <div style="opacity: 0.8;">log(Z<sup>(${gap})</sup>) = ${logContrib.toFixed(6)}</div>
+                            <div style="opacity: 0.8;">log(P<sub>${gap}</sub>) = ${logContrib.toFixed(6)}</div>
                         </div>
                         <div style="margin-top: 8px; font-size: 0.85em; opacity: 0.8;">
-                            ${gap === 0 ? 'Prime 2 (special case)' : 
-                              gap === 2 ? 'Twin primes: p → p+2 both prime' :
-                              `Primes with lowest forward even gap = ${gap}`}
+                            ${gap === 2 ? 'Twin primes (consecutive odd primes)' :
+                              gap === 4 ? 'Cousin primes' :
+                              gap === 6 ? 'Sexy primes' :
+                              `Primes with gap ${gap} to next prime`}
                         </div>
                         <div style="margin-top: 8px; font-size: 0.85em; opacity: 0.8;">
                             Range: ${Math.min(...gapPrimes)} - ${Math.max(...gapPrimes)}
@@ -2116,27 +2091,15 @@
                         <div class="expand-indicator">Click to view details</div>
                         
                         <div class="gap-primes-list" id="gap-primes-${gap}">
-                            <h4 style="color: #ffd700; margin-bottom: 10px;">Gap Class P<sub>${gap}</sub>: All ${gapPrimes.length} Primes</h4>
+                            <h4 style="color: #ffd700; margin-bottom: 10px;">Gap Class: ${gapPrimes.length} Primes with Gap ${gap}</h4>
                             <div class="gap-primes-container">${gapPrimes.map((p, idx) => {
-                                if (p === 2) return `p = 2 (gap class 0: special case)`;
-                                
-                                // Find lowest valid even gap FORWARD
-                                const primeSet = new Set(primes);
-                                let lowestGap = null;
-                                let nextPrime = null;
-                                for (let g = 2; g <= 1000; g += 2) {
-                                    const candidate = p + g;
-                                    if (primeSet.has(candidate)) {
-                                        lowestGap = g;
-                                        nextPrime = candidate;
-                                        break;
-                                    }
-                                }
-                                
-                                if (lowestGap !== null) {
-                                    return `p = ${p} → forward gap: ${nextPrime} - ${p} = ${lowestGap}`;
+                                const nextIdx = primes.indexOf(p) + 1;
+                                if (nextIdx < primes.length) {
+                                    const nextP = primes[nextIdx];
+                                    const actualGap = nextP - p;
+                                    return `p = ${p} → next prime: ${nextP}, gap = ${actualGap}`;
                                 } else {
-                                    return `p = ${p} → (last prime in set)`;
+                                    return `p = ${p} (last prime in dataset)`;
                                 }
                             }).join('<br>')}</div>
                             
@@ -2150,7 +2113,7 @@
                                     </div>
                                 `).join('')}
                                 <div style="margin-top: 15px; padding: 10px; background: rgba(78, 205, 196, 0.2); border-radius: 5px;">
-                                    <strong>Z<sup>(${gap})</sup>(${exponent}) = ${contribution.toFixed(Math.min(decimalPlaces, 12))}</strong><br>
+                                    <strong>P<sub>${gap}</sub>(${exponent}) = ${contribution.toFixed(Math.min(decimalPlaces, 12))}</strong><br>
                                     <strong>Global Cumulative ζ(${exponent}) = ${cumulative.toFixed(Math.min(decimalPlaces, 12))}</strong>
                                 </div>
                             </div>
