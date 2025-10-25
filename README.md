@@ -1361,7 +1361,6 @@
                     <button class="viz-btn" onclick="changeViz('modularInterference')">Mod Interference</button>
                     <button class="viz-btn" onclick="changeViz('twinSemiprimes')">Twin Semiprimes</button>
                     <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
-                    <button class="viz-btn" onclick="changeViz('primeAvoidance')">Prime Channel Avoidance</button>
                     <button class="viz-btn" onclick="changeViz('compositeChannels')">Composite Channels</button>
                 </div>
                 <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
@@ -5920,26 +5919,26 @@
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Getachew Prime Channel Avoidance Theorem</h4>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Max Modulus: <span id="avoidanceMaxMod">30</span></label>
-                    <input type="range" id="avoidanceMaxModSlider" min="10" max="500" step="1" value="30" 
+                    <input type="range" id="avoidanceMaxModSlider" min="10" max="200" step="1" value="30" 
                            style="width: 100%; margin-top: 8px;"
-                           oninput="document.getElementById('avoidanceMaxMod').textContent = this.value; updatePrimeAvoidance(parseInt(this.value))">
+                           oninput="document.getElementById('avoidanceMaxMod').textContent = this.value; window.updatePrimeAvoidance(parseInt(this.value))">
                     <div style="display: flex; justify-content: space-between; font-size: 0.85em; opacity: 0.7; margin-top: 5px;">
                         <span>10 (minimal)</span>
-                        <span>100 (default detail)</span>
-                        <span>500 (maximum)</span>
+                        <span>30 (default)</span>
+                        <span>200 (maximum)</span>
                     </div>
                     <div style="margin-top: 10px;">
                         <label style="color: #fff; font-weight: 500; font-size: 0.9em;">Or enter custom value:</label>
-                        <input type="number" id="avoidanceCustomMod" min="2" max="1000" placeholder="Enter modulus (2-1000)" 
+                        <input type="number" id="avoidanceCustomMod" min="2" max="200" placeholder="Enter modulus (2-200)" 
                                style="width: 100%; padding: 8px; border-radius: 6px; margin-top: 5px; font-size: 14px;"
-                               onchange="const val = Math.min(1000, Math.max(2, parseInt(this.value) || 30)); document.getElementById('avoidanceMaxModSlider').value = val; updatePrimeAvoidance(val);">
+                               onchange="const val = Math.min(200, Math.max(2, parseInt(this.value) || 30)); document.getElementById('avoidanceMaxModSlider').value = val; window.updatePrimeAvoidance(val);">
                     </div>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Projection Line Opacity: <span id="avoidanceEpsilon">0.2</span></label>
                     <input type="range" id="avoidanceEpsilonSlider" min="0.05" max="1" step="0.05" value="0.2" 
                            style="width: 100%; margin-top: 8px;"
-                           oninput="const val = parseFloat(this.value); document.getElementById('avoidanceEpsilon').textContent = val.toFixed(2); updatePrimeAvoidance(parseInt(document.getElementById('avoidanceMaxModSlider').value))">
+                           oninput="window.updatePrimeAvoidance(parseInt(document.getElementById('avoidanceMaxModSlider').value))">
                 </div>
                 <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>Theorem Visualization:</strong><br>
@@ -5952,14 +5951,21 @@
             `;
             
             window.updatePrimeAvoidance = (maxMod = 30) => {
-                const canvas = document.getElementById('vizCanvas');
-                if (!canvas) return;
+                console.log('Starting Prime Channel Avoidance with maxMod:', maxMod);
                 
+                const canvas = document.getElementById('vizCanvas');
+                if (!canvas) {
+                    console.error('Canvas not found!');
+                    return;
+                }
+                
+                const freshCtx = canvas.getContext('2d');
                 const rect = canvas.getBoundingClientRect();
                 canvas.width = rect.width;
                 canvas.height = rect.height;
                 
-                const freshCtx = canvas.getContext('2d');
+                console.log('Canvas dimensions:', rect.width, 'x', rect.height);
+                
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 const maxRadius = Math.min(rect.width, rect.height) * 0.42;
@@ -5971,6 +5977,8 @@
                 const modPrimes = sieveOfEratosthenes(maxMod);
                 const primeSet = new Set(modPrimes);
                 
+                console.log('Generated', modPrimes.length, 'primes up to', maxMod);
+                
                 // Create list of all moduli
                 const moduli = [];
                 for (let m = 2; m <= maxMod; m++) {
@@ -5980,6 +5988,8 @@
                 // Clear canvas
                 freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
                 freshCtx.fillRect(0, 0, rect.width, rect.height);
+                
+                console.log('Canvas cleared, drawing', allResidues.length, 'residues');
                 
                 // Calculate all residues and their reduction paths
                 const allResidues = [];
@@ -6059,11 +6069,11 @@
                 freshCtx.arc(centerX, centerY, 6, 0, Math.PI * 2);
                 freshCtx.fill();
                 
-                // Update display safely
-                const maxModElem = document.getElementById('avoidanceMaxMod');
-                const epsilonElem = document.getElementById('avoidanceEpsilon');
-                if (maxModElem) maxModElem.textContent = maxMod;
-                if (epsilonElem) epsilonElem.textContent = epsilon.toFixed(2);
+                // Update display
+                document.getElementById('avoidanceMaxMod').textContent = maxMod;
+                document.getElementById('avoidanceEpsilon').textContent = epsilon.toFixed(2);
+                
+                console.log('Prime Channel Avoidance rendering complete');
                 
                 // Add hover AND click
                 canvas.onmousemove = (e) => {
@@ -6146,12 +6156,7 @@
                 };
             };
             
-            // Initialize with safety check
-            setTimeout(() => {
-                if (document.getElementById('vizCanvas')) {
-                    window.updatePrimeAvoidance(30);
-                }
-            }, 100);
+            window.updatePrimeAvoidance(30);
         }
         
         function createCompositeChannelsPlot(ctx) {
@@ -6233,13 +6238,11 @@
             
             window.updateCompositeChannels = (M = 12) => {
                 const canvas = document.getElementById('vizCanvas');
-                if (!canvas) return;
-                
+                const freshCtx = canvas.getContext('2d');
                 const rect = canvas.getBoundingClientRect();
                 canvas.width = rect.width;
                 canvas.height = rect.height;
                 
-                const freshCtx = canvas.getContext('2d');
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 
