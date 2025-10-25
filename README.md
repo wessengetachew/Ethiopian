@@ -1535,7 +1535,9 @@
             'semiprimeGraph': 'semiprimes',
             'factorizationTiming': 'semiprimes',
             'twinSemiprimes': 'semiprimes',
-            'semiprimeZeta': 'semiprimes'
+            'semiprimeZeta': 'semiprimes',
+            'primeAvoidance': 'modular',
+            'compositeChannels': 'modular'
         };
         
         function showPresets() {
@@ -5912,23 +5914,32 @@
         }
         
         function createPrimeAvoidancePlot(ctx) {
-            const { primes } = computationData;
-            
             const statsDiv = document.getElementById('vizStats');
             statsDiv.style.display = 'block';
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Getachew Prime Channel Avoidance Theorem</h4>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Max Modulus: <span id="avoidanceMaxMod">30</span></label>
-                    <input type="range" id="avoidanceMaxModSlider" min="10" max="100" step="1" value="30" 
+                    <input type="range" id="avoidanceMaxModSlider" min="10" max="500" step="1" value="30" 
                            style="width: 100%; margin-top: 8px;"
-                           oninput="updatePrimeAvoidance(parseInt(this.value))">
+                           oninput="document.getElementById('avoidanceMaxMod').textContent = this.value; updatePrimeAvoidance(parseInt(this.value))">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em; opacity: 0.7; margin-top: 5px;">
+                        <span>10 (minimal)</span>
+                        <span>100 (default detail)</span>
+                        <span>500 (maximum)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label style="color: #fff; font-weight: 500; font-size: 0.9em;">Or enter custom value:</label>
+                        <input type="number" id="avoidanceCustomMod" min="2" max="1000" placeholder="Enter modulus (2-1000)" 
+                               style="width: 100%; padding: 8px; border-radius: 6px; margin-top: 5px; font-size: 14px;"
+                               onchange="const val = Math.min(1000, Math.max(2, parseInt(this.value) || 30)); document.getElementById('avoidanceMaxModSlider').value = val; updatePrimeAvoidance(val);">
+                    </div>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Projection Line Opacity: <span id="avoidanceEpsilon">0.2</span></label>
                     <input type="range" id="avoidanceEpsilonSlider" min="0.05" max="1" step="0.05" value="0.2" 
                            style="width: 100%; margin-top: 8px;"
-                           oninput="updatePrimeAvoidance(parseInt(document.getElementById('avoidanceMaxModSlider').value))">
+                           oninput="const val = parseFloat(this.value); document.getElementById('avoidanceEpsilon').textContent = val.toFixed(2); updatePrimeAvoidance(parseInt(document.getElementById('avoidanceMaxModSlider').value))">
                 </div>
                 <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
                     <strong>Theorem Visualization:</strong><br>
@@ -5942,16 +5953,19 @@
             
             window.updatePrimeAvoidance = (maxMod = 30) => {
                 const canvas = document.getElementById('vizCanvas');
-                const freshCtx = canvas.getContext('2d');
+                if (!canvas) return;
+                
                 const rect = canvas.getBoundingClientRect();
                 canvas.width = rect.width;
                 canvas.height = rect.height;
                 
+                const freshCtx = canvas.getContext('2d');
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 const maxRadius = Math.min(rect.width, rect.height) * 0.42;
                 
-                const epsilon = parseFloat(document.getElementById('avoidanceEpsilonSlider').value);
+                const epsilonSlider = document.getElementById('avoidanceEpsilonSlider');
+                const epsilon = epsilonSlider ? parseFloat(epsilonSlider.value) : 0.2;
                 
                 // Generate primes up to maxMod
                 const modPrimes = sieveOfEratosthenes(maxMod);
@@ -6045,11 +6059,13 @@
                 freshCtx.arc(centerX, centerY, 6, 0, Math.PI * 2);
                 freshCtx.fill();
                 
-                // Update display
-                document.getElementById('avoidanceMaxMod').textContent = maxMod;
-                document.getElementById('avoidanceEpsilon').textContent = epsilon.toFixed(2);
+                // Update display safely
+                const maxModElem = document.getElementById('avoidanceMaxMod');
+                const epsilonElem = document.getElementById('avoidanceEpsilon');
+                if (maxModElem) maxModElem.textContent = maxMod;
+                if (epsilonElem) epsilonElem.textContent = epsilon.toFixed(2);
                 
-                // Add hover
+                // Add hover AND click
                 canvas.onmousemove = (e) => {
                     const rect = canvas.getBoundingClientRect();
                     const mouseX = e.clientX - rect.left;
@@ -6100,11 +6116,42 @@
                         lines.forEach((line, idx) => {
                             freshCtx.fillText(line, mouseX + 15 + padding, mouseY - 30 + padding + idx * lineHeight + 13);
                         });
+                        
+                        canvas.style.cursor = 'pointer';
+                    } else {
+                        canvas.style.cursor = 'default';
+                    }
+                };
+                
+                // Click handler for detailed info
+                canvas.onclick = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    let closestRes = null;
+                    let minDist = 10;
+                    
+                    for (const res of allResidues) {
+                        const dist = Math.sqrt((mouseX - res.x) ** 2 + (mouseY - res.y) ** 2);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestRes = res;
+                        }
+                    }
+                    
+                    if (closestRes) {
+                        showPointDetailsModal(closestRes, 'avoidance');
                     }
                 };
             };
             
-            window.updatePrimeAvoidance(30);
+            // Initialize with safety check
+            setTimeout(() => {
+                if (document.getElementById('vizCanvas')) {
+                    window.updatePrimeAvoidance(30);
+                }
+            }, 100);
         }
         
         function createCompositeChannelsPlot(ctx) {
@@ -6116,14 +6163,26 @@
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Getachew Composite Channel Projection Corollary</h4>
                 <div style="margin-bottom: 15px;">
                     <label style="color: #fff; font-weight: 500;">Composite Modulus (M): <span id="compositeMValue">12</span></label>
-                    <input type="range" id="compositeMSlider" min="4" max="60" step="1" value="12" 
+                    <input type="range" id="compositeMSlider" min="4" max="500" step="1" value="12" 
                            style="width: 100%; margin-top: 8px;"
-                           oninput="updateCompositeChannels(parseInt(this.value))">
+                           oninput="document.getElementById('compositeMValue').textContent = this.value; updateCompositeChannels(parseInt(this.value))">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em; opacity: 0.7; margin-top: 5px;">
+                        <span>4 (minimal)</span>
+                        <span>60 (standard)</span>
+                        <span>500 (maximum)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label style="color: #fff; font-weight: 500; font-size: 0.9em;">Or enter custom value:</label>
+                        <input type="number" id="compositeCustomMod" min="2" max="1000" placeholder="Enter modulus (2-1000)" 
+                               style="width: 100%; padding: 8px; border-radius: 6px; margin-top: 5px; font-size: 14px;"
+                               onchange="const val = Math.min(1000, Math.max(2, parseInt(this.value) || 12)); document.getElementById('compositeMSlider').value = val; updateCompositeChannels(val);">
+                    </div>
                     <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px;">
                         <button onclick="document.getElementById('compositeMSlider').value=6; updateCompositeChannels(6);" style="padding: 6px; background: rgba(78, 205, 196, 0.3); border: 1px solid #4ecdc4; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 6</button>
                         <button onclick="document.getElementById('compositeMSlider').value=12; updateCompositeChannels(12);" style="padding: 6px; background: rgba(255, 215, 0, 0.3); border: 1px solid #ffd700; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 12</button>
                         <button onclick="document.getElementById('compositeMSlider').value=30; updateCompositeChannels(30);" style="padding: 6px; background: rgba(255, 99, 132, 0.3); border: 1px solid #ff6384; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 30</button>
                         <button onclick="document.getElementById('compositeMSlider').value=60; updateCompositeChannels(60);" style="padding: 6px; background: rgba(153, 102, 255, 0.3); border: 1px solid #9966ff; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 60</button>
+                        <button onclick="document.getElementById('compositeMSlider').value=210; updateCompositeChannels(210);" style="padding: 6px; background: rgba(255, 159, 64, 0.3); border: 1px solid #ff9f40; border-radius: 5px; color: #fff; cursor: pointer; font-size: 0.85em;">M = 210</button>
                     </div>
                 </div>
                 <div style="margin-bottom: 15px;">
@@ -6174,11 +6233,13 @@
             
             window.updateCompositeChannels = (M = 12) => {
                 const canvas = document.getElementById('vizCanvas');
-                const freshCtx = canvas.getContext('2d');
+                if (!canvas) return;
+                
                 const rect = canvas.getBoundingClientRect();
                 canvas.width = rect.width;
                 canvas.height = rect.height;
                 
+                const freshCtx = canvas.getContext('2d');
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 
