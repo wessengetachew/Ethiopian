@@ -1409,12 +1409,25 @@
                         <input type="number" id="pointSize" value="4" min="2" max="10" step="1">
                     </label>
                     <label>
-                        <input type="checkbox" id="showLabels" checked>
-                        Show Prime Labels
+                        Display Filter:
+                        <select id="ringDisplayFilter">
+                            <option value="all">All Residues</option>
+                            <option value="gcd1">Only GCD = 1 (Coprime)</option>
+                            <option value="nongcd1">Only GCD > 1 (Reducible)</option>
+                            <option value="channels">Residue Channels Only</option>
+                        </select>
                     </label>
                     <label>
-                        <input type="checkbox" id="showModLines" checked>
-                        Show Mod Lines
+                        <input type="checkbox" id="showUnitRays" checked>
+                        Show Unit Circle Rays
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showReductionPaths">
+                        Show Reduction Paths
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showAngleLabels">
+                        Show Angle Labels (θ)
                     </label>
                     <label>
                         <input type="checkbox" id="invertRings">
@@ -1426,6 +1439,7 @@
                             <option value="residue">Residue Class</option>
                             <option value="modulus">Modulus Level</option>
                             <option value="size">Prime Size</option>
+                            <option value="gcdStatus">GCD Status</option>
                         </select>
                     </label>
                     <button onclick="updatePrimeRing()" style="padding: 6px 16px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update</button>
@@ -1452,11 +1466,16 @@
                 </div>
                 <canvas id="primeRingCanvas"></canvas>
                 <div class="ring-info">
-                    <strong>Visualization:</strong> Each prime p is plotted on concentric rings where ring m represents residues mod m.
-                    Position on ring: angle θ = 2π·(p mod m)/m for primes with gcd(p mod m, m) = 1.
-                    Use "Invert Ring Order" to show smallest modulus on outer ring.
-                    <br><strong>Presets:</strong> Powers of 2 (1,2,4,8,...), Powers of 3 (1,3,9,27,...), or custom list.
-                    Hover over points to see prime details.
+                    <strong>Visualization:</strong> Each value on ring m represents position at angle θ = 2πr/m (unit circle parameterization).
+                    <br><strong>Display Filters:</strong>
+                    • <strong>All Residues:</strong> Show all points on each ring
+                    • <strong>Only GCD = 1:</strong> Show only coprime residues (irreducible fractions)
+                    • <strong>Only GCD > 1:</strong> Show only reducible residues (project onto Farey channels)
+                    • <strong>Residue Channels Only:</strong> Show the fundamental Farey channels (1/n families)
+                    <br><strong>Unit Circle Rays:</strong> Each point connects to its corresponding angle θ on the unit circle, showing the direct geometric correspondence between residues and circular position.
+                    <br><strong>Reduction Paths:</strong> For reducible residues (GCD > 1), shows projection lines to their reduced form channel.
+                    <br><strong>Angle Labels:</strong> Display θ values in units of π for geometric clarity.
+                    <br><strong>Hover:</strong> See detailed information including θ angle, GCD, and reduction path for each point.
                 </div>
                 <div id="ringLegend" class="ring-legend"></div>
             </div>
