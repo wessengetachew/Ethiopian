@@ -6151,7 +6151,7 @@
                     }
                     
                     if (closestRes) {
-                        showPointDetailsModal(closestRes, 'avoidance');
+                        showCompositePointDetails(closestRes);
                     }
                 };
             };
@@ -6204,13 +6204,17 @@
                     </div>
                 </div>
                 <div id="compositeStats"></div>
-                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6; margin-top: 15px;">
+                <div id="compositeDetails" style="padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6; margin-top: 15px;">
                     <strong>Corollary Visualization:</strong><br>
                     <span style="color: #4ecdc4;">● Cyan points</span> = Irreducible residues (gcd = 1)<br>
                     <span style="color: #ff6384;">● Red points</span> = Reducible residues (gcd > 1)<br>
                     <span style="color: #ffd700;">● Gold rings</span> = Farey channels (reduction targets)<br>
+                    <span style="color: rgba(255, 99, 132, 0.5);">● Red lines</span> = Projection paths showing r/M → r'/M'<br><br>
                     <strong>Key Result:</strong> Every composite M has reducible residues that project onto simpler Farey channels.<br>
-                    The number projecting to each channel M' is exactly d = M/M' (channel multiplicity).
+                    The number projecting to each channel M' is exactly d = M/M' (channel multiplicity).<br><br>
+                    <strong>Click any point</strong> to see detailed reduction path!
+                </div>
+                <div id="projectionBreakdown" style="display: none; margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
                 </div>
             `;
             
