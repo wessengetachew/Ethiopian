@@ -849,6 +849,17 @@
             border-radius: 10px;
         }
         
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
         .loading {
             text-align: center;
             font-style: italic;
@@ -1312,9 +1323,11 @@
                 <div class="control-group">
                     <h3>Actions</h3>
                     <button onclick="compute()">Calculate</button>
+                    <button class="export-btn" onclick="clearCache()" style="background: linear-gradient(45deg, #ff6b6b, #ee5a52);">Clear Cache</button>
                     <button class="export-btn" onclick="exportResults()">Export Results (JSON)</button>
                     <button class="export-btn" onclick="exportStepsText()">Export Steps (TXT)</button>
                     <button class="export-btn" onclick="exportChartImage()">Export Chart (4K/8K JPEG)</button>
+                    <div id="cacheStatus" style="margin-top: 10px; padding: 8px; background: rgba(78, 205, 196, 0.1); border-radius: 5px; font-size: 0.85em; text-align: center; color: #4ecdc4;">Cache: <span id="cacheCount">0</span> results stored</div>
                 </div>
             </div>
             
@@ -1815,6 +1828,16 @@
             'zeta10': Math.PI ** 10 / 93555
         };
         
+        // Web Worker for heavy computations
+        let computeWorker = null;
+        
+        // Cache for computed results
+        const computationCache = new Map();
+        
+        function getCacheKey(epsilon, constantType, modulus) {
+            return `${epsilon}_${constantType}_${modulus}`;
+        }
+        
         function compute() {
             const epsilon = parseFloat(document.getElementById('epsilon').value);
             const constantType = document.getElementById('constant').value;
@@ -1823,16 +1846,30 @@
             const modulus = parseInt(document.getElementById('modulus').value);
             decimalPlaces = parseInt(document.getElementById('decimalPlaces').value);
             
+            // Check cache first
+            const cacheKey = getCacheKey(epsilon, constantType, modulus);
+            if (computationCache.has(cacheKey)) {
+                console.log('Loading from cache...');
+                const cached = computationCache.get(cacheKey);
+                displayResults(cached, showSteps, method);
+                return;
+            }
+            
             document.getElementById('results').style.display = 'block';
-            document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...</div>';
+            document.getElementById('computed-value').innerHTML = '<div class="loading">Computing...<br><div id="progressBar" style="width: 100%; height: 20px; background: rgba(0,0,0,0.3); border-radius: 10px; margin-top: 10px; overflow: hidden;"><div id="progressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4ecdc4, #44a8a3); transition: width 0.3s ease;"></div></div><div id="progressText" style="margin-top: 8px; font-size: 0.9em; opacity: 0.8;">Initializing...</div></div>';
             
             setTimeout(() => {
                 try {
                     const Y = computeCutoff(epsilon, constantType);
+                    updateProgress(10, 'Generating primes...');
+                    
                     const primes = sieveOfEratosthenes(Y - 1);
+                    updateProgress(40, 'Computing Euler product...');
                     
                     let computedValue;
                     const exponent = constantType === 'pi' ? 2 : parseInt(constantType.replace('zeta', ''));
+                    
+                    updateProgress(60, 'Computing truncated product...');
                     
                     if (constantType === 'pi') {
                         const zetaProduct = computeTruncatedProduct(primes, 2);
@@ -1841,6 +1878,8 @@
                         const n = parseInt(constantType.replace('zeta', '')) / 2;
                         computedValue = computeTruncatedProduct(primes, 2 * n);
                     }
+                    
+                    updateProgress(80, 'Generating partial products...');
                     
                     // Store computation data
                     computationData = {
@@ -1856,53 +1895,73 @@
                         partialProducts: computePartialProducts(primes, constantType === 'pi' ? 2 : exponent)
                     };
                     
-                    // Display results
-                    document.getElementById('computed-value').textContent = computedValue.toFixed(decimalPlaces);
-                    document.getElementById('exact-value').textContent = exactValues[constantType].toFixed(decimalPlaces);
+                    // Cache the result
+                    computationCache.set(cacheKey, computationData);
                     
-                    const actualError = Math.abs(computedValue - exactValues[constantType]) / exactValues[constantType];
-                    document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(Math.min(decimalPlaces - 5, 8))}%</strong>`;
-                    document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
-                    document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong>`;
+                    updateProgress(100, 'Complete!');
                     
-                    // Add precision info
-                    const precisionNote = decimalPlaces > 15 ? 
-                        '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">⚠️ Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
-                    document.getElementById('prime-count').innerHTML += precisionNote;
-                    
-                    // Show step-by-step
-                    if (showSteps) {
-                        showStepByStep(computationData);
-                    } else {
-                        document.getElementById('step-by-step').style.display = 'none';
-                    }
-                    
-                    // Method-specific analysis
-                    if (method === 'gap' || method === 'both') {
-                        showGapAnalysis(primes, constantType);
-                    } else {
-                        document.getElementById('gap-analysis').style.display = 'none';
-                    }
-                    
-                    if (method === 'residue' || method === 'both') {
-                        showResidueAnalysis(primes, constantType, modulus);
-                    } else {
-                        document.getElementById('channel-analysis').style.display = 'none';
-                        document.getElementById('chart-section').style.display = 'none';
-                    }
-                    
-                    // Show visualization
-                    document.getElementById('visualization-section').style.display = 'block';
-                    updateVisualization(currentViz);
-                    
-                    // Show prime ring visualization
-                    document.getElementById('prime-ring-section').style.display = 'block';
-                    updatePrimeRing();
+                    setTimeout(() => {
+                        displayResults(computationData, showSteps, method);
+                    }, 300);
                     
                 } catch (error) {
                     document.getElementById('computed-value').innerHTML = `<span style="color: #ff6b6b;">Error: ${error.message}</span>`;
                 }
             }, 100);
+        }
+        
+        function updateProgress(percent, message) {
+            const fill = document.getElementById('progressFill');
+            const text = document.getElementById('progressText');
+            if (fill) fill.style.width = percent + '%';
+            if (text) text.textContent = message;
+        }
+        
+        function displayResults(data, showSteps, method) {
+            const { epsilon, constantType, modulus, Y, primes, computedValue, exactValue, exponent } = data;
+            
+            // Display results
+            document.getElementById('computed-value').textContent = computedValue.toFixed(decimalPlaces);
+            document.getElementById('exact-value').textContent = exactValue.toFixed(decimalPlaces);
+            
+            const actualError = Math.abs(computedValue - exactValue) / exactValue;
+            document.getElementById('actual-error').innerHTML = `Actual relative error: <strong>${(actualError * 100).toFixed(Math.min(decimalPlaces - 5, 8))}%</strong>`;
+            document.getElementById('error-bound').innerHTML = `Guaranteed error ≤ <strong>${(epsilon * 100).toFixed(4)}%</strong>`;
+            document.getElementById('prime-count').innerHTML = `Using <strong>${primes.length}</strong> primes up to <strong>${Y-1}</strong> <span style="color: #4ecdc4; font-size: 0.9em;">(cached)</span>`;
+            
+            // Add precision info
+            const precisionNote = decimalPlaces > 15 ? 
+                '<div style="font-size: 0.85em; color: #ff6b6b; margin-top: 8px;">⚠️ Note: JavaScript floating-point precision is limited to ~15-17 significant digits</div>' : '';
+            document.getElementById('prime-count').innerHTML += precisionNote;
+            
+            // Show step-by-step
+            if (showSteps) {
+                showStepByStep(data);
+            } else {
+                document.getElementById('step-by-step').style.display = 'none';
+            }
+            
+            // Method-specific analysis
+            if (method === 'gap' || method === 'both') {
+                showGapAnalysis(primes, constantType);
+            } else {
+                document.getElementById('gap-analysis').style.display = 'none';
+            }
+            
+            if (method === 'residue' || method === 'both') {
+                showResidueAnalysis(primes, constantType, modulus);
+            } else {
+                document.getElementById('channel-analysis').style.display = 'none';
+                document.getElementById('chart-section').style.display = 'none';
+            }
+            
+            // Show visualization
+            document.getElementById('visualization-section').style.display = 'block';
+            updateVisualization(currentViz);
+            
+            // Show prime ring visualization
+            document.getElementById('prime-ring-section').style.display = 'block';
+            updatePrimeRing();
         }
         
         function showStepByStep(data) {
@@ -9888,8 +9947,87 @@
             }, mimeType, 0.95);
         }
         
+        function clearCache() {
+            if (confirm(`Clear ${computationCache.size} cached results?`)) {
+                computationCache.clear();
+                updateCacheStatus();
+                alert('Cache cleared successfully!');
+            }
+        }
+        
+        function updateCacheStatus() {
+            const count = document.getElementById('cacheCount');
+            if (count) {
+                count.textContent = computationCache.size;
+            }
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + E: Export results
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                exportResults();
+            }
+            // Ctrl/Cmd + Enter: Compute
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                compute();
+            }
+            // Ctrl/Cmd + S: Export steps
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                exportStepsText();
+            }
+            // Ctrl/Cmd + I: Export chart
+            if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+                e.preventDefault();
+                exportChartImage();
+            }
+        });
+        
         window.onload = () => {
             compute();
+            updateCacheStatus();
+            
+            // Show keyboard shortcuts hint
+            setTimeout(() => {
+                const hint = document.createElement('div');
+                hint.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: rgba(0, 0, 0, 0.9);
+                    color: #fff;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    font-size: 0.85em;
+                    max-width: 300px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                    z-index: 9999;
+                    animation: slideIn 0.5s ease;
+                `;
+                hint.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="color: #ffd700;">⌨️ Keyboard Shortcuts</strong>
+                        <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 1.2em;">×</button>
+                    </div>
+                    <div style="line-height: 1.8;">
+                        <strong>Ctrl+Enter</strong> - Calculate<br>
+                        <strong>Ctrl+E</strong> - Export JSON<br>
+                        <strong>Ctrl+S</strong> - Export Steps<br>
+                        <strong>Ctrl+I</strong> - Export Chart
+                    </div>
+                `;
+                document.body.appendChild(hint);
+                
+                // Auto-hide after 8 seconds
+                setTimeout(() => {
+                    hint.style.transition = 'opacity 0.5s ease';
+                    hint.style.opacity = '0';
+                    setTimeout(() => hint.remove(), 500);
+                }, 8000);
+            }, 2000);
         };
     </script>
 </body>
