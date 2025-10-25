@@ -1152,39 +1152,72 @@
             
             <div class="info-section">
                 <div class="toggle-section" onclick="toggleSection('credits')">
-                    <h3>Credits & Acknowledgments</h3>
+                    <h3>Credits, Acknowledgments & References</h3>
                     <span class="toggle-icon" id="credits-icon">▼</span>
                 </div>
                 <div id="credits-content" class="collapsible-content">
-                    <p style="margin-bottom: 15px;"><strong>Creator:</strong> Wessen Getachew (<a href="https://twitter.com/7Dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7Dview</a>)</p>
+                    <p style="margin-bottom: 15px;"><strong>Creator & Original Research:</strong> Wessen Getachew (<a href="https://twitter.com/7Dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7Dview</a>)</p>
                     
-                    <p style="margin-bottom: 15px;"><strong>Mathematical Foundations:</strong></p>
+                    <div style="padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700; margin-bottom: 20px;">
+                        <p style="margin-bottom: 10px;"><strong>Original Contributions by Wessen Getachew:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li><strong>Getachew Prime Channel Avoidance Theorem</strong> - Novel geometric characterization showing prime moduli form complete coprime rings that avoid all Farey reduction channels</li>
+                            <li><strong>Getachew Composite Channel Projection Corollary</strong> - Systematic analysis of how composite moduli project reducible residues onto Farey flow lines with precise channel multiplicity formulas</li>
+                            <li><strong>Gap-Class Decomposition Framework</strong> - Reorganization of the Euler product by prime gap classes P<sub>g</sub>(s), providing an alternative structural view of ζ(s)</li>
+                            <li><strong>Modular Zeta Surface Visualization</strong> - Interactive nested unity lattice representation revealing the geometric structure of ζ(s) through modular arithmetic</li>
+                            <li><strong>Phase Law Extension</strong> - Convergent Euler product formulation in the critical strip using phase alignment φ(p,t) = t·log(p) - π/2 with decay parameter β ~ 1/log(t)</li>
+                        </ul>
+                    </div>
+                    
+                    <p style="margin-bottom: 15px;"><strong>Classical Mathematical Foundations:</strong></p>
                     <ul style="margin-left: 20px; line-height: 1.8;">
-                        <li><strong>Leonhard Euler (1707-1783)</strong> - Pioneer of the Euler product formula for the Riemann zeta function, discovered the beautiful identity ζ(2) = π²/6, and laid the groundwork for analytic number theory</li>
-                        <li><strong>Bernhard Riemann (1826-1866)</strong> - Extended Euler's work to the complex plane with the Riemann zeta function</li>
+                        <li><strong>Leonhard Euler (1707-1783)</strong> - Discovered the Euler product formula ζ(s) = ∏<sub>p</sub>(1-p<sup>-s</sup>)<sup>-1</sup> and proved ζ(2) = π²/6 (Basel problem, 1734)</li>
+                        <li><strong>Bernhard Riemann (1826-1866)</strong> - Extended the zeta function to the complex plane and formulated the Riemann Hypothesis (1859)</li>
+                        <li><strong>Peter Gustav Lejeune Dirichlet (1805-1859)</strong> - Proved Dirichlet's theorem on primes in arithmetic progressions, fundamental to residue channel analysis</li>
+                        <li><strong>Edmund Landau (1877-1938)</strong> - Developed rigorous analytic number theory and error bounds for prime counting functions</li>
+                        <li><strong>Godfrey Harold Hardy (1877-1947) & J.E. Littlewood (1885-1977)</strong> - Proved infinitely many lead changes in prime races (Chebyshev's bias)</li>
                     </ul>
                     
                     <p style="margin-top: 15px; margin-bottom: 15px;"><strong>Educational Inspiration:</strong></p>
                     <ul style="margin-left: 20px; line-height: 1.8;">
-                        <li><strong>3Blue1Brown (Grant Sanderson)</strong> - For exceptional mathematical visualizations and making complex concepts accessible through elegant visual storytelling. His videos on the Basel problem, prime number patterns, and the Riemann zeta function inspired the interactive visualization approach in this calculator.</li>
+                        <li><strong>3Blue1Brown (Grant Sanderson)</strong> - Exceptional mathematical visualizations that inspired the interactive approach in this calculator</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px; margin-bottom: 15px;"><strong>Key References:</strong></p>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li>Euler, L. (1748). <em>Introductio in analysin infinitorum</em>. Lausanne.</li>
+                        <li>Riemann, B. (1859). "Über die Anzahl der Primzahlen unter einer gegebenen Größe". <em>Monatsberichte der Berliner Akademie</em>.</li>
+                        <li>Dirichlet, P.G.L. (1837). "Beweis des Satzes, dass jede unbegrenzte arithmetische Progression...". <em>Abhandlungen der Königlich Preussischen Akademie der Wissenschaften</em>.</li>
+                        <li>Hardy, G.H. & Littlewood, J.E. (1914). "Some problems of 'Partitio numerorum'". <em>Acta Mathematica</em>, 44(1), 1-70.</li>
+                        <li>Edwards, H.M. (1974). <em>Riemann's Zeta Function</em>. Academic Press.</li>
+                        <li>Davenport, H. (2000). <em>Multiplicative Number Theory</em> (3rd ed.). Springer.</li>
+                        <li>Montgomery, H.L. & Vaughan, R.C. (2007). <em>Multiplicative Number Theory I: Classical Theory</em>. Cambridge University Press.</li>
+                        <li>Titchmarsh, E.C. (1986). <em>The Theory of the Riemann Zeta Function</em> (2nd ed.). Oxford University Press.</li>
+                        <li>Rubinstein, M. & Sarnak, P. (1994). "Chebyshev's bias". <em>Experimental Mathematics</em>, 3(3), 173-197.</li>
+                        <li>Granville, A. & Martin, G. (2006). "Prime number races". <em>The American Mathematical Monthly</em>, 113(1), 1-33.</li>
+                    </ol>
+                    
+                    <p style="margin-top: 15px; margin-bottom: 15px;"><strong>Online Resources:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>OEIS (Online Encyclopedia of Integer Sequences): <a href="https://oeis.org" target="_blank" style="color: #4ecdc4;">https://oeis.org</a></li>
+                        <li>Wolfram MathWorld - Riemann Zeta Function: <a href="https://mathworld.wolfram.com/RiemannZetaFunction.html" target="_blank" style="color: #4ecdc4;">mathworld.wolfram.com</a></li>
+                        <li>Prime Number Theorem Resources: <a href="https://primes.utm.edu" target="_blank" style="color: #4ecdc4;">primes.utm.edu</a></li>
                     </ul>
                     
                     <p style="margin-top: 15px; margin-bottom: 15px;"><strong>Technologies Used:</strong></p>
                     <ul style="margin-left: 20px; line-height: 1.8;">
                         <li><strong>Chart.js</strong> - Interactive charting library for data visualization</li>
-                        <li><strong>HTML5 Canvas</strong> - For high-resolution chart exports</li>
-                        <li><strong>JavaScript</strong> - Core computation engine and user interface</li>
-                    </ul>
-                    
-                    <p style="margin-top: 15px;"><strong>Special Thanks:</strong></p>
-                    <ul style="margin-left: 20px; line-height: 1.8;">
-                        <li>The mathematical community for centuries of insights into prime numbers and the zeta function</li>
-                        <li>Open-source developers who created the libraries that power this calculator</li>
-                        <li>Everyone who uses this tool to explore the beauty of mathematics</li>
+                        <li><strong>HTML5 Canvas</strong> - For high-resolution visualizations and exports</li>
+                        <li><strong>JavaScript ES6+</strong> - Core computation engine and user interface</li>
                     </ul>
                     
                     <p style="margin-top: 20px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <strong>Note:</strong> This calculator is an educational tool designed to demonstrate the power of Euler products and modular arithmetic in computing fundamental mathematical constants. It combines classical number theory with modern computational methods and interactive visualization.
+                        <strong>Note:</strong> This calculator combines classical analytic number theory with original research by Wessen Getachew on modular decompositions of the Riemann zeta function. The visualizations and interactive tools are designed to make these deep mathematical concepts accessible to students, educators, and researchers. All novel theorems and methods are original contributions that build upon the classical foundations of Euler, Riemann, and Dirichlet.
+                    </p>
+                    
+                    <p style="margin-top: 15px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
+                        <strong>Citation:</strong> If you use this calculator or reference the original research in academic work, please cite:<br>
+                        Getachew, W. (2025). "Modular Sieve: Computing π and ζ(2n) via Gap-Class and Residue-Channel Decompositions". <em>Interactive Mathematical Calculator</em>. Available at: [URL]
                     </p>
                 </div>
             </div>
