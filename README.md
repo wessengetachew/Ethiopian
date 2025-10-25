@@ -6246,12 +6246,16 @@
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 
-                const divisors = [];
-                for (let d = 1; d < M; d++) {
+                // Get all divisors (including M itself for complete factor list)
+                const allDivisors = [];
+                for (let d = 1; d <= M; d++) {
                     if (M % d === 0) {
-                        divisors.push(d);
+                        allDivisors.push(d);
                     }
                 }
+                
+                // Divisors for rings (exclude M itself)
+                const divisors = allDivisors.filter(d => d < M);
                 
                 const phiM = eulerPhi(M);
                 const maxRadius = Math.min(rect.width, rect.height) * 0.4;
