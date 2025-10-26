@@ -1390,7 +1390,7 @@
                     <button class="category-btn" onclick="filterVizCategory('complex')">Complex Analysis</button>
                     <button class="category-btn" onclick="filterVizCategory('modular')">Modular</button>
                     <button class="category-btn" onclick="filterVizCategory('semiprimes')">Semiprimes</button>
-                    <button class="category-btn" onclick="filterVizCategory('3d')">🎮 3D</button>
+
                 </div>
                 
                 <div class="viz-options">
@@ -1422,30 +1422,7 @@
                     <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
                     <button class="viz-btn" onclick="changeViz('compositeChannels')">Prime & Composite Channels</button>
                 </div>
-                <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
-                    <label style="color: #fff; font-weight: 500;">Universal Zoom: <span id="universalZoomLevel">1.0</span>x</label>
-                    <input type="range" id="universalZoomSlider" min="0.5" max="5" step="0.1" value="1" 
-                           style="width: 100%;"
-                           oninput="updateUniversalZoom(parseFloat(this.value))">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; opacity: 0.7; margin-top: 5px;">
-                        <span>0.5x (Zoom Out)</span>
-                        <span>1x (Default)</span>
-                        <span>5x (Zoom In)</span>
-                    </div>
-                </div>
-                <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
-                    <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
-                        Universal Zoom: <span id="universalZoomLevel">1.0</span>x
-                    </label>
-                    <input type="range" id="universalZoomSlider" min="0.5" max="5" step="0.1" value="1" 
-                           style="width: 100%;"
-                           oninput="updateUniversalZoom(parseFloat(this.value))">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; opacity: 0.7; margin-top: 5px;">
-                        <span>0.5x (Zoom Out)</span>
-                        <span>1x (Default)</span>
-                        <span>5x (Zoom In)</span>
-                    </div>
-                </div>
+
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
             </div>
