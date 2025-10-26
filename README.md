@@ -6,49 +6,53 @@
     <title>GCD Mapping Framework - Wessen Getachew</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Georgia, 'Times New Roman', serif; background: #ffffff; color: #1a1a1a; line-height: 1.8; }
-        header { background: #2c3e50; color: #ffffff; padding: 60px 40px; border-bottom: 4px solid #34495e; text-align: center; }
-        h1 { font-size: 2.8em; font-weight: 400; margin-bottom: 15px; }
+        body { font-family: Georgia, 'Times New Roman', serif; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); color: #ecf0f1; line-height: 1.8; }
+        header { background: #1a2332; color: #ffffff; padding: 60px 40px; border-bottom: 4px solid #34495e; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        h1 { font-size: 2.8em; font-weight: 400; margin-bottom: 15px; color: #3498db; }
         .subtitle { font-size: 1.3em; font-weight: 300; opacity: 0.9; font-style: italic; margin-bottom: 20px; }
         .author { font-size: 1.1em; opacity: 0.85; font-family: 'Segoe UI', sans-serif; }
-        nav { background: #34495e; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        nav { background: #34495e; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         nav ul { list-style: none; display: flex; max-width: 1400px; margin: 0 auto; }
         nav li { flex: 1; }
         nav a { display: block; padding: 18px 20px; color: #ecf0f1; text-decoration: none; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); transition: background 0.3s; font-family: 'Segoe UI', sans-serif; font-size: 0.95em; }
         nav a:hover { background: #2c3e50; }
-        section { max-width: 1400px; margin: 0 auto; padding: 60px 40px; border-bottom: 1px solid #e0e0e0; }
-        section:nth-child(even) { background: #f8f9fa; }
-        section h2 { font-size: 2.2em; font-weight: 400; margin-bottom: 30px; color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 15px; }
+        section { max-width: 1400px; margin: 0 auto; padding: 60px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        section:nth-child(even) { background: rgba(52, 73, 94, 0.3); }
+        section h2 { font-size: 2.2em; font-weight: 400; margin-bottom: 30px; color: #3498db; border-bottom: 3px solid #3498db; padding-bottom: 15px; }
         .viz-container { display: grid; grid-template-columns: 350px 1fr; gap: 30px; margin-top: 30px; }
-        .controls { background: #f8f9fa; padding: 25px; border: 1px solid #dee2e6; height: fit-content; }
-        .control-group { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+        .controls { background: rgba(26, 35, 50, 0.6); padding: 25px; border: 1px solid rgba(52, 152, 219, 0.3); height: fit-content; backdrop-filter: blur(10px); }
+        .control-group { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .control-group:last-child { border-bottom: none; }
-        .control-group h3 { font-size: 1.05em; margin-bottom: 15px; color: #2c3e50; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
-        label { display: block; margin-bottom: 8px; font-size: 0.95em; color: #495057; font-family: 'Segoe UI', sans-serif; }
-        input[type="range"] { width: 100%; margin: 10px 0; height: 4px; background: #dee2e6; border-radius: 2px; outline: none; -webkit-appearance: none; }
+        .control-group h3 { font-size: 1.05em; margin-bottom: 15px; color: #3498db; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
+        label { display: block; margin-bottom: 8px; font-size: 0.95em; color: #bdc3c7; font-family: 'Segoe UI', sans-serif; }
+        input[type="range"] { width: 100%; margin: 10px 0; height: 4px; background: rgba(189, 195, 199, 0.3); border-radius: 2px; outline: none; -webkit-appearance: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #3498db; cursor: pointer; border-radius: 50%; }
         input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: #3498db; cursor: pointer; border-radius: 50%; border: none; }
-        input[type="number"], select { width: 100%; padding: 8px 12px; background: #ffffff; border: 1px solid #ced4da; border-radius: 4px; color: #495057; font-size: 0.95em; font-family: 'Segoe UI', sans-serif; }
+        input[type="number"], select { width: 100%; padding: 8px 12px; background: rgba(44, 62, 80, 0.8); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 4px; color: #ecf0f1; font-size: 0.95em; font-family: 'Segoe UI', sans-serif; }
         button { width: 100%; padding: 10px; background: #3498db; border: none; border-radius: 4px; color: #ffffff; font-size: 0.95em; font-weight: 500; cursor: pointer; transition: background 0.3s; margin-top: 10px; font-family: 'Segoe UI', sans-serif; }
         button:hover { background: #2980b9; }
-        .value-display { float: right; background: #e3f2fd; color: #1976d2; padding: 2px 10px; border-radius: 3px; font-weight: 600; }
-        canvas { border: 1px solid #dee2e6; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #0a0a0f; display: block; }
+        .value-display { float: right; background: rgba(52, 152, 219, 0.3); color: #3498db; padding: 2px 10px; border-radius: 3px; font-weight: 600; }
+        canvas { border: 1px solid rgba(52, 152, 219, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); background: #0a0a0f; display: block; }
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }
-        .stat-box { background: #ffffff; padding: 25px; border: 1px solid #dee2e6; border-left: 4px solid #3498db; text-align: center; }
-        .stat-value { font-size: 2.5em; font-weight: 300; color: #2c3e50; }
-        .stat-label { font-size: 0.95em; color: #6c757d; margin-top: 8px; }
+        .stat-box { background: rgba(26, 35, 50, 0.6); padding: 25px; border: 1px solid rgba(52, 152, 219, 0.3); border-left: 4px solid #3498db; text-align: center; backdrop-filter: blur(10px); }
+        .stat-value { font-size: 2.5em; font-weight: 300; color: #3498db; }
+        .stat-label { font-size: 0.95em; color: #bdc3c7; margin-top: 8px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 25px 0; }
-        .card { background: #ffffff; padding: 20px; border: 1px solid #dee2e6; border-radius: 4px; }
-        .card strong { color: #2c3e50; display: block; margin-bottom: 8px; }
-        .card code { background: #f8f9fa; padding: 4px 8px; border-radius: 3px; font-size: 0.9em; display: block; margin: 8px 0; }
-        .theorem { background: #ffffff; padding: 30px; margin: 25px 0; border: 1px solid #dee2e6; border-left: 4px solid #3498db; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .theorem h4 { color: #2c3e50; font-size: 1.3em; margin-bottom: 20px; font-weight: 500; }
-        .formula { background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; margin: 15px 0; border-left: 3px solid #6c757d; }
-        .highlight { background: #e3f2fd; padding: 20px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #2196f3; }
+        .card { background: rgba(26, 35, 50, 0.6); padding: 20px; border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 4px; backdrop-filter: blur(10px); }
+        .card strong { color: #3498db; display: block; margin-bottom: 8px; }
+        .card code { background: rgba(44, 62, 80, 0.6); padding: 4px 8px; border-radius: 3px; font-size: 0.9em; display: block; margin: 8px 0; color: #ecf0f1; }
+        .theorem { background: rgba(26, 35, 50, 0.6); padding: 30px; margin: 25px 0; border: 1px solid rgba(52, 152, 219, 0.3); border-left: 4px solid #3498db; box-shadow: 0 2px 4px rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+        .theorem h4 { color: #3498db; font-size: 1.3em; margin-bottom: 20px; font-weight: 500; }
+        .theorem p { color: #bdc3c7; }
+        .theorem ul { color: #bdc3c7; }
+        .formula { background: rgba(44, 62, 80, 0.6); padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; margin: 15px 0; border-left: 3px solid #6c757d; color: #ecf0f1; }
+        .highlight { background: rgba(52, 152, 219, 0.2); padding: 20px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #3498db; }
         .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         input[type="checkbox"] { width: 18px; height: 18px; margin-right: 10px; cursor: pointer; }
-        .tooltip { position: fixed; background: rgba(44, 62, 80, 0.95); color: #ffffff; padding: 12px 16px; border-radius: 4px; font-size: 0.9em; pointer-events: none; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-family: 'Segoe UI', sans-serif; }
+        .tooltip { position: fixed; background: rgba(26, 35, 50, 0.95); color: #ffffff; padding: 12px 16px; border-radius: 4px; font-size: 0.9em; pointer-events: none; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-family: 'Segoe UI', sans-serif; border: 1px solid rgba(52, 152, 219, 0.5); }
         @media (max-width: 1200px) { .viz-container { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: 1fr; } }
+        .nested-range { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .nested-range input { margin: 0; }
     </style>
 </head>
 <body>
@@ -91,6 +95,16 @@
                         <option value="nested">Nested Modular</option>
                         <option value="spiral">Logarithmic Spiral</option>
                     </select>
+                </div>
+                
+                <div class="control-group" id="nestedControls" style="display: none;">
+                    <h3>Nested Modular Range</h3>
+                    <label>Start Modulus: <span class="value-display" id="nestedStartValue">1</span></label>
+                    <input type="number" id="nestedStart" min="1" max="500" value="1">
+                    <label style="margin-top: 10px;">End Modulus: <span class="value-display" id="nestedEndValue">30</span></label>
+                    <input type="number" id="nestedEnd" min="1" max="500" value="30">
+                    <label style="margin-top: 10px;">Ring Spacing: <span class="value-display" id="ringSpacingValue">1.0</span></label>
+                    <input type="range" id="ringSpacing" min="0.5" max="3" step="0.1" value="1.0">
                 </div>
                 
                 <div class="control-group">
@@ -374,21 +388,51 @@
             }
             
             const points = [];
-            for (let r = 1; r <= m; r++) {
-                const g = gcd(r, m);
-                let theta = (2 * Math.PI * r) / m;
-                let radius = mode === 'unit' ? maxRadius : mode === 'concentric' ? maxRadius * (g / m) : maxRadius * (r / m);
-                const radiusRatio = radius / maxRadius;
-                let rotationOffset = globalRotation * Math.PI / 180;
-                if (rotateOuterIn) rotationOffset *= radiusRatio;
-                else if (rotateInnerOut) rotationOffset *= (1 - radiusRatio);
-                theta += rotationOffset;
-                const x = centerX + radius * Math.cos(theta - Math.PI / 2);
-                const y = centerY + radius * Math.sin(theta - Math.PI / 2);
-                points.push({ x, y, gcd: g, r, m, theta });
+            
+            if (mode === 'nested') {
+                const startMod = parseInt(document.getElementById('nestedStart').value);
+                const endMod = parseInt(document.getElementById('nestedEnd').value);
+                const ringSpacing = parseFloat(document.getElementById('ringSpacing').value);
+                const modRange = endMod - startMod + 1;
+                
+                for (let currentM = startMod; currentM <= endMod; currentM++) {
+                    // Calculate ring radius: inner (small m) to outer (large m)
+                    const ringIndex = currentM - startMod;
+                    const ringRadius = ((ringIndex + 1) / modRange) * maxRadius * ringSpacing;
+                    
+                    for (let r = 1; r <= currentM; r++) {
+                        const g = gcd(r, currentM);
+                        let theta = (2 * Math.PI * r) / currentM;
+                        
+                        // Apply rotation
+                        const radiusRatio = ringRadius / maxRadius;
+                        let rotationOffset = globalRotation * Math.PI / 180;
+                        if (rotateOuterIn) rotationOffset *= radiusRatio;
+                        else if (rotateInnerOut) rotationOffset *= (1 - radiusRatio);
+                        theta += rotationOffset;
+                        
+                        const x = centerX + ringRadius * Math.cos(theta - Math.PI / 2);
+                        const y = centerY + ringRadius * Math.sin(theta - Math.PI / 2);
+                        points.push({ x, y, gcd: g, r, m: currentM, theta });
+                    }
+                }
+            } else {
+                for (let r = 1; r <= m; r++) {
+                    const g = gcd(r, m);
+                    let theta = (2 * Math.PI * r) / m;
+                    let radius = mode === 'unit' ? maxRadius : mode === 'concentric' ? maxRadius * (g / m) : maxRadius * (r / m);
+                    const radiusRatio = radius / maxRadius;
+                    let rotationOffset = globalRotation * Math.PI / 180;
+                    if (rotateOuterIn) rotationOffset *= radiusRatio;
+                    else if (rotateInnerOut) rotationOffset *= (1 - radiusRatio);
+                    theta += rotationOffset;
+                    const x = centerX + radius * Math.cos(theta - Math.PI / 2);
+                    const y = centerY + radius * Math.sin(theta - Math.PI / 2);
+                    points.push({ x, y, gcd: g, r, m, theta });
+                }
             }
             
-            if (showConnections) {
+            if (showConnections && mode !== 'nested') {
                 const gcd1Points = points.filter(p => p.gcd === 1);
                 ctx.strokeStyle = 'rgba(102, 126, 234, 0.2)';
                 ctx.lineWidth = 1;
@@ -405,7 +449,7 @@
                 ctx.fillStyle = color; ctx.globalAlpha = opacity;
                 ctx.beginPath(); ctx.arc(point.x, point.y, pointSize, 0, 2 * Math.PI); ctx.fill();
                 
-                if (labelingSystem !== 'none') {
+                if (labelingSystem !== 'none' && mode !== 'nested') {
                     const label = getLabel(point.r, point.m, labelingSystem);
                     if (label) {
                         ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.globalAlpha = 0.8;
@@ -419,7 +463,7 @@
                 }
             });
             ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-            updateStats(m);
+            updateStats(mode === 'nested' ? parseInt(document.getElementById('nestedEnd').value) : m);
         }
         
         function updateStats(m) {
@@ -493,7 +537,41 @@
         
         document.getElementById('modulusSlider').addEventListener('input', (e) => { const value = e.target.value; document.getElementById('modulusInput').value = value; document.getElementById('modulusValue').textContent = value; draw(); });
         document.getElementById('modulusInput').addEventListener('input', (e) => { const value = Math.min(10000, Math.max(3, parseInt(e.target.value) || 3)); e.target.value = value; if (value <= 1000) document.getElementById('modulusSlider').value = value; document.getElementById('modulusValue').textContent = value; draw(); });
-        document.getElementById('vizMode').addEventListener('change', draw);
+        document.getElementById('vizMode').addEventListener('change', (e) => {
+            const nestedControls = document.getElementById('nestedControls');
+            if (e.target.value === 'nested') {
+                nestedControls.style.display = 'block';
+            } else {
+                nestedControls.style.display = 'none';
+            }
+            draw();
+        });
+        document.getElementById('nestedStart').addEventListener('input', (e) => {
+            const value = Math.min(500, Math.max(1, parseInt(e.target.value) || 1));
+            e.target.value = value;
+            document.getElementById('nestedStartValue').textContent = value;
+            const endVal = parseInt(document.getElementById('nestedEnd').value);
+            if (value > endVal) {
+                document.getElementById('nestedEnd').value = value;
+                document.getElementById('nestedEndValue').textContent = value;
+            }
+            draw();
+        });
+        document.getElementById('nestedEnd').addEventListener('input', (e) => {
+            const value = Math.min(500, Math.max(1, parseInt(e.target.value) || 1));
+            e.target.value = value;
+            document.getElementById('nestedEndValue').textContent = value;
+            const startVal = parseInt(document.getElementById('nestedStart').value);
+            if (value < startVal) {
+                document.getElementById('nestedStart').value = value;
+                document.getElementById('nestedStartValue').textContent = value;
+            }
+            draw();
+        });
+        document.getElementById('ringSpacing').addEventListener('input', (e) => {
+            document.getElementById('ringSpacingValue').textContent = parseFloat(e.target.value).toFixed(1);
+            draw();
+        });
         document.getElementById('colorScheme').addEventListener('change', draw);
         document.getElementById('pointSize').addEventListener('input', (e) => { document.getElementById('pointSizeValue').textContent = e.target.value; draw(); });
         document.getElementById('gcd1Opacity').addEventListener('input', (e) => { document.getElementById('gcd1OpacityValue').textContent = e.target.value + '%'; draw(); });
