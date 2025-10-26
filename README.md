@@ -908,6 +908,20 @@
             <div class="quick-actions">
                 <button class="quick-btn" onclick="exportAllData()">Export All</button>
                 <button class="quick-btn" onclick="showPresets()">Presets</button>
+                <div style="margin-top: 15px;">
+                    <button onclick="enterGalleryMode()" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🖼️ Gallery Mode</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="galleryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 10000; overflow-y: auto; padding: 20px;">
+            <div style="max-width: 1600px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: sticky; top: 0; background: rgba(0, 0, 0, 0.9); padding: 20px; border-radius: 10px; z-index: 10001;">
+                    <h2 style="color: #ffd700; margin: 0;">Gallery Mode - Multiple Visualizations</h2>
+                    <button onclick="exitGalleryMode()" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✕ Close</button>
+                </div>
+                <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px;">
+                </div>
             </div>
         </div>
     </nav>
@@ -1383,11 +1397,12 @@
                 <h3>Interactive Visualization</h3>
                 
                 <div class="viz-categories">
-                    <button class="category-btn active" onclick="filterVizCategory('all')">All (25)</button>
+                    <button class="category-btn active" onclick="filterVizCategory('all')">All (28)</button>
                     <button class="category-btn" onclick="filterVizCategory('distribution')">Distribution</button>
                     <button class="category-btn" onclick="filterVizCategory('complex')">Complex Analysis</button>
                     <button class="category-btn" onclick="filterVizCategory('modular')">Modular</button>
                     <button class="category-btn" onclick="filterVizCategory('semiprimes')">Semiprimes</button>
+                    <button class="category-btn" onclick="filterVizCategory('3d')">🎮 3D</button>
                 </div>
                 
                 <div class="viz-options">
@@ -1418,6 +1433,9 @@
                     <button class="viz-btn" onclick="changeViz('twinSemiprimes')">Twin Semiprimes</button>
                     <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
                     <button class="viz-btn" onclick="changeViz('compositeChannels')">Prime & Composite Channels</button>
+                    <button class="viz-btn" onclick="changeViz('3dModularLattice')">🎮 3D Modular Lattice</button>
+                    <button class="viz-btn" onclick="changeViz('3dZetaSurface')">🎮 3D Zeta Surface</button>
+                    <button class="viz-btn" onclick="changeViz('3dPrimeHelix')">🎮 3D Prime Helix</button>
                 </div>
                 <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
                     <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
@@ -1591,8 +1609,18 @@
             'factorizationTiming': 'semiprimes',
             'twinSemiprimes': 'semiprimes',
             'semiprimeZeta': 'semiprimes',
-            'compositeChannels': 'modular'
+            'compositeChannels': 'modular',
+            '3dModularLattice': '3d',
+            '3dZetaSurface': '3d',
+            '3dPrimeHelix': '3d'
         };
+        
+        // Three.js globals for 3D visualizations
+        let scene3D = null;
+        let camera3D = null;
+        let renderer3D = null;
+        let controls3D = null;
+        let animationFrame3D = null;
         
         function showPresets() {
             const presets = document.getElementById('presetExamples');
@@ -2797,6 +2825,11 @@
         
         function updateVisualization(type) {
             if (!computationData) return;
+            
+            // Cleanup 3D scene when switching away from 3D visualizations
+            if (!type.startsWith('3d')) {
+                cleanup3D();
+            }
             
             const canvas = document.getElementById('vizCanvas');
             const ctx = canvas.getContext('2d');
@@ -7961,6 +7994,13 @@
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Phasor Sum Visualization: ζ(s) as Rotating Vectors</h4>
                 <div style="margin-bottom: 20px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button id="phasorPlayBtn" onclick="togglePhasorAnimation()" style="padding: 8px 16px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Play</button>
+                        <button onclick="resetPhasorAnimation()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 6px; cursor: pointer;">Reset</button>
+                        <label style="display: flex; align-items: center; color: #fff; margin-left: auto;">
+                            Speed: <input type="number" id="phasorSpeed" value="1" min="0.1" max="10" step="0.1" style="width: 60px; margin-left: 8px; padding: 4px; border-radius: 4px;">×
+                        </label>
+                    </div>
                     <label style="color: #fff; font-weight: 500;">Imaginary Part (t): <span id="tValue">0</span></label>
                     <input type="range" id="tSlider" min="0" max="250" step="0.001" value="0" 
                            style="width: 100%; margin-top: 10px;"
@@ -8049,6 +8089,51 @@
                     Adjust t to see how the sum changes along the critical line
                 </div>
             `;
+            
+            let phasorAnimationId = null;
+            let isPhasorPlaying = false;
+            
+            window.togglePhasorAnimation = () => {
+                isPhasorPlaying = !isPhasorPlaying;
+                const btn = document.getElementById('phasorPlayBtn');
+                
+                if (isPhasorPlaying) {
+                    btn.textContent = 'Pause';
+                    btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
+                    startPhasorAnimation();
+                } else {
+                    btn.textContent = 'Play';
+                    btn.style.background = 'linear-gradient(45deg, #4ecdc4, #44a8a3)';
+                    if (phasorAnimationId) cancelAnimationFrame(phasorAnimationId);
+                }
+            };
+            
+            window.resetPhasorAnimation = () => {
+                isPhasorPlaying = false;
+                document.getElementById('phasorPlayBtn').textContent = 'Play';
+                document.getElementById('phasorPlayBtn').style.background = 'linear-gradient(45deg, #4ecdc4, #44a8a3)';
+                if (phasorAnimationId) cancelAnimationFrame(phasorAnimationId);
+                document.getElementById('tSlider').value = 0;
+                updatePhasorPlot(0, parseFloat(document.getElementById('zoomSlider').value));
+            };
+            
+            function startPhasorAnimation() {
+                if (!isPhasorPlaying) return;
+                
+                const speed = parseFloat(document.getElementById('phasorSpeed').value);
+                const slider = document.getElementById('tSlider');
+                let currentValue = parseFloat(slider.value);
+                
+                currentValue += 0.1 * speed;
+                if (currentValue > parseFloat(slider.max)) {
+                    currentValue = 0;
+                }
+                
+                slider.value = currentValue;
+                updatePhasorPlot(currentValue, parseFloat(document.getElementById('zoomSlider').value));
+                
+                phasorAnimationId = requestAnimationFrame(startPhasorAnimation);
+            }
             
             // Initial plot at t=0
             // Initial plot at t=0
@@ -10093,8 +10178,696 @@
             }
         }
         
-        // Keyboard shortcuts
+        let isScreenshotMode = false;
+        
+        function enterScreenshotMode() {
+            isScreenshotMode = !isScreenshotMode;
+            
+            if (isScreenshotMode) {
+                // Hide UI elements
+                document.querySelector('.sticky-nav').style.display = 'none';
+                document.querySelectorAll('.viz-options').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.view-options').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.category-btn').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.viz-categories').forEach(el => el.style.display = 'none');
+                document.getElementById('vizStats').style.display = 'none';
+                
+                alert('Screenshot Mode: UI elements hidden. Press "Esc" to exit.');
+            } else {
+                exitScreenshotMode();
+            }
+        }
+        
+        function exitScreenshotMode() {
+            isScreenshotMode = false;
+            document.querySelector('.sticky-nav').style.display = 'block';
+            document.querySelectorAll('.viz-options').forEach(el => el.style.display = 'flex');
+            document.querySelectorAll('.view-options').forEach(el => el.style.display = 'flex');
+            document.querySelectorAll('.viz-categories').forEach(el => el.style.display = 'flex');
+            document.getElementById('vizStats').style.display = 'block';
+        }
+        
+        function enterGalleryMode() {
+            if (!computationData) {
+                alert('Please compute a value first!');
+                return;
+            }
+            
+            const modal = document.getElementById('galleryModal');
+            const grid = document.getElementById('galleryGrid');
+            
+            modal.style.display = 'block';
+            grid.innerHTML = '';
+            
+            // Create mini canvases for each visualization
+            const vizTypes = [
+                { id: 'convergence', name: 'Convergence' },
+                { id: 'contribution', name: 'Prime Contributions' },
+                { id: 'gapDist', name: 'Gap Distribution' },
+                { id: 'primeCount', name: 'Prime Counting π(x)' },
+                { id: 'phasorSum', name: 'Phasor Sum' },
+                { id: 'sacksSpiral', name: 'Sacks Spiral' }
+            ];
+            
+            vizTypes.forEach(viz => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    background: rgba(30, 60, 114, 0.6);
+                    border-radius: 15px;
+                    padding: 20px;
+                    border: 2px solid rgba(78, 205, 196, 0.3);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                `;
+                
+                card.onmouseenter = () => {
+                    card.style.borderColor = '#4ecdc4';
+                    card.style.transform = 'translateY(-5px)';
+                };
+                
+                card.onmouseleave = () => {
+                    card.style.borderColor = 'rgba(78, 205, 196, 0.3)';
+                    card.style.transform = 'translateY(0)';
+                };
+                
+                card.onclick = () => {
+                    exitGalleryMode();
+                    changeViz(viz.id);
+                    document.getElementById('visualization-section').scrollIntoView({ behavior: 'smooth' });
+                };
+                
+                card.innerHTML = `
+                    <h3 style="color: #4ecdc4; margin-bottom: 15px; text-align: center;">${viz.name}</h3>
+                    <canvas id="gallery-${viz.id}" style="width: 100%; height: 300px; border-radius: 10px; background: rgba(0, 0, 0, 0.4);"></canvas>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            // Render each visualization
+            setTimeout(() => {
+                vizTypes.forEach(viz => {
+                    const canvas = document.getElementById(`gallery-${viz.id}`);
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        const rect = canvas.getBoundingClientRect();
+                        canvas.width = rect.width;
+                        canvas.height = rect.height;
+                        renderGalleryViz(ctx, viz.id);
+                    }
+                });
+            }, 100);
+        }
+        
+        function exitGalleryMode() {
+            document.getElementById('galleryModal').style.display = 'none';
+        }
+        
+        function renderGalleryViz(ctx, type) {
+            // Simplified rendering for gallery thumbnails
+            const { primes, partialProducts, exactValue, constantType, exponent } = computationData;
+            
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+            ctx.fillRect(0, 0, width, height);
+            
+            if (type === 'convergence') {
+                const values = partialProducts.map(p => constantType === 'pi' ? Math.sqrt(6 * p.value) : p.value).slice(0, 100);
+                drawSimpleLine(ctx, values, width, height, '#4ecdc4');
+            } else if (type === 'contribution') {
+                const contributions = primes.slice(0, 50).map(p => 1 / (1 - Math.pow(p, -exponent)) - 1);
+                drawScatter(ctx, contributions, width, height, '#ff6384');
+            } else if (type === 'gapDist') {
+                const gaps = [];
+                for (let i = 1; i < Math.min(primes.length, 200); i++) {
+                    gaps.push(primes[i] - primes[i-1]);
+                }
+                const gapCounts = {};
+                gaps.forEach(g => gapCounts[g] = (gapCounts[g] || 0) + 1);
+                const sortedGaps = Object.keys(gapCounts).map(Number).sort((a,b) => a-b);
+                drawBars(ctx, sortedGaps.map(g => gapCounts[g]), width, height, '#4ecdc4');
+            } else if (type === 'primeCount') {
+                const counts = [];
+                for (let x = 100; x <= Math.min(primes[primes.length-1], 10000); x += 100) {
+                    counts.push(primes.filter(p => p <= x).length);
+                }
+                drawSimpleLine(ctx, counts, width, height, '#4ecdc4');
+            } else if (type === 'phasorSum') {
+                drawPhasorMini(ctx, width, height);
+            } else if (type === 'sacksSpiral') {
+                drawSacksMini(ctx, width, height);
+            }
+        }
+        
+        function drawSimpleLine(ctx, data, width, height, color) {
+            const max = Math.max(...data);
+            const min = Math.min(...data);
+            const range = max - min;
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            data.forEach((val, i) => {
+                const x = (i / (data.length - 1)) * width;
+                const y = height - ((val - min) / range) * height * 0.8 - height * 0.1;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            
+            ctx.stroke();
+        }
+        
+        function drawScatter(ctx, data, width, height, color) {
+            ctx.fillStyle = color;
+            data.forEach((val, i) => {
+                const x = (i / data.length) * width;
+                const y = height - val * height * 0.8;
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function drawBars(ctx, data, width, height, color) {
+            const max = Math.max(...data);
+            const barWidth = width / data.length;
+            
+            ctx.fillStyle = color;
+            data.forEach((val, i) => {
+                const barHeight = (val / max) * height * 0.8;
+                const x = i * barWidth;
+                const y = height - barHeight;
+                ctx.fillRect(x, y, barWidth - 2, barHeight);
+            });
+        }
+        
+        function drawPhasorMini(ctx, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const scale = Math.min(width, height) * 0.35;
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, scale, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            const sigma = computationData.exponent / 2;
+            const t = 14.134725;
+            let sumReal = 0, sumImag = 0;
+            
+            for (let i = 0; i < Math.min(20, computationData.primes.length); i++) {
+                const n = computationData.primes[i];
+                const radius = Math.pow(n, -sigma);
+                const angle = -t * Math.log(n);
+                sumReal += radius * Math.cos(angle);
+                sumImag += radius * Math.sin(angle);
+            }
+            
+            const finalX = centerX + sumReal * scale;
+            const finalY = centerY - sumImag * scale;
+            
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(finalX, finalY);
+            ctx.stroke();
+        }
+        
+        function drawSacksMini(ctx, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxR = Math.sqrt(1000);
+            const scale = Math.min(width, height) / (2 * maxR) * 0.85;
+            
+            const primeSet = new Set(computationData.primes);
+            
+            for (let n = 1; n <= 1000; n++) {
+                const r = Math.sqrt(n);
+                const theta = 2 * Math.PI * Math.sqrt(n);
+                const x = centerX + r * scale * Math.cos(theta);
+                const y = centerY + r * scale * Math.sin(theta);
+                
+                ctx.fillStyle = primeSet.has(n) ? '#ffd700' : 'rgba(255, 255, 255, 0.1)';
+                ctx.beginPath();
+                ctx.arc(x, y, primeSet.has(n) ? 2 : 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Exit screenshot mode on Escape key
+        
+        // ===== 3D VISUALIZATIONS =====
+        
+        function cleanup3D() {
+            if (animationFrame3D) {
+                cancelAnimationFrame(animationFrame3D);
+                animationFrame3D = null;
+            }
+            if (renderer3D) {
+                renderer3D.dispose();
+                renderer3D = null;
+            }
+            if (controls3D) {
+                controls3D.dispose();
+                controls3D = null;
+            }
+            scene3D = null;
+            camera3D = null;
+        }
+        
+        function init3DScene(canvas) {
+            cleanup3D();
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Create scene
+            scene3D = new THREE.Scene();
+            scene3D.background = new THREE.Color(0x0a0a0a);
+            
+            // Create camera
+            camera3D = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            camera3D.position.set(5, 5, 5);
+            camera3D.lookAt(0, 0, 0);
+            
+            // Create renderer
+            renderer3D = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer3D.setSize(width, height);
+            
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene3D.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 10);
+            scene3D.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0x4ecdc4, 1, 100);
+            pointLight.position.set(0, 5, 0);
+            scene3D.add(pointLight);
+            
+            return { scene: scene3D, camera: camera3D, renderer: renderer3D };
+        }
+        
+        function create3DModularLattice(ctx) {
+            const { primes } = computationData;
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">🎮 3D Modular Lattice</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Max Modulus: <span id="3dMaxMod">20</span></label>
+                    <input type="range" id="3dMaxModSlider" min="5" max="50" step="1" value="20" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="update3DModularLattice()">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                        <input type="checkbox" id="3dAutoRotate" checked style="width: auto; margin-right: 10px;">
+                        <span>Auto-Rotate</span>
+                    </label>
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Interactive 3D Controls:</strong><br>
+                    🖱️ <strong>Left Click + Drag:</strong> Rotate view<br>
+                    🖱️ <strong>Right Click + Drag:</strong> Pan camera<br>
+                    🖱️ <strong>Scroll:</strong> Zoom in/out<br>
+                    <strong>Visualization:</strong> Each ring is a modulus m, points are primes at residue positions<br>
+                    Height represents prime magnitude, color shows modulus level
+                </div>
+            `;
+            
+            const canvas = document.getElementById('vizCanvas');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            window.update3DModularLattice = function() {
+                const maxMod = parseInt(document.getElementById('3dMaxModSlider').value);
+                document.getElementById('3dMaxMod').textContent = maxMod;
+                render3DModularLattice(maxMod);
+            };
+            
+            function render3DModularLattice(maxMod) {
+                const { scene, camera, renderer } = init3DScene(canvas);
+                
+                // Create rings for each modulus
+                for (let m = 2; m <= maxMod; m++) {
+                    const radius = m * 0.5;
+                    const y = m * 0.3;
+                    
+                    // Ring geometry
+                    const ringGeometry = new THREE.RingGeometry(radius - 0.05, radius + 0.05, 64);
+                    const ringMaterial = new THREE.MeshBasicMaterial({ 
+                        color: 0x4ecdc4, 
+                        opacity: 0.2, 
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+                    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                    ring.rotation.x = Math.PI / 2;
+                    ring.position.y = y;
+                    scene.add(ring);
+                    
+                    // Add primes on this ring
+                    for (const p of primes) {
+                        if (p < m) continue;
+                        const residue = p % m;
+                        if (gcd(residue, m) !== 1) continue;
+                        
+                        const angle = (2 * Math.PI * residue) / m;
+                        const x = radius * Math.cos(angle);
+                        const z = radius * Math.sin(angle);
+                        
+                        // Height based on prime size
+                        const height = Math.log(p) * 0.2;
+                        
+                        // Create sphere for prime
+                        const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+                        const hue = (m / maxMod) * 0.7;
+                        const color = new THREE.Color().setHSL(hue, 0.8, 0.6);
+                        const material = new THREE.MeshPhongMaterial({ 
+                            color: color,
+                            emissive: color,
+                            emissiveIntensity: 0.3
+                        });
+                        
+                        const sphere = new THREE.Mesh(geometry, material);
+                        sphere.position.set(x, y + height, z);
+                        scene.add(sphere);
+                        
+                        // Add vertical line to ring
+                        const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                            new THREE.Vector3(x, y, z),
+                            new THREE.Vector3(x, y + height, z)
+                        ]);
+                        const lineMaterial = new THREE.LineBasicMaterial({ 
+                            color: color, 
+                            opacity: 0.3, 
+                            transparent: true 
+                        });
+                        const line = new THREE.Line(lineGeometry, lineMaterial);
+                        scene.add(line);
+                    }
+                }
+                
+                // Add axes
+                const axesHelper = new THREE.AxesHelper(maxMod * 0.6);
+                scene.add(axesHelper);
+                
+                // Animation loop
+                function animate() {
+                    if (document.getElementById('3dAutoRotate')?.checked) {
+                        camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.005);
+                        camera.lookAt(0, maxMod * 0.15, 0);
+                    }
+                    
+                    renderer.render(scene, camera);
+                    animationFrame3D = requestAnimationFrame(animate);
+                }
+                
+                animate();
+            }
+            
+            render3DModularLattice(20);
+        }
+        
+        function create3DZetaSurface(ctx) {
+            const { primes, exponent } = computationData;
+            const sigma = exponent / 2;
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">🎮 3D Zeta Surface</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">t Range: <span id="3dTRange">50</span></label>
+                    <input type="range" id="3dTRangeSlider" min="20" max="100" step="10" value="50" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="update3DZetaSurface()">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Resolution: <span id="3dResolution">20</span></label>
+                    <input type="range" id="3dResolutionSlider" min="10" max="40" step="5" value="20" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="update3DZetaSurface()">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer;">
+                        <input type="checkbox" id="3dZetaWireframe" style="width: auto; margin-right: 10px;">
+                        <span>Wireframe Mode</span>
+                    </label>
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>3D Zeta Surface:</strong><br>
+                    X-axis: Real part σ (0.5 to 2)<br>
+                    Z-axis: Imaginary part t (0 to ${document.getElementById('3dTRange')?.textContent || 50})<br>
+                    Y-axis: |ζ(σ + it)| magnitude<br>
+                    Valleys show zeros where magnitude approaches 0
+                </div>
+            `;
+            
+            const canvas = document.getElementById('vizCanvas');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            window.update3DZetaSurface = function() {
+                const tRange = parseInt(document.getElementById('3dTRangeSlider').value);
+                const resolution = parseInt(document.getElementById('3dResolutionSlider').value);
+                document.getElementById('3dTRange').textContent = tRange;
+                document.getElementById('3dResolution').textContent = resolution;
+                render3DZetaSurface(tRange, resolution);
+            };
+            
+            function render3DZetaSurface(tRange, resolution) {
+                const { scene, camera, renderer } = init3DScene(canvas);
+                
+                camera.position.set(8, 6, 8);
+                camera.lookAt(0, 0, 0);
+                
+                // Create surface geometry
+                const geometry = new THREE.PlaneGeometry(4, tRange / 10, resolution, resolution);
+                const vertices = geometry.attributes.position.array;
+                
+                // Calculate zeta values for each vertex
+                const maxMagnitude = { val: 0 };
+                
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const sigmaT = 0.5 + (vertices[i] + 2) / 4 * 1.5; // sigma from 0.5 to 2
+                    const tVal = (vertices[i + 1] + tRange / 20) * 10;
+                    
+                    // Compute |ζ(σ + it)|
+                    let magnitude = 0;
+                    for (let j = 0; j < Math.min(30, primes.length); j++) {
+                        const n = primes[j];
+                        const r = Math.pow(n, -sigmaT);
+                        const angle = -tVal * Math.log(n);
+                        const real = r * Math.cos(angle);
+                        const imag = r * Math.sin(angle);
+                        magnitude += Math.sqrt(real * real + imag * imag);
+                    }
+                    
+                    vertices[i + 2] = magnitude * 0.5; // Height
+                    maxMagnitude.val = Math.max(maxMagnitude.val, magnitude);
+                }
+                
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                // Color vertices based on height
+                const colors = new Float32Array(vertices.length);
+                for (let i = 0; i < vertices.length; i += 3) {
+                    const height = vertices[i + 2];
+                    const ratio = height / (maxMagnitude.val * 0.5);
+                    
+                    const color = new THREE.Color();
+                    color.setHSL(0.6 - ratio * 0.6, 0.8, 0.5);
+                    
+                    colors[i] = color.r;
+                    colors[i + 1] = color.g;
+                    colors[i + 2] = color.b;
+                }
+                
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                
+                const wireframe = document.getElementById('3dZetaWireframe')?.checked || false;
+                const material = new THREE.MeshPhongMaterial({
+                    vertexColors: true,
+                    side: THREE.DoubleSide,
+                    wireframe: wireframe,
+                    shininess: 30
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.rotation.x = -Math.PI / 2;
+                scene.add(mesh);
+                
+                // Add grid
+                const gridHelper = new THREE.GridHelper(10, 20, 0x4ecdc4, 0x2a5298);
+                gridHelper.position.y = -0.1;
+                scene.add(gridHelper);
+                
+                // Animation
+                function animate() {
+                    camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.003);
+                    camera.lookAt(0, 1, 0);
+                    
+                    renderer.render(scene, camera);
+                    animationFrame3D = requestAnimationFrame(animate);
+                }
+                
+                animate();
+            }
+            
+            render3DZetaSurface(50, 20);
+        }
+        
+        function create3DPrimeHelix(ctx) {
+            const { primes } = computationData;
+            
+            const statsDiv = document.getElementById('vizStats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                <h4 style="color: #ffd700; margin-bottom: 15px;">🎮 3D Prime Helix</h4>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Modulus: <span id="3dHelixMod">6</span></label>
+                    <input type="range" id="3dHelixModSlider" min="2" max="30" step="1" value="6" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="update3DPrimeHelix()">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #fff; font-weight: 500;">Primes Shown: <span id="3dHelixCount">200</span></label>
+                    <input type="range" id="3dHelixCountSlider" min="50" max="500" step="50" value="200" 
+                           style="width: 100%; margin-top: 8px;"
+                           oninput="update3DPrimeHelix()">
+                </div>
+                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; line-height: 1.6;">
+                    <strong>Prime Helix Visualization:</strong><br>
+                    Primes spiral upward based on their residue class (mod m)<br>
+                    Each residue class creates a distinct helical strand<br>
+                    Height represents the prime's position in sequence<br>
+                    Color represents the residue class<br>
+                    Reveals patterns in prime distribution around the helix
+                </div>
+            `;
+            
+            const canvas = document.getElementById('vizCanvas');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            window.update3DPrimeHelix = function() {
+                const modulus = parseInt(document.getElementById('3dHelixModSlider').value);
+                const count = parseInt(document.getElementById('3dHelixCountSlider').value);
+                document.getElementById('3dHelixMod').textContent = modulus;
+                document.getElementById('3dHelixCount').textContent = count;
+                render3DPrimeHelix(modulus, count);
+            };
+            
+            function render3DPrimeHelix(modulus, count) {
+                const { scene, camera, renderer } = init3DScene(canvas);
+                
+                camera.position.set(8, count * 0.03, 8);
+                camera.lookAt(0, count * 0.015, 0);
+                
+                const displayPrimes = primes.slice(0, Math.min(count, primes.length));
+                const radius = 3;
+                
+                // Create helix strands for each residue class
+                const coprimeResidues = getCoprimeResidues(modulus);
+                
+                for (let i = 0; i < displayPrimes.length; i++) {
+                    const p = displayPrimes[i];
+                    if (p < modulus) continue;
+                    
+                    const residue = p % modulus;
+                    if (!coprimeResidues.includes(residue)) continue;
+                    
+                    const height = i * 0.05;
+                    const baseAngle = (2 * Math.PI * residue) / modulus;
+                    const spiralRotation = i * 0.1;
+                    const angle = baseAngle + spiralRotation;
+                    
+                    const x = radius * Math.cos(angle);
+                    const z = radius * Math.sin(angle);
+                    
+                    // Create sphere
+                    const geometry = new THREE.SphereGeometry(0.15, 12, 12);
+                    const hue = (residue / modulus) * 0.8;
+                    const color = new THREE.Color().setHSL(hue, 0.9, 0.6);
+                    const material = new THREE.MeshPhongMaterial({ 
+                        color: color,
+                        emissive: color,
+                        emissiveIntensity: 0.4
+                    });
+                    
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(x, height, z);
+                    scene.add(sphere);
+                    
+                    // Connect to previous prime in same residue class
+                    if (i > 0) {
+                        const prevP = displayPrimes[i - 1];
+                        if (prevP % modulus === residue) {
+                            const prevHeight = (i - 1) * 0.05;
+                            const prevAngle = baseAngle + (i - 1) * 0.1;
+                            const prevX = radius * Math.cos(prevAngle);
+                            const prevZ = radius * Math.sin(prevAngle);
+                            
+                            const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                                new THREE.Vector3(prevX, prevHeight, prevZ),
+                                new THREE.Vector3(x, height, z)
+                            ]);
+                            const lineMaterial = new THREE.LineBasicMaterial({ 
+                                color: color, 
+                                opacity: 0.3, 
+                                transparent: true 
+                            });
+                            const line = new THREE.Line(lineGeometry, lineMaterial);
+                            scene.add(line);
+                        }
+                    }
+                }
+                
+                // Add central axis
+                const axisGeometry = new THREE.CylinderGeometry(0.1, 0.1, count * 0.05, 16);
+                const axisMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xffffff, 
+                    opacity: 0.2, 
+                    transparent: true 
+                });
+                const axis = new THREE.Mesh(axisGeometry, axisMaterial);
+                axis.position.y = count * 0.025;
+                scene.add(axis);
+                
+                // Animation
+                function animate() {
+                    camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.005);
+                    camera.lookAt(0, count * 0.015, 0);
+                    
+                    renderer.render(scene, camera);
+                    animationFrame3D = requestAnimationFrame(animate);
+                }
+                
+                animate();
+            }
+            
+            render3DPrimeHelix(6, 200);
+        }
+        
+        // Exit screenshot mode on Escape key
         document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isScreenshotMode) {
+                exitScreenshotMode();
+            }
+            
             // Ctrl/Cmd + E: Export results
             if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
                 e.preventDefault();
