@@ -6460,6 +6460,16 @@
             statsDiv.innerHTML = `
                 <h4 style="color: #ffd700; margin-bottom: 15px;">Phase Explorer: Combined Phasor Sum & Phase Law Analysis</h4>
                 <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer; margin-bottom: 10px;">
+                        <input type="checkbox" id="showTraceLine" style="width: auto; margin-right: 10px;">
+                        <span>Show Phasor Sum Trace (Final Vector Tip Path)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; color: #fff; cursor: pointer; margin-bottom: 10px;">
+                        <input type="checkbox" id="showPhasorSteps" style="width: auto; margin-right: 10px;">
+                        <span>Show Phasor Construction Steps (How Line is Built)</span>
+                    </label>
+                </div>
+                <div style="margin-bottom: 20px;">
                     <label style="color: #fff; font-weight: 500;">Imaginary Part (t): <span id="explorerT">14.134725</span></label>
                     <input type="range" id="explorerTSlider" min="0" max="250" step="0.001" value="14.134725" 
                            style="width: 100%; margin-top: 10px;"
@@ -6543,6 +6553,7 @@
             });
             
             let explorerViewMode = 'sideBySide';
+            let tracePoints = []; // Store trace history
             
             window.setExplorerMode = (mode) => {
                 explorerViewMode = mode;
@@ -6592,6 +6603,10 @@
                     document.getElementById('explorerBeta').textContent = beta.toFixed(4);
                 }
                 
+                // Check if trace is enabled
+                const showTrace = document.getElementById('showTraceLine')?.checked || false;
+                const showSteps = document.getElementById('showPhasorSteps')?.checked || false;
+                
                 // Clear canvas
                 freshCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
                 freshCtx.fillRect(0, 0, width, height);
@@ -6604,7 +6619,7 @@
                     freshCtx.save();
                     freshCtx.rect(0, 0, splitX, height);
                     freshCtx.clip();
-                    const phasorMag = drawPhasorSumSection(freshCtx, 0, 0, splitX, height, t, sigma);
+                    const phasorMag = drawPhasorSumSection(freshCtx, 0, 0, splitX, height, t, sigma, showTrace, showSteps);
                     freshCtx.restore();
                     
                     // Divider line
@@ -6635,7 +6650,7 @@
                     
                 } else if (explorerViewMode === 'overlay') {
                     // Draw both on same canvas with transparency
-                    const phasorMag = drawPhasorSumSection(freshCtx, 0, 0, width, height, t, sigma, 0.5);
+                    const phasorMag = drawPhasorSumSection(freshCtx, 0, 0, width, height, t, sigma, showTrace, showSteps, 0.5);
                     const phaseLawMag = drawPhaseLawSection(freshCtx, 0, 0, width, height, t, beta, sortedGaps, gapClasses, 0.5);
                     
                     // Legend
@@ -6752,7 +6767,7 @@
                 }
             };
             
-            function drawPhasorSumSection(ctx, x, y, w, h, t, sigma, alpha = 1) {
+            function drawPhasorSumSection(ctx, x, y, w, h, t, sigma, showTrace = false, showSteps = false, alpha = 1) {
                 const centerX = x + w / 2;
                 const centerY = y + h / 2;
                 const scale = Math.min(w, h) * 0.35;
@@ -6777,6 +6792,9 @@
                 let currentX = centerX, currentY = centerY;
                 const numPhasors = Math.min(50, primes.length);
                 
+                // Store intermediate points for step visualization
+                const stepPoints = [{ x: currentX, y: currentY }];
+                
                 for (let i = 0; i < numPhasors; i++) {
                     const n = primes[i];
                     const radius = Math.pow(n, -sigma);
@@ -6791,6 +6809,8 @@
                     const nextX = currentX + real * scale;
                     const nextY = currentY - imag * scale;
                     
+                    stepPoints.push({ x: nextX, y: nextY });
+                    
                     const hue = (i / numPhasors) * 280;
                     ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${0.5 * alpha})`;
                     ctx.lineWidth = 1.5;
@@ -6804,10 +6824,72 @@
                     currentY = nextY;
                 }
                 
-                // Draw final sum vector
+                // Store current point for trace
                 const finalX = centerX + sumReal * scale;
                 const finalY = centerY - sumImag * scale;
                 
+                // Draw step-by-step construction path if enabled
+                if (showSteps && stepPoints.length > 1) {
+                    ctx.strokeStyle = `rgba(255, 255, 0, ${0.4 * alpha})`;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(stepPoints[0].x, stepPoints[0].y);
+                    
+                    for (let i = 1; i < stepPoints.length; i++) {
+                        ctx.lineTo(stepPoints[i].x, stepPoints[i].y);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Draw small dots at each step
+                    for (let i = 0; i < stepPoints.length; i++) {
+                        ctx.fillStyle = `rgba(255, 255, 0, ${(i / stepPoints.length) * 0.8 * alpha})`;
+                        ctx.beginPath();
+                        ctx.arc(stepPoints[i].x, stepPoints[i].y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                if (showTrace) {
+                    // Add current point to trace history
+                    tracePoints.push({ x: finalX, y: finalY, t: t });
+                    
+                    // Limit trace length to prevent memory issues
+                    const maxTracePoints = 1000;
+                    if (tracePoints.length > maxTracePoints) {
+                        tracePoints.shift();
+                    }
+                    
+                    // Draw trace line
+                    if (tracePoints.length > 1) {
+                        ctx.strokeStyle = `rgba(255, 215, 0, ${0.6 * alpha})`;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(tracePoints[0].x, tracePoints[0].y);
+                        
+                        for (let i = 1; i < tracePoints.length; i++) {
+                            ctx.lineTo(tracePoints[i].x, tracePoints[i].y);
+                        }
+                        ctx.stroke();
+                        
+                        // Draw gradient fade on trace
+                        for (let i = 0; i < tracePoints.length - 1; i++) {
+                            const opacity = (i / tracePoints.length) * 0.5 * alpha;
+                            ctx.strokeStyle = `rgba(255, 215, 0, ${opacity})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(tracePoints[i].x, tracePoints[i].y);
+                            ctx.lineTo(tracePoints[i + 1].x, tracePoints[i + 1].y);
+                            ctx.stroke();
+                        }
+                    }
+                } else {
+                    // Clear trace if disabled
+                    tracePoints = [];
+                }
+                
+                // Draw final sum vector
                 ctx.strokeStyle = `rgba(78, 205, 196, ${alpha})`;
                 ctx.lineWidth = 4;
                 ctx.beginPath();
@@ -6839,7 +6921,36 @@
                 
                 // Compute phase law contributions
                 let totalReal = 0, totalImag = 0;
-                const scale = Math.min(w, h) * 0.4;
+                
+                // Calculate bounds to determine scale
+                let maxMagnitude = 0;
+                sortedGaps.forEach((gap) => {
+                    const gapPrimes = gapClasses[gap];
+                    let gapReal = 0, gapImag = 0;
+                    
+                    for (const p of gapPrimes) {
+                        const phi = t * Math.log(p) - Math.PI / 2;
+                        const pHalf = Math.pow(p, -0.5);
+                        const decay = Math.exp(-beta * Math.log(p));
+                        
+                        const denomReal = 1 - pHalf * Math.cos(-phi);
+                        const denomImag = -pHalf * Math.sin(-phi);
+                        const denomMagSq = denomReal * denomReal + denomImag * denomImag;
+                        
+                        gapReal += (denomReal / denomMagSq) * decay;
+                        gapImag += (-denomImag / denomMagSq) * decay;
+                    }
+                    
+                    totalReal += gapReal;
+                    totalImag += gapImag;
+                    
+                    const mag = Math.sqrt(totalReal * totalReal + totalImag * totalImag);
+                    maxMagnitude = Math.max(maxMagnitude, mag);
+                });
+                
+                // Use dynamic scale to keep visualization visible
+                const baseScale = Math.min(w, h) * 0.4;
+                const scale = maxMagnitude > 0 ? Math.min(baseScale, baseScale * 2 / maxMagnitude) : baseScale;
                 
                 let cumReal = 0, cumImag = 0;
                 ctx.strokeStyle = `rgba(255, 99, 132, ${0.8 * alpha})`;
@@ -6877,9 +6988,19 @@
                 });
                 ctx.stroke();
                 
-                // Draw final point
+                // Draw final point with enhanced visibility
                 const finalX = centerX + totalReal * scale;
                 const finalY = centerY - totalImag * scale;
+                
+                // Draw glow effect around final point
+                const gradient = ctx.createRadialGradient(finalX, finalY, 0, finalX, finalY, 15);
+                gradient.addColorStop(0, `rgba(255, 99, 132, ${0.8 * alpha})`);
+                gradient.addColorStop(1, `rgba(255, 99, 132, 0)`);
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(finalX, finalY, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
                 ctx.fillStyle = `rgba(255, 99, 132, ${alpha})`;
                 ctx.beginPath();
                 ctx.arc(finalX, finalY, 5, 0, Math.PI * 2);
