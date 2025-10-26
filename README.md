@@ -901,7 +901,7 @@
                 <a href="#controls" class="nav-link">Controls</a>
                 <a href="#results" class="nav-link">Results</a>
                 <a href="#gap-analysis" class="nav-link">Gap Analysis</a>
-                <a href="#channel-analysis" class="nav-link">Channels</a>
+                <a href="#channel-analysis" class="nav-link">Composite Channels</a>
                 <a href="#visualization-section" class="nav-link">Visualizations</a>
                 <a href="#prime-ring-section" class="nav-link">Prime Rings</a>
             </div>
@@ -1024,95 +1024,105 @@
             </div>
             
             <div class="info-section">
-                <div class="toggle-section" onclick="toggleSection('primeAvoidance')">
-                    <h3>Getachew Prime Channel Avoidance Theorem</h3>
-                    <span class="toggle-icon" id="primeAvoidance-icon">▼</span>
+                <div class="toggle-section" onclick="toggleSection('channelTheorems')">
+                    <h3>Getachew Channel Theorems: Prime Avoidance & Composite Projection</h3>
+                    <span class="toggle-icon" id="channelTheorems-icon">▼</span>
                 </div>
-                <div id="primeAvoidance-content" class="collapsible-content">
-                    <p><strong>Theorem (Getachew Prime Channel Avoidance Theorem)</strong></p>
-                    <p style="margin-top: 10px;"><em>Let each modulus M ∈ ℤ⁺ define a fractional residue system:</em></p>
-                    <div class="formula">
-                        ℛ(M) = { r/M | 0 ≤ r < M }
-                    </div>
-                    
-                    <p style="margin-top: 10px;"><em>Define a reduction channel as the equivalence class of fractions that share the same lowest-term representation:</em></p>
-                    <div class="formula">
-                        r₁/M₁ ~ r₂/M₂  ⟺  r₁/M₁ = r₂/M₂ (in lowest terms)
-                    </div>
-                    <p style="margin-top: 5px;"><em>Each equivalence class corresponds to a fundamental Farey channel of the form 1/N or its rational multiples.</em></p>
-                    
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <p><strong>Statement:</strong> For every prime modulus p, the complete residue set</p>
+                <div id="channelTheorems-content" class="collapsible-content">
+                    <div style="margin-bottom: 30px; padding: 15px; background: rgba(78, 205, 196, 0.15); border-radius: 10px; border: 2px solid #4ecdc4;">
+                        <h4 style="color: #4ecdc4; margin-bottom: 15px;">🔵 Theorem 1: Prime Channel Avoidance</h4>
+                        <p><strong>Theorem (Getachew Prime Channel Avoidance Theorem)</strong></p>
+                        <p style="margin-top: 10px;"><em>Let each modulus M ∈ ℤ⁺ define a fractional residue system:</em></p>
                         <div class="formula">
-                            Φ(p) = {1, 2, 3, ..., p-1}
+                            ℛ(M) = { r/M | 0 ≤ r < M }
                         </div>
-                        <p>contains no reducible fractions, and therefore intersects no reduction channel 1/N for any N > 1.</p>
+                        
+                        <p style="margin-top: 10px;"><em>Define a reduction channel as the equivalence class of fractions that share the same lowest-term representation:</em></p>
                         <div class="formula">
-                            gcd(r, p) = 1 &nbsp; ∀r ∈ Φ(p) &nbsp; ⟹ &nbsp; r/p cannot reduce to any channel 1/N
+                            r₁/M₁ ~ r₂/M₂  ⟺  r₁/M₁ = r₂/M₂ (in lowest terms)
+                        </div>
+                        <p style="margin-top: 5px;"><em>Each equivalence class corresponds to a fundamental Farey channel of the form 1/N or its rational multiples.</em></p>
+                        
+                        <div style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                            <p><strong>Statement:</strong> For every prime modulus p, the complete residue set</p>
+                            <div class="formula">
+                                Φ(p) = {1, 2, 3, ..., p-1}
+                            </div>
+                            <p>contains no reducible fractions, and therefore intersects no reduction channel 1/N for any N > 1.</p>
+                            <div class="formula">
+                                gcd(r, p) = 1 &nbsp; ∀r ∈ Φ(p) &nbsp; ⟹ &nbsp; r/p cannot reduce to any channel 1/N
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>Interpretation:</strong></p>
+                        <p style="margin-left: 20px; line-height: 1.8;">
+                            Primes define <strong>irreducible modular orbits</strong> within the fractional lattice. Their residues never project downward into simpler rational channels because no shared divisors exist between any residue r and the prime modulus p. Each prime ring therefore forms a <strong>fully independent coprime manifold</strong>, geometrically isolated from the composite Farey flows that pass through reducible fractions such as 1/2, 1/3, 1/4, ...
+                        </p>
+                        
+                        <div style="margin-top: 15px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
+                            <p><strong>Geometric Consequence:</strong></p>
+                            <p>In the nested modular plane, the loci of reducible fractions form continuous <strong>Farey flow lines</strong> — rational channels through which composite moduli project. Prime moduli, in contrast, occupy the <strong>interstitial lattice regions</strong> between these channels, creating smooth, full, and non-overlapping modular rings.</p>
+                            <p style="margin-top: 10px; padding: 10px; background: rgba(255, 215, 0, 0.2); border-radius: 5px; font-weight: 500;">
+                                ⟹ Prime moduli trace paths that avoid all reducible channels, forming the pure coprime skeleton of the modular continuum.
+                            </p>
                         </div>
                     </div>
                     
-                    <p style="margin-top: 15px;"><strong>Interpretation:</strong></p>
-                    <p style="margin-left: 20px; line-height: 1.8;">
-                        Primes define <strong>irreducible modular orbits</strong> within the fractional lattice. Their residues never project downward into simpler rational channels because no shared divisors exist between any residue r and the prime modulus p. Each prime ring therefore forms a <strong>fully independent coprime manifold</strong>, geometrically isolated from the composite Farey flows that pass through reducible fractions such as 1/2, 1/3, 1/4, ...
-                    </p>
+                    <div style="padding: 15px; background: rgba(255, 99, 132, 0.15); border-radius: 10px; border: 2px solid #ff6384;">
+                        <h4 style="color: #ff6384; margin-bottom: 15px;">🔴 Theorem 2: Composite Channel Projection</h4>
+                        <p><strong>Corollary (Getachew Composite Channel Projection Corollary)</strong></p>
+                        <p style="margin-top: 10px;"><em>Let M ∈ ℤ⁺ be a composite modulus. For each integer r (0 ≤ r < M) define the fraction r/M.<br>
+                        Write d = gcd(r, M) and set r' = r/d, M' = M/d.<br>
+                        Then r/M reduces to the lowest-term fraction r'/M' with gcd(r', M') = 1.</em></p>
+                        
+                        <div style="margin-top: 15px; padding: 15px; background: rgba(255, 99, 132, 0.1); border-radius: 8px; border-left: 4px solid #ff6384;">
+                            <p><strong>Statement:</strong> Every composite modulus M admits a nontrivial projection of its residues onto reduction channels (Farey channels):</p>
+                            <div class="formula">
+                                ∀ r ∈ {0,1,...,M-1}, &nbsp; r/M = r'/M' &nbsp; with<br>
+                                d = gcd(r,M), &nbsp; M' = M/d, &nbsp; r' = r/d
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>Key Properties:</strong></p>
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li><strong>(i) Channel Multiplicity:</strong> The number of distinct residues r (mod M) that reduce to a fixed lowest-term fraction r'/M' equals d = M/M'</li>
+                            <li><strong>(ii) Reducibility Ratio:</strong> The total number of reducible residues modulo M is M - φ(M), giving proportion: <strong>1 - φ(M)/M</strong></li>
+                            <li><strong>(iii) Channel Denominators:</strong> For composite M, the set of reduction channel denominators M' is exactly the set of divisors of M strictly less than M</li>
+                        </ol>
+                        
+                        <p style="margin-top: 15px;"><strong>Example: M = 12</strong></p>
+                        <div style="margin-left: 20px; line-height: 1.8;">
+                            <p>φ(12) = 4, so M - φ(M) = 8 reducible residues</p>
+                            <p>Proper divisors M' ∈ {1, 2, 3, 4, 6}</p>
+                            <p>Take r = 8: gcd(8,12) = 4, r' = 2, M' = 3</p>
+                            <p>Thus 8/12 = 2/3, projecting onto the 1/3-family (channel with denominator 3)</p>
+                            <p>There are d = 4 residues that reduce to each fraction with denominator 3</p>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
+                            <p><strong>Geometric Consequence:</strong></p>
+                            <p>In the nested modular plane, reducible residues of composite moduli populate the <strong>Farey flow lines</strong> (the 1/N channels and their rational multiples). Each channel with denominator M' < M collects exactly d = M/M' lattice points from modulus M for each corresponding coprime numerator r'.</p>
+                            <p style="margin-top: 10px; padding: 10px; background: rgba(255, 215, 0, 0.2); border-radius: 5px; font-weight: 500;">
+                                ⟹ Composite moduli project their reducible residues onto a dense web of Farey channels; primes, by contrast, contribute only irreducible residues and avoid these channels.
+                            </p>
+                        </div>
+                    </div>
                     
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
-                        <p><strong>Geometric Consequence:</strong></p>
-                        <p>In the nested modular plane, the loci of reducible fractions form continuous <strong>Farey flow lines</strong> — rational channels through which composite moduli project. Prime moduli, in contrast, occupy the <strong>interstitial lattice regions</strong> between these channels, creating smooth, full, and non-overlapping modular rings.</p>
-                        <p style="margin-top: 10px; padding: 10px; background: rgba(255, 215, 0, 0.2); border-radius: 5px; font-weight: 500;">
-                            ⟹ Prime moduli trace paths that avoid all reducible channels, forming the pure coprime skeleton of the modular continuum.
+                    <div style="margin-top: 25px; padding: 20px; background: rgba(153, 102, 255, 0.15); border-radius: 10px; border: 2px solid #9966ff;">
+                        <h4 style="color: #9966ff; margin-bottom: 15px;">📊 Interactive Visualization</h4>
+                        <p style="line-height: 1.8;">
+                            Use the <strong>"Prime & Composite Channels"</strong> visualization to see both theorems in action:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                            <li><span style="color: #4ecdc4; font-weight: bold;">● Cyan rings</span> = Prime moduli avoiding all Farey channels (Theorem 1)</li>
+                            <li><span style="color: #ff6384; font-weight: bold;">● Red points</span> = Composite residues projecting onto channels (Theorem 2)</li>
+                            <li><span style="color: #ffd700; font-weight: bold;">● Gold rings</span> = Farey channels (reduction targets)</li>
+                            <li>Each point shows its gcd value and reduction path when clicked</li>
+                        </ul>
+                        <p style="margin-top: 15px; font-weight: 500; color: #9966ff;">
+                            Together, these theorems reveal the fundamental geometric distinction between primes and composites in the modular lattice.
                         </p>
                     </div>
-                    
-                    <p style="margin-top: 15px;"><strong>Interactive Visualization:</strong> Use the "Prime Channel Avoidance" visualization to see how primes (cyan rings) avoid Farey channels while composites (red points) project onto them. Each point shows its gcd value and reduction path.</p>
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <div class="toggle-section" onclick="toggleSection('composite')">
-                    <h3>Getachew Composite Channel Projection Corollary</h3>
-                    <span class="toggle-icon" id="composite-icon">▼</span>
-                </div>
-                <div id="composite-content" class="collapsible-content">
-                    <p><strong>Corollary (Getachew Composite Channel Projection Corollary)</strong></p>
-                    <p style="margin-top: 10px;"><em>Let M ∈ ℤ⁺ be a composite modulus. For each integer r (0 ≤ r < M) define the fraction r/M.<br>
-                    Write d = gcd(r, M) and set r' = r/d, M' = M/d.<br>
-                    Then r/M reduces to the lowest-term fraction r'/M' with gcd(r', M') = 1.</em></p>
-                    
-                    <div style="margin-top: 15px; padding: 15px; background: rgba(78, 205, 196, 0.1); border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <p><strong>Statement:</strong> Every composite modulus M admits a nontrivial projection of its residues onto reduction channels (Farey channels):</p>
-                        <div class="formula">
-                            ∀ r ∈ {0,1,...,M-1}, &nbsp; r/M = r'/M' &nbsp; with<br>
-                            d = gcd(r,M), &nbsp; M' = M/d, &nbsp; r' = r/d
-                        </div>
-                    </div>
-                    
-                    <p style="margin-top: 15px;"><strong>Key Properties:</strong></p>
-                    <ol style="margin-left: 20px; line-height: 1.8;">
-                        <li><strong>(i) Channel Multiplicity:</strong> The number of distinct residues r (mod M) that reduce to a fixed lowest-term fraction r'/M' equals d = M/M'</li>
-                        <li><strong>(ii) Reducibility Ratio:</strong> The total number of reducible residues modulo M is M - φ(M), giving proportion: <strong>1 - φ(M)/M</strong></li>
-                        <li><strong>(iii) Channel Denominators:</strong> For composite M, the set of reduction channel denominators M' is exactly the set of divisors of M strictly less than M</li>
-                    </ol>
-                    
-                    <p style="margin-top: 15px;"><strong>Example: M = 12</strong></p>
-                    <div style="margin-left: 20px; line-height: 1.8;">
-                        <p>φ(12) = 4, so M - φ(M) = 8 reducible residues</p>
-                        <p>Proper divisors M' ∈ {1, 2, 3, 4, 6}</p>
-                        <p>Take r = 8: gcd(8,12) = 4, r' = 2, M' = 3</p>
-                        <p>Thus 8/12 = 2/3, projecting onto the 1/3-family (channel with denominator 3)</p>
-                        <p>There are d = 4 residues that reduce to each fraction with denominator 3</p>
-                    </div>
-                    
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
-                        <p><strong>Geometric Consequence:</strong></p>
-                        <p>In the nested modular plane, reducible residues of composite moduli populate the <strong>Farey flow lines</strong> (the 1/N channels and their rational multiples). Each channel with denominator M' < M collects exactly d = M/M' lattice points from modulus M for each corresponding coprime numerator r'.</p>
-                        <p style="margin-top: 10px; padding: 10px; background: rgba(255, 215, 0, 0.2); border-radius: 5px; font-weight: 500;">
-                            ⟹ Composite moduli project their reducible residues onto a dense web of Farey channels; primes, by contrast, contribute only irreducible residues and avoid these channels.
-                        </p>
-                    </div>
-                    
-                    <p style="margin-top: 15px;"><strong>Interactive Visualization:</strong> Use the visualization below to explore how different composite moduli project onto Farey channels, and adjust epsilon to see the density of projections.</p>
                 </div>
             </div>
             
@@ -1373,7 +1383,7 @@
                 <h3>Interactive Visualization</h3>
                 
                 <div class="viz-categories">
-                    <button class="category-btn active" onclick="filterVizCategory('all')">All (26)</button>
+                    <button class="category-btn active" onclick="filterVizCategory('all')">All (25)</button>
                     <button class="category-btn" onclick="filterVizCategory('distribution')">Distribution</button>
                     <button class="category-btn" onclick="filterVizCategory('complex')">Complex Analysis</button>
                     <button class="category-btn" onclick="filterVizCategory('modular')">Modular</button>
@@ -1407,7 +1417,7 @@
                     <button class="viz-btn" onclick="changeViz('modularInterference')">Mod Interference</button>
                     <button class="viz-btn" onclick="changeViz('twinSemiprimes')">Twin Semiprimes</button>
                     <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
-                    <button class="viz-btn" onclick="changeViz('compositeChannels')">Composite Channels</button>
+                    <button class="viz-btn" onclick="changeViz('compositeChannels')">Prime & Composite Channels</button>
                 </div>
                 <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
                     <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
@@ -1581,7 +1591,6 @@
             'factorizationTiming': 'semiprimes',
             'twinSemiprimes': 'semiprimes',
             'semiprimeZeta': 'semiprimes',
-            'primeAvoidance': 'modular',
             'compositeChannels': 'modular'
         };
         
@@ -8236,6 +8245,7 @@
                     <strong>At zeros:</strong> modular rotations align destructively → dark/zero sum<br>
                     <strong>Away from zeros:</strong> constructive interference → bright regions<br>
                     <strong>Adjust modulus:</strong> More rings = finer resolution, captures higher-order structure<br>
+                    <strong>Use the Composite Channels visualization</strong> to see how primes (cyan rings) avoid Farey channels while composites (red points) project onto them<br>
                     First nontrivial zero: t ≈ 14.134725 (try this value)
                 </div>
             `;
