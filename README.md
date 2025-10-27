@@ -319,8 +319,8 @@
         }
 
         pre {
-            background: #2c3e50;
-            color: #ecf0f1;
+            background: white;
+            color: #2c3e50;
             padding: 20px;
             border-radius: 8px;
             overflow-x: auto;
@@ -328,6 +328,7 @@
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
             line-height: 1.5;
+            border: 2px solid #dee2e6;
         }
 
         .experimental-section {
@@ -378,6 +379,77 @@
             justify-content: center;
             color: white;
             font-weight: 600;
+        }
+
+        .results-history {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .result-item:hover {
+            background: #f8f9fa;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .result-time {
+            font-size: 0.85em;
+            color: #95a5a6;
+        }
+
+        .result-summary {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .collapsed-details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .result-item.expanded .collapsed-details {
+            display: block;
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
         }
 
         @media (max-width: 768px) {
@@ -564,6 +636,18 @@
             
             <div id="testResult"></div>
             <div id="batchResults"></div>
+
+            <div class="export-buttons">
+                <button class="secondary" onclick="exportTestScreenshot()">📸 Export Screenshot</button>
+                <button class="secondary" onclick="exportTestData('json')">📄 Export JSON</button>
+                <button class="secondary" onclick="exportTestData('csv')">📊 Export CSV</button>
+                <button class="secondary" onclick="clearTestHistory()">🗑️ Clear History</button>
+            </div>
+
+            <div id="testHistory" style="display: none;">
+                <h4 style="color: #667eea; margin: 20px 0 10px 0;">Test History</h4>
+                <div class="results-history" id="testHistoryList"></div>
+            </div>
         </div>
 
         <div class="section-title">4. Algorithmic Formulation</div>
@@ -631,7 +715,170 @@ function is_prime_candidate(m, k, slice="half",
             <div id="experimentResults"></div>
         </div>
 
-        <div class="section-title">6. Failure Modes and Limitations</div>
+        <div class="section-title">6. Geometric Interpretation and Concentric Rings</div>
+
+        <p>The fractional-slice heuristic can be visualized in two complementary ways: on the unit circle, and as a 2D plane of concentric rings.</p>
+
+        <div class="subsection-title">6.1 Unit Circle Representation</div>
+
+        <p>Map each residue \(r \in \{1,2,\dots,m-1\}\) to the point</p>
+        <p style="text-align: center;">
+        \[
+        z_r = e^{2\pi i r / m}.
+        \]
+        </p>
+        <p>Coprime residues lie on "open channels" that avoid blocked directions determined by the factors of \(m\).</p>
+
+        <div class="definition">
+            <span class="label">Angular Slices.</span>
+            Selecting a subset \(S(m)\) of size \(|S|\) corresponds to choosing an arc
+            \[
+            \theta \in \left[ \frac{2\pi r_0}{m}, \frac{2\pi (r_0 + |S|)}{m} \right)
+            \]
+            on the unit circle.
+            <ul style="margin-top: 10px;">
+                <li>Half-circle: \(|S| = \lfloor m/2 \rfloor\), spanning \(\pi\) radians.</li>
+                <li>One-\(n\)th slice: \(|S| = \lfloor m/n \rfloor\), spanning \(2\pi/n\) radians.</li>
+            </ul>
+        </div>
+
+        <p>Blocked Farey channels appear as gaps along the arc where \(\gcd(r,m) > 1\). Prime moduli maximize the fraction of occupied (coprime) points in every slice; composites produce visible voids aligned with their divisors.</p>
+
+        <div class="remarks">
+            <strong>Farey Sequence Connection:</strong> Positions of blocked residues correspond to fractions \(r/m\) reducible to lower terms, forming a subset of the Farey sequence \(F_m\). Partial sampling of the circle thus samples a fractional Farey subsequence, producing a geometric signature for primality.
+        </div>
+
+        <div class="subsection-title">6.2 Concentric Ring Visualization</div>
+
+        <p>The unit circle can be extended to a 2D plane of concentric rings to capture the nested structure of residues for multiple moduli.</p>
+
+        <ul>
+            <li>Let each ring correspond to a modulus \(m\).</li>
+            <li>Place the points \(z_r = e^{2\pi i r / m}\) on the ring of radius proportional to \(m\).</li>
+            <li>Coprime residues are marked (filled dots), blocked residues are shown differently.</li>
+        </ul>
+
+        <div class="canvas-container">
+            <h3 style="color: #667eea; margin-bottom: 20px; text-align: center;">Concentric Rings: Nested Farey Structure</h3>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <span style="color: #666; font-weight: 600;">Resolution: </span>
+                <button class="mode-btn" onclick="setConcentricResolution(1920)">HD</button>
+                <button class="mode-btn active" onclick="setConcentricResolution(2560)">2K</button>
+                <button class="mode-btn" onclick="setConcentricResolution(3840)">4K</button>
+            </div>
+            <canvas id="concentricCanvas" width="2560" height="2560" style="max-width: 100%; height: auto;"></canvas>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="minMod">Min Modulus:</label>
+                    <input type="number" id="minMod" value="2" min="2" max="200">
+                </div>
+                <div class="control-group">
+                    <label for="maxMod">Max Modulus:</label>
+                    <input type="number" id="maxMod" value="12" min="2" max="200">
+                </div>
+                <div class="control-group">
+                    <label for="pointSize">Point Size:</label>
+                    <input type="range" id="pointSize" min="1" max="10" value="3" step="0.5" style="width: 100px;">
+                    <span id="pointSizeVal">3</span>px
+                </div>
+            </div>
+
+            <div class="controls" style="margin-top: 10px;">
+                <div class="control-group">
+                    <label for="ringMode">Display Mode:</label>
+                    <select id="ringMode">
+                        <option value="all">All Residues</option>
+                        <option value="open-only">Open Channels Only</option>
+                        <option value="primes-only">Primes Only</option>
+                        <option value="fixed-r">Fixed r (vary m)</option>
+                        <option value="fixed-m">Fixed m (vary r)</option>
+                    </select>
+                </div>
+                <div class="control-group" id="fixedRGroup" style="display: none;">
+                    <label for="fixedRValue">r value:</label>
+                    <input type="number" id="fixedRValue" value="1" min="1" max="100">
+                </div>
+                <div class="control-group" id="fixedMGroup" style="display: none;">
+                    <label for="fixedMValue">m value:</label>
+                    <input type="number" id="fixedMValue" value="12" min="2" max="200">
+                </div>
+            </div>
+
+            <div class="controls" style="margin-top: 10px;">
+                <div class="control-group">
+                    <label for="colorMode">Color Mode:</label>
+                    <select id="colorMode" onchange="updateColorModeInfo()">
+                        <option value="open-blocked">1. Binary: Open vs Blocked</option>
+                        <option value="gcd-gradient">2. GCD Gradient</option>
+                        <option value="gcd-local">3. GCD (Local per m)</option>
+                        <option value="gcd-global">4. GCD (Global)</option>
+                        <option value="prime-factor">5. Smallest Prime Factor</option>
+                        <option value="density-local">6. Local Density Gradient</option>
+                        <option value="residue-class">7. Residue Class mod k</option>
+                        <option value="farey-level">8. Farey Denominator Level</option>
+                        <option value="angular-hue">9. Angular Hue</option>
+                        <option value="multi-property">10. Multi-Property (HSB)</option>
+                    </select>
+                </div>
+                <div class="control-group" id="residueClassGroup" style="display: none;">
+                    <label for="residueK">mod k:</label>
+                    <input type="number" id="residueK" value="3" min="2" max="12">
+                </div>
+                <div id="colorModeInfo" style="margin-top: 5px; font-size: 0.85em; color: #666; font-style: italic;"></div>
+            </div>
+
+            <div class="controls" style="margin-top: 15px;">
+                <strong style="color: #495057;">Visibility:</strong>
+                <label style="display: inline-flex; align-items: center; margin-left: 15px;">
+                    <input type="checkbox" id="showRings" checked style="margin-right: 5px;">
+                    Ring Lines
+                </label>
+                <label style="display: inline-flex; align-items: center; margin-left: 15px;">
+                    <input type="checkbox" id="showLabels" checked style="margin-right: 5px;">
+                    Modulus Labels
+                </label>
+                <label style="display: inline-flex; align-items: center; margin-left: 15px;">
+                    <input type="checkbox" id="showAxes" checked style="margin-right: 5px;">
+                    Axes
+                </label>
+                <label style="display: inline-flex; align-items: center; margin-left: 15px;">
+                    <input type="checkbox" id="showLegend" checked style="margin-right: 5px;">
+                    Legend
+                </label>
+            </div>
+
+            <div class="controls" style="margin-top: 15px;">
+                <button onclick="drawConcentricRings()">Visualize</button>
+                <button class="success" onclick="exportConcentricWithLegend('4k')">📸 Export 4K + Legend</button>
+                <button class="success" onclick="exportConcentricWithLegend('2k')">📸 Export 2K + Legend</button>
+                <button class="secondary" onclick="exportConcentricView()">📸 Simple Export</button>
+            </div>
+            
+            <div class="stats-display" id="concentricStats" style="margin-top: 20px;"></div>
+            <div class="caption">Figure 2: Concentric rings showing nested Farey channel structure across multiple moduli</div>
+        </div>
+
+        <div class="remarks">
+            <strong>Interpretation:</strong>
+            <ul>
+                <li>Each ring shows the local coprimality pattern for a single modulus.</li>
+                <li>Nested rings reveal how Farey channels propagate across successive moduli.</li>
+                <li>Angular gaps (blocked channels) align radially, illustrating the "nested" property: blocked residues of smaller divisors project outward to higher moduli.</li>
+            </ul>
+        </div>
+
+        <div class="proposition">
+            <span class="label">Visualization Principle.</span>
+            <em>By combining angular slices on the unit circle with concentric rings in 2D, we obtain a comprehensive geometric view:</em>
+            \[
+            \text{Prime moduli: full occupancy along slices and rings} \quad\quad
+            \text{Composite moduli: radial gaps aligned with factors.}
+            \]
+            <em>This representation underlies the fractional-slice heuristic and provides visual intuition for why primes maintain maximal channel openness, even when sampling only a fraction of the residues.</em>
+        </div>
+
+        <div class="section-title">7. Failure Modes and Limitations</div>
 
         <ul>
             <li><strong>Semiprime leakage:</strong> Composites with large prime factors can pass the test.</li>
@@ -641,7 +888,7 @@ function is_prime_candidate(m, k, slice="half",
 
         <p>The heuristic is therefore best used as a rapid <em>prefilter</em> prior to a deterministic or probabilistic primality test (e.g., Miller–Rabin).</p>
 
-        <div class="section-title">7. Conclusion</div>
+        <div class="section-title">8. Conclusion</div>
 
         <p>Fractional-slice coprimality sampling provides a geometric and probabilistic bridge between Nested Farey Channel theory and practical number testing. It captures the essential property that prime moduli maintain maximal channel openness even when viewed through restricted arcs of the unit circle, while composites introduce blocked Farey channels visible through partial sampling.</p>
 
@@ -759,7 +1006,7 @@ function is_prime_candidate(m, k, slice="half",
                 ctx.arc(x, y, isOpen ? 6 : 5, 0, 2 * Math.PI);
                 ctx.fill();
 
-                if (showChannelLabels && m <= 30) {
+                if (showChannelLabels) {
                     ctx.fillStyle = '#2c3e50';
                     ctx.font = '11px serif';
                     const labelX = centerX + (radius + 30) * Math.cos(theta);
@@ -1040,8 +1287,902 @@ function is_prime_candidate(m, k, slice="half",
             return true;
         }
 
+        // ==================== COMPREHENSIVE LEGEND EXPORT ====================
+        
+        function exportConcentricWithLegend(quality = '4k') {
+            const canvas = document.getElementById('concentricCanvas');
+            const originalWidth = canvas.width;
+            const originalHeight = canvas.height;
+            
+            // Set resolution
+            let exportWidth, exportHeight;
+            if (quality === '4k') {
+                exportWidth = exportHeight = 3840;
+            } else if (quality === '2k') {
+                exportWidth = exportHeight = 2560;
+            } else {
+                exportWidth = exportHeight = 1920;
+            }
+            
+            // Temporarily resize and redraw
+            canvas.width = exportWidth;
+            canvas.height = exportHeight;
+            drawConcentricRings();
+            
+            // Now create a new canvas with space for detailed legend
+            const legendWidth = Math.floor(exportWidth * 0.3); // 30% width for legend
+            const fullCanvas = document.createElement('canvas');
+            fullCanvas.width = exportWidth + legendWidth;
+            fullCanvas.height = exportHeight;
+            const fullCtx = fullCanvas.getContext('2d');
+            
+            // White background
+            fullCtx.fillStyle = 'white';
+            fullCtx.fillRect(0, 0, fullCanvas.width, fullCanvas.height);
+            
+            // Draw main visualization
+            fullCtx.drawImage(canvas, 0, 0);
+            
+            // Draw comprehensive legend
+            drawComprehensiveLegend(fullCtx, exportWidth, 0, legendWidth, exportHeight);
+            
+            // Export
+            const link = document.createElement('a');
+            link.download = `concentric-${quality}-legend-${Date.now()}.png`;
+            link.href = fullCanvas.toDataURL('image/png');
+            link.click();
+            
+            // Restore original size
+            canvas.width = originalWidth;
+            canvas.height = originalHeight;
+            drawConcentricRings();
+        }
+
+        function drawComprehensiveLegend(ctx, x, y, width, height) {
+            const minMod = parseInt(document.getElementById('minMod').value);
+            const maxMod = parseInt(document.getElementById('maxMod').value);
+            const mode = document.getElementById('ringMode').value;
+            const colorMode = document.getElementById('colorMode').value;
+            const pointSize = parseFloat(document.getElementById('pointSize').value);
+            const residueK = parseInt(document.getElementById('residueK')?.value || 3);
+            
+            // Calculate statistics
+            let totalPoints = 0;
+            let openPoints = 0;
+            let blockedPoints = 0;
+            let primeRings = 0;
+            let compositeRings = 0;
+            const gcdCounts = {};
+            const primeFactorCounts = {};
+            
+            for (let m = minMod; m <= maxMod; m++) {
+                if (mode === 'primes-only' && !isPrime(m)) continue;
+                if (mode === 'fixed-m') {
+                    const fixedM = parseInt(document.getElementById('fixedMValue').value);
+                    if (m !== fixedM) continue;
+                }
+                
+                if (isPrime(m)) primeRings++;
+                else compositeRings++;
+                
+                for (let r = 1; r < m; r++) {
+                    if (mode === 'fixed-r') {
+                        const fixedR = parseInt(document.getElementById('fixedRValue').value);
+                        if (r !== fixedR) continue;
+                    }
+                    
+                    const gcdVal = gcd(r, m);
+                    const isOpen = gcdVal === 1;
+                    
+                    totalPoints++;
+                    if (isOpen) openPoints++;
+                    else blockedPoints++;
+                    
+                    gcdCounts[gcdVal] = (gcdCounts[gcdVal] || 0) + 1;
+                    
+                    if (gcdVal > 1) {
+                        const spf = smallestPrimeFactor(gcdVal);
+                        primeFactorCounts[spf] = (primeFactorCounts[spf] || 0) + 1;
+                    }
+                }
+            }
+            
+            // Drawing settings
+            const padding = 20;
+            const fontSize = Math.max(12, width / 40);
+            const lineHeight = fontSize * 1.5;
+            let currentY = y + padding;
+            
+            // Title
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = `bold ${fontSize * 1.4}px Arial`;
+            ctx.fillText('VISUALIZATION LEGEND', x + padding, currentY);
+            currentY += lineHeight * 2;
+            
+            // Parameters Section
+            ctx.font = `bold ${fontSize * 1.1}px Arial`;
+            ctx.fillText('═══ PARAMETERS ═══', x + padding, currentY);
+            currentY += lineHeight * 1.2;
+            
+            ctx.font = `${fontSize}px Arial`;
+            const params = [
+                `Modulus Range: ${minMod} – ${maxMod}`,
+                `Display Mode: ${mode}`,
+                `Color Mode: ${colorMode}`,
+                `Point Size: ${pointSize}px`,
+                mode === 'residue-class' ? `Residue mod k: ${residueK}` : null,
+                mode === 'fixed-r' ? `Fixed r: ${document.getElementById('fixedRValue').value}` : null,
+                mode === 'fixed-m' ? `Fixed m: ${document.getElementById('fixedMValue').value}` : null,
+            ].filter(p => p !== null);
+            
+            params.forEach(param => {
+                ctx.fillText(param, x + padding, currentY);
+                currentY += lineHeight;
+            });
+            
+            currentY += lineHeight * 0.5;
+            
+            // Statistics Section
+            ctx.font = `bold ${fontSize * 1.1}px Arial`;
+            ctx.fillText('═══ STATISTICS ═══', x + padding, currentY);
+            currentY += lineHeight * 1.2;
+            
+            ctx.font = `${fontSize}px Arial`;
+            const stats = [
+                `Total Rings: ${primeRings + compositeRings}`,
+                `Prime Rings: ${primeRings}`,
+                `Composite Rings: ${compositeRings}`,
+                `Total Points: ${totalPoints}`,
+                `Open Channels: ${openPoints}`,
+                `Blocked Channels: ${blockedPoints}`,
+                `Open Density: ${(openPoints/totalPoints*100).toFixed(1)}%`,
+            ];
+            
+            stats.forEach(stat => {
+                ctx.fillText(stat, x + padding, currentY);
+                currentY += lineHeight;
+            });
+            
+            currentY += lineHeight * 0.5;
+            
+            // GCD Distribution
+            if (Object.keys(gcdCounts).length > 0) {
+                ctx.font = `bold ${fontSize * 1.1}px Arial`;
+                ctx.fillText('═══ GCD DISTRIBUTION ═══', x + padding, currentY);
+                currentY += lineHeight * 1.2;
+                
+                ctx.font = `${fontSize * 0.9}px Arial`;
+                const sortedGCDs = Object.keys(gcdCounts).map(Number).sort((a,b) => a-b).slice(0, 10);
+                sortedGCDs.forEach(gcdVal => {
+                    const count = gcdCounts[gcdVal];
+                    const percentage = (count/totalPoints*100).toFixed(1);
+                    
+                    // Draw color sample
+                    let sampleColor;
+                    switch(colorMode) {
+                        case 'gcd-local':
+                        case 'gcd-gradient':
+                            sampleColor = getGCDColor(gcdVal, Math.max(...Object.keys(gcdCounts).map(Number)));
+                            break;
+                        case 'gcd-global':
+                            sampleColor = getGCDColorGlobal(gcdVal);
+                            break;
+                        case 'prime-factor':
+                            sampleColor = getSmallestPrimeFactorColor(gcdVal);
+                            break;
+                        default:
+                            sampleColor = gcdVal === 1 ? '#27ae60' : '#e74c3c';
+                    }
+                    
+                    ctx.fillStyle = sampleColor;
+                    ctx.beginPath();
+                    ctx.arc(x + padding + 8, currentY - 4, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText(`gcd=${gcdVal}: ${count} (${percentage}%)`, x + padding + 20, currentY);
+                    currentY += lineHeight * 0.9;
+                });
+            }
+            
+            currentY += lineHeight * 0.5;
+            
+            // Prime Factor Distribution (if applicable)
+            if (Object.keys(primeFactorCounts).length > 0 && colorMode === 'prime-factor') {
+                ctx.font = `bold ${fontSize * 1.1}px Arial`;
+                ctx.fillText('═══ PRIME FACTORS ═══', x + padding, currentY);
+                currentY += lineHeight * 1.2;
+                
+                ctx.font = `${fontSize * 0.9}px Arial`;
+                const sortedPrimes = Object.keys(primeFactorCounts).map(Number).sort((a,b) => a-b);
+                sortedPrimes.forEach(prime => {
+                    const count = primeFactorCounts[prime];
+                    const color = getSmallestPrimeFactorColor(prime);
+                    
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x + padding + 8, currentY - 4, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText(`Prime ${prime}: ${count} points`, x + padding + 20, currentY);
+                    currentY += lineHeight * 0.9;
+                });
+            }
+            
+            currentY += lineHeight * 0.5;
+            
+            // Color Mode Explanation
+            ctx.font = `bold ${fontSize * 1.1}px Arial`;
+            ctx.fillText('═══ COLOR KEY ═══', x + padding, currentY);
+            currentY += lineHeight * 1.2;
+            
+            ctx.font = `${fontSize * 0.85}px Arial`;
+            const colorExplanations = {
+                'open-blocked': ['Green = Coprime (open)', 'Red = Blocked'],
+                'gcd-gradient': ['Green→Red gradient', 'by GCD magnitude'],
+                'gcd-local': ['Colors per ring', 'by GCD value'],
+                'gcd-global': ['Same GCD =', 'same color globally'],
+                'prime-factor': ['Color = smallest', 'prime factor of gcd'],
+                'density-local': ['Brightness = local', 'coprime density'],
+                'residue-class': [`Colors by r mod ${residueK}`],
+                'farey-level': ['Brightness = reduced', 'denominator level'],
+                'angular-hue': ['Hue by angle', 'Brightness by coprime'],
+                'multi-property': ['Hue=angle, Sat=gcd', 'Bright=slice member'],
+            };
+            
+            const explanations = colorExplanations[colorMode] || ['Standard coloring'];
+            explanations.forEach(line => {
+                ctx.fillText(line, x + padding, currentY);
+                currentY += lineHeight * 0.85;
+            });
+            
+            // Footer
+            currentY = y + height - padding - lineHeight * 2;
+            ctx.font = `${fontSize * 0.8}px Arial`;
+            ctx.fillStyle = '#95a5a6';
+            ctx.fillText('Generated: ' + new Date().toLocaleString(), x + padding, currentY);
+            currentY += lineHeight;
+            ctx.fillText('Nested Farey Channels Framework', x + padding, currentY);
+            ctx.fillText('by Wessen Getachew', x + padding, currentY + lineHeight);
+        }
+
         // Initialize
         drawChannelRing();
+        updateColorModeInfo();
+
+        // ==================== RESULTS HISTORY ====================
+        
+        let testHistory = [];
+
+        function addToHistory(result) {
+            testHistory.unshift(result);
+            if (testHistory.length > 50) testHistory.pop();
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyDiv = document.getElementById('testHistory');
+            const listDiv = document.getElementById('testHistoryList');
+            
+            if (testHistory.length === 0) {
+                historyDiv.style.display = 'none';
+                return;
+            }
+            
+            historyDiv.style.display = 'block';
+            listDiv.innerHTML = testHistory.map((item, idx) => `
+                <div class="result-item" onclick="toggleResultDetails(${idx})">
+                    <div class="result-header">
+                        <span class="result-title">${item.type}: m=${item.modulus}, k=${item.k}</span>
+                        <span class="result-time">${item.timestamp}</span>
+                    </div>
+                    <div class="result-summary">
+                        Result: ${item.passed ? 'PASS ✓' : 'FAIL ✗'} | 
+                        ${item.prime ? 'Prime' : 'Composite'} | 
+                        Density: ${item.density}
+                    </div>
+                    <div class="collapsed-details">
+                        <strong>Details:</strong><br>
+                        Samples: ${item.passedSamples}/${item.k}<br>
+                        Smallest Factor: ${item.smallestFactor}<br>
+                        Theoretical Prob: ${item.theoreticalProb}<br>
+                        Slice Type: ${item.sliceType}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleResultDetails(idx) {
+            const items = document.querySelectorAll('.result-item');
+            items[idx].classList.toggle('expanded');
+        }
+
+        function clearTestHistory() {
+            if (confirm('Clear all test history?')) {
+                testHistory = [];
+                updateHistoryDisplay();
+            }
+        }
+
+        // ==================== EXPORT FUNCTIONS ====================
+        
+        function exportTestScreenshot() {
+            const canvas = document.getElementById('testCanvas');
+            const link = document.createElement('a');
+            link.download = `farey-test-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function exportConcentricView() {
+            const canvas = document.getElementById('concentricCanvas');
+            const link = document.createElement('a');
+            link.download = `concentric-rings-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function exportTestData(format) {
+            if (testHistory.length === 0) {
+                alert('No test history to export');
+                return;
+            }
+
+            let content, mimeType, extension;
+
+            if (format === 'json') {
+                content = JSON.stringify(testHistory, null, 2);
+                mimeType = 'application/json';
+                extension = 'json';
+            } else if (format === 'csv') {
+                const headers = 'Timestamp,Type,Modulus,Prime,Passed,Samples(k),PassedSamples,Density,SmallestFactor,TheoreticalProb,SliceType\n';
+                const rows = testHistory.map(item => 
+                    `"${item.timestamp}",${item.type},${item.modulus},${item.prime},${item.passed},${item.k},${item.passedSamples},${item.density},${item.smallestFactor},${item.theoreticalProb},${item.sliceType}`
+                ).join('\n');
+                content = headers + rows;
+                mimeType = 'text/csv';
+                extension = 'csv';
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const link = document.createElement('a');
+            link.download = `farey-tests-${Date.now()}.${extension}`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+
+        // ==================== CONCENTRIC RINGS VISUALIZATION ====================
+        
+        let concentricResolution = 2560;
+
+        function setConcentricResolution(res) {
+            concentricResolution = res;
+            const canvas = document.getElementById('concentricCanvas');
+            canvas.width = res;
+            canvas.height = res;
+            
+            // Update button states
+            document.querySelectorAll('.canvas-container .mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            drawConcentricRings();
+        }
+
+        // Update point size display
+        document.getElementById('pointSize')?.addEventListener('input', function() {
+            document.getElementById('pointSizeVal').textContent = this.value;
+        });
+
+        // Show/hide fixed value inputs based on mode
+        document.getElementById('ringMode')?.addEventListener('change', function() {
+            const fixedRGroup = document.getElementById('fixedRGroup');
+            const fixedMGroup = document.getElementById('fixedMGroup');
+            
+            fixedRGroup.style.display = this.value === 'fixed-r' ? 'flex' : 'none';
+            fixedMGroup.style.display = this.value === 'fixed-m' ? 'flex' : 'none';
+        });
+
+        // GCD-based color palette
+        const gcdColors = [
+            '#e74c3c', // gcd=1 (or blocked)
+            '#27ae60', // gcd=1 (coprime)
+            '#3498db', // gcd=2
+            '#f39c12', // gcd=3
+            '#9b59b6', // gcd=4
+            '#1abc9c', // gcd=5
+            '#e67e22', // gcd=6
+            '#34495e', // gcd=7
+            '#16a085', // gcd=8
+            '#d35400', // gcd=9
+            '#c0392b', // gcd=10+
+        ];
+
+        function getGCDColor(gcdValue, maxGCD) {
+            if (gcdValue === 1) return '#27ae60'; // Coprime - always green
+            
+            // Map gcd to color index
+            const idx = Math.min(gcdValue, gcdColors.length - 1);
+            return gcdColors[idx];
+        }
+
+        function getGCDColorGlobal(gcdValue) {
+            const globalColors = {
+                1: '#27ae60',  // Coprime
+                2: '#e74c3c',  // Even
+                3: '#3498db',  // Multiple of 3
+                4: '#f39c12',  // Multiple of 4
+                5: '#9b59b6',  // Multiple of 5
+                6: '#1abc9c',  // Multiple of 6
+                7: '#e67e22',  // Multiple of 7
+                8: '#34495e',  // Multiple of 8
+                9: '#16a085',  // Multiple of 9
+                10: '#d35400', // Multiple of 10
+            };
+            return globalColors[gcdValue] || '#95a5a6';
+        }
+
+        // NEW: GCD Gradient coloring
+        function getGCDGradientColor(gcdValue, maxGCD) {
+            if (gcdValue === 1) return '#27ae60'; // Coprime - bright green
+            
+            // Gradient from green to red based on gcd magnitude
+            const intensity = gcdValue / maxGCD;
+            const hue = 120 * (1 - intensity); // 120=green to 0=red
+            return `hsl(${hue}, 70%, 50%)`;
+        }
+
+        // NEW: Smallest prime factor coloring
+        function getSmallestPrimeFactorColor(gcdValue) {
+            if (gcdValue === 1) return '#ecf0f1'; // Near-white for coprime
+            
+            const spf = smallestPrimeFactor(gcdValue);
+            const primeColors = {
+                2: '#3498db',   // Blue
+                3: '#f1c40f',   // Yellow
+                5: '#e67e22',   // Orange
+                7: '#9b59b6',   // Purple
+                11: '#1abc9c',  // Turquoise
+                13: '#e74c3c',  // Red
+                17: '#16a085',  // Dark cyan
+                19: '#d35400',  // Dark orange
+                23: '#8e44ad',  // Dark purple
+                29: '#27ae60',  // Green
+                31: '#2c3e50',  // Dark blue
+            };
+            return primeColors[spf] || '#95a5a6';
+        }
+
+        // NEW: Local density gradient
+        function getLocalDensityColor(r, m, windowSize = 5) {
+            // Count coprime residues in window around r
+            let coprimeCount = 0;
+            const halfWindow = Math.floor(windowSize / 2);
+            
+            for (let i = -halfWindow; i <= halfWindow; i++) {
+                const testR = ((r + i - 1 + m) % m) + 1;
+                if (testR >= 1 && testR < m && gcd(testR, m) === 1) {
+                    coprimeCount++;
+                }
+            }
+            
+            const density = coprimeCount / windowSize;
+            const hue = 120 * density; // Green gradient
+            const sat = 70;
+            const light = 30 + density * 40; // Darker to brighter
+            return `hsl(${hue}, ${sat}%, ${light}%)`;
+        }
+
+        // NEW: Residue class mod k coloring
+        function getResidueClassColor(r, k) {
+            const residue = r % k;
+            const hue = (residue * 360) / k;
+            return `hsl(${hue}, 70%, 50%)`;
+        }
+
+        // NEW: Farey denominator level coloring
+        function getFareyLevelColor(r, m) {
+            const g = gcd(r, m);
+            const reducedDenom = m / g;
+            
+            // Smaller denominators = brighter
+            const maxDenom = m;
+            const brightness = 100 - (reducedDenom / maxDenom) * 60;
+            return `hsl(200, 70%, ${brightness}%)`;
+        }
+
+        // NEW: Angular hue coloring
+        function getAngularHueColor(r, m) {
+            const angle = (2 * Math.PI * r) / m;
+            const hue = (angle / (2 * Math.PI)) * 360;
+            const isOpen = gcd(r, m) === 1;
+            const sat = 70;
+            const light = isOpen ? 50 : 30; // Brighter if coprime
+            return `hsl(${hue}, ${sat}%, ${light}%)`;
+        }
+
+        // NEW: Multi-property (HSB) coloring
+        function getMultiPropertyColor(r, m, inSlice = true) {
+            const g = gcd(r, m);
+            const angle = (2 * Math.PI * r) / m;
+            
+            // Hue: angle
+            const hue = (angle / (2 * Math.PI)) * 360;
+            
+            // Saturation: gcd (coprime = high saturation)
+            const sat = g === 1 ? 80 : 30;
+            
+            // Brightness: slice membership
+            const light = inSlice ? 60 : 30;
+            
+            return `hsl(${hue}, ${sat}%, ${light}%)`;
+        }
+
+        // Color mode info text
+        function updateColorModeInfo() {
+            const mode = document.getElementById('colorMode').value;
+            const infoDiv = document.getElementById('colorModeInfo');
+            const residueGroup = document.getElementById('residueClassGroup');
+            
+            const infoTexts = {
+                'open-blocked': 'Binary: Green=coprime, Red=blocked',
+                'gcd-gradient': 'Gradient intensity by gcd(r,m) magnitude',
+                'gcd-local': 'Each ring: independent color per GCD value',
+                'gcd-global': 'All rings: same GCD = same color (shows nesting)',
+                'prime-factor': 'Color by smallest prime factor of gcd(r,m)',
+                'density-local': 'Heatmap: local coprime density around each r',
+                'residue-class': 'Color by residue class r mod k',
+                'farey-level': 'Brightness by reduced denominator (Farey level)',
+                'angular-hue': 'Hue by angle, brightness by coprimality',
+                'multi-property': 'Hue=angle, Saturation=gcd, Brightness=slice'
+            };
+            
+            infoDiv.textContent = infoTexts[mode] || '';
+            residueGroup.style.display = mode === 'residue-class' ? 'flex' : 'none';
+        }
+
+        function drawConcentricRings() {
+            const canvas = document.getElementById('concentricCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            const minMod = parseInt(document.getElementById('minMod').value);
+            const maxMod = parseInt(document.getElementById('maxMod').value);
+            const mode = document.getElementById('ringMode').value;
+            const colorMode = document.getElementById('colorMode').value;
+            const pointSize = parseFloat(document.getElementById('pointSize').value);
+            
+            const showRings = document.getElementById('showRings').checked;
+            const showLabels = document.getElementById('showLabels').checked;
+            const showAxes = document.getElementById('showAxes').checked;
+            const showLegend = document.getElementById('showLegend').checked;
+
+            if (isNaN(minMod) || isNaN(maxMod) || minMod >= maxMod) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw axes
+            if (showAxes) {
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(width, centerY);
+                ctx.moveTo(centerX, 0);
+                ctx.lineTo(centerX, height);
+                ctx.stroke();
+            }
+
+            const maxRadius = Math.min(width, height) / 2 - 80;
+            const radiusStep = maxRadius / (maxMod - minMod + 1);
+
+            // For fixed-m mode, get the fixed value
+            let fixedM = null;
+            if (mode === 'fixed-m') {
+                fixedM = parseInt(document.getElementById('fixedMValue').value);
+            }
+
+            // For fixed-r mode, get the fixed value
+            let fixedR = null;
+            if (mode === 'fixed-r') {
+                fixedR = parseInt(document.getElementById('fixedRValue').value);
+            }
+
+            // Collect all GCD values for local coloring
+            let allGCDs = new Set();
+            if (colorMode === 'gcd-local' || colorMode === 'gcd-global') {
+                for (let m = minMod; m <= maxMod; m++) {
+                    if (mode === 'primes-only' && !isPrime(m)) continue;
+                    if (mode === 'fixed-m' && m !== fixedM) continue;
+                    
+                    for (let r = 1; r < m; r++) {
+                        if (mode === 'fixed-r' && r !== fixedR) continue;
+                        allGCDs.add(gcd(r, m));
+                    }
+                }
+            }
+
+            // Draw concentric rings
+            for (let m = minMod; m <= maxMod; m++) {
+                if (mode === 'primes-only' && !isPrime(m)) continue;
+                if (mode === 'fixed-m' && m !== fixedM) continue;
+
+                const radius = radiusStep * (m - minMod + 1);
+                const prime = isPrime(m);
+
+                // Draw ring circle
+                if (showRings) {
+                    ctx.strokeStyle = prime ? '#27ae60' : '#95a5a6';
+                    ctx.lineWidth = prime ? 3 : 1.5;
+                    ctx.setLineDash(prime ? [] : [10, 5]);
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // Draw label
+                if (showLabels) {
+                    ctx.fillStyle = prime ? '#27ae60' : '#7f8c8d';
+                    ctx.font = `bold ${Math.max(12, width/200)}px serif`;
+                    const label = mode === 'fixed-r' ? `m=${m}, r=${fixedR}` : 
+                                 mode === 'fixed-m' ? `m=${fixedM}` : `m=${m}`;
+                    ctx.fillText(label, centerX + radius + 10, centerY);
+                }
+
+                // Draw residue points
+                const startR = (mode === 'fixed-m') ? 1 : (mode === 'fixed-r' ? fixedR : 1);
+                const endR = (mode === 'fixed-m') ? m - 1 : (mode === 'fixed-r' ? fixedR : m - 1);
+
+                for (let r = startR; r <= endR; r++) {
+                    if (mode === 'fixed-r' && r !== fixedR) continue;
+                    if (r >= m) continue;
+
+                    const gcdVal = gcd(r, m);
+                    const isOpen = gcdVal === 1;
+                    
+                    if (mode === 'open-only' && !isOpen) continue;
+
+                    const theta = (2 * Math.PI * r) / m;
+                    const x = centerX + radius * Math.cos(theta);
+                    const y = centerY - radius * Math.sin(theta);
+
+                    // Determine color based on color mode
+                    let color;
+                    const residueK = parseInt(document.getElementById('residueK')?.value || 3);
+                    
+                    switch(colorMode) {
+                        case 'open-blocked':
+                            color = isOpen ? (prime ? '#27ae60' : '#3498db') : '#e74c3c';
+                            break;
+                        case 'gcd-gradient':
+                            color = getGCDGradientColor(gcdVal, Math.max(...Array.from(allGCDs)));
+                            break;
+                        case 'gcd-local':
+                            color = getGCDColor(gcdVal, Math.max(...Array.from(allGCDs)));
+                            break;
+                        case 'gcd-global':
+                            color = getGCDColorGlobal(gcdVal);
+                            break;
+                        case 'prime-factor':
+                            color = getSmallestPrimeFactorColor(gcdVal);
+                            break;
+                        case 'density-local':
+                            color = getLocalDensityColor(r, m);
+                            break;
+                        case 'residue-class':
+                            color = getResidueClassColor(r, residueK);
+                            break;
+                        case 'farey-level':
+                            color = getFareyLevelColor(r, m);
+                            break;
+                        case 'angular-hue':
+                            color = getAngularHueColor(r, m);
+                            break;
+                        case 'multi-property':
+                            const inSlice = r <= Math.floor(m/2); // Example: half-circle
+                            color = getMultiPropertyColor(r, m, inSlice);
+                            break;
+                        default:
+                            color = isOpen ? '#27ae60' : '#e74c3c';
+                    }
+
+                    // Draw point - filled for most modes, outlined for blocked in binary mode
+                    const shouldFill = colorMode !== 'open-blocked' || isOpen;
+                    if (shouldFill) {
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
+                        ctx.fill();
+                    } else {
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = Math.max(1.5, pointSize * 0.5);
+                        ctx.beginPath();
+                        ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw legend
+            if (showLegend) {
+                const legendX = 30;
+                const legendY = height - 150;
+                const legendWidth = 280;
+                let legendHeight = 120;
+
+                // Adjust legend height based on color mode
+                if (colorMode.startsWith('gcd')) {
+                    legendHeight = Math.min(300, 80 + allGCDs.size * 25);
+                }
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                ctx.fillRect(legendX, legendY, legendWidth, legendHeight);
+                ctx.strokeStyle = '#667eea';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(legendX, legendY, legendWidth, legendHeight);
+
+                ctx.font = `${Math.max(12, width/200)}px serif`;
+                let yOffset = legendY + 25;
+
+                if (colorMode === 'open-blocked') {
+                    ctx.fillStyle = '#27ae60';
+                    ctx.beginPath();
+                    ctx.arc(legendX + 15, yOffset, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText('Open Channel (coprime)', legendX + 30, yOffset + 5);
+
+                    yOffset += 30;
+                    ctx.strokeStyle = '#e74c3c';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(legendX + 15, yOffset, 5, 0, 2 * Math.PI);
+                    ctx.stroke();
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText('Blocked Channel', legendX + 30, yOffset + 5);
+
+                    yOffset += 30;
+                    ctx.strokeStyle = '#27ae60';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([]);
+                    ctx.beginPath();
+                    ctx.moveTo(legendX + 10, yOffset);
+                    ctx.lineTo(legendX + 40, yOffset);
+                    ctx.stroke();
+                    ctx.fillText('Prime Ring', legendX + 50, yOffset + 5);
+
+                    yOffset += 25;
+                    ctx.strokeStyle = '#95a5a6';
+                    ctx.setLineDash([10, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(legendX + 10, yOffset);
+                    ctx.lineTo(legendX + 40, yOffset);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillText('Composite Ring', legendX + 50, yOffset + 5);
+
+                } else if (colorMode === 'gcd-local' || colorMode === 'gcd-global') {
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.font = `bold ${Math.max(12, width/200)}px serif`;
+                    ctx.fillText('GCD Values:', legendX + 15, yOffset);
+                    yOffset += 25;
+                    ctx.font = `${Math.max(11, width/220)}px serif`;
+
+                    const sortedGCDs = Array.from(allGCDs).sort((a, b) => a - b).slice(0, 8);
+                    sortedGCDs.forEach(gcdVal => {
+                        const color = colorMode === 'gcd-local' ? 
+                                     getGCDColor(gcdVal, Math.max(...allGCDs)) : 
+                                     getGCDColorGlobal(gcdVal);
+                        
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(legendX + 15, yOffset, 5, 0, 2 * Math.PI);
+                        ctx.fill();
+                        ctx.fillStyle = '#2c3e50';
+                        ctx.fillText(`gcd = ${gcdVal}${gcdVal === 1 ? ' (coprime)' : ''}`, 
+                                    legendX + 30, yOffset + 5);
+                        yOffset += 25;
+                    });
+                } else if (colorMode === 'prime-composite') {
+                    ctx.fillStyle = '#27ae60';
+                    ctx.beginPath();
+                    ctx.arc(legendX + 15, yOffset, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText('Prime Modulus', legendX + 30, yOffset + 5);
+
+                    yOffset += 30;
+                    ctx.fillStyle = '#e67e22';
+                    ctx.beginPath();
+                    ctx.arc(legendX + 15, yOffset, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillText('Composite Modulus', legendX + 30, yOffset + 5);
+                }
+            }
+
+            // Title
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = `bold ${Math.max(20, width/100)}px serif`;
+            ctx.textAlign = 'center';
+            const titleText = mode === 'fixed-r' ? `Fixed r=${fixedR}: Moduli ${minMod}-${maxMod}` :
+                             mode === 'fixed-m' ? `Fixed m=${fixedM}: All residues` :
+                             mode === 'primes-only' ? `Prime Moduli ${minMod}-${maxMod}` :
+                             `Concentric Rings: Moduli ${minMod}-${maxMod}`;
+            ctx.fillText(titleText, centerX, 40);
+            ctx.textAlign = 'left';
+        }
+
+        // Enhanced export function with resolution options
+        const originalExportConcentric = exportConcentricView;
+        exportConcentricView = function(quality = '4k') {
+            const canvas = document.getElementById('concentricCanvas');
+            const currentWidth = canvas.width;
+            
+            if (quality === 'hd') {
+                // Temporarily set to HD
+                canvas.width = 1920;
+                canvas.height = 1920;
+                drawConcentricRings();
+            }
+            
+            const link = document.createElement('a');
+            link.download = `concentric-rings-${quality}-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // Restore original resolution
+            if (quality === 'hd') {
+                canvas.width = currentWidth;
+                canvas.height = currentWidth;
+                drawConcentricRings();
+            }
+        };
+
+        // Modified runFractionalTest to save to history
+        const originalRunFractionalTest = runFractionalTest;
+        runFractionalTest = function() {
+            originalRunFractionalTest();
+
+            // Save to history
+            const m = parseInt(document.getElementById('testModulus').value);
+            const k = parseInt(document.getElementById('sampleCount').value);
+            const sliceType = document.getElementById('sliceType').value;
+            const slice = getSlice(m, sliceType);
+            
+            let passedSamples = 0;
+            let allPass = true;
+            for (let i = 0; i < k; i++) {
+                const r = slice[Math.floor(Math.random() * slice.length)];
+                if (gcd(r, m) === 1) passedSamples++;
+                else allPass = false;
+            }
+
+            const result = {
+                type: 'Single Test',
+                timestamp: new Date().toLocaleString(),
+                modulus: m,
+                prime: isPrime(m),
+                passed: allPass,
+                k: k,
+                passedSamples: passedSamples,
+                density: (eulerPhi(m) / m).toFixed(4),
+                smallestFactor: smallestPrimeFactor(m),
+                theoreticalProb: Math.pow(1 - 1/smallestPrimeFactor(m), k).toFixed(4),
+                sliceType: sliceType
+            };
+
+            addToHistory(result);
+        };
+
+        // Initialize concentric rings
+        drawConcentricRings();
     </script>
 </body>
 </html>
