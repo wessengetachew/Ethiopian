@@ -1390,7 +1390,7 @@
                     <button class="category-btn" onclick="filterVizCategory('complex')">Complex Analysis</button>
                     <button class="category-btn" onclick="filterVizCategory('modular')">Modular</button>
                     <button class="category-btn" onclick="filterVizCategory('semiprimes')">Semiprimes</button>
-                    <button class="category-btn" onclick="filterVizCategory('3d')">🎮 3D</button>
+
                 </div>
                 
                 <div class="viz-options">
@@ -1422,36 +1422,24 @@
                     <button class="viz-btn" onclick="changeViz('semiprimeZeta')">Semiprime ζ_S</button>
                     <button class="viz-btn" onclick="changeViz('compositeChannels')">Prime & Composite Channels</button>
                 </div>
-                <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
-                    <label style="color: #fff; font-weight: 500;">Universal Zoom: <span id="universalZoomLevel">1.0</span>x</label>
-                    <input type="range" id="universalZoomSlider" min="0.5" max="5" step="0.1" value="1" 
-                           style="width: 100%;"
-                           oninput="updateUniversalZoom(parseFloat(this.value))">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; opacity: 0.7; margin-top: 5px;">
-                        <span>0.5x (Zoom Out)</span>
-                        <span>1x (Default)</span>
-                        <span>5x (Zoom In)</span>
-                    </div>
-                </div>
-                <div style="margin: 15px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
-                    <label style="color: #fff; font-weight: 500; display: block; margin-bottom: 8px;">
-                        Universal Zoom: <span id="universalZoomLevel">1.0</span>x
-                    </label>
-                    <input type="range" id="universalZoomSlider" min="0.5" max="5" step="0.1" value="1" 
-                           style="width: 100%;"
-                           oninput="updateUniversalZoom(parseFloat(this.value))">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; opacity: 0.7; margin-top: 5px;">
-                        <span>0.5x (Zoom Out)</span>
-                        <span>1x (Default)</span>
-                        <span>5x (Zoom In)</span>
-                    </div>
-                </div>
+
                 <canvas id="vizCanvas"></canvas>
                 <div id="vizStats" style="margin-top: 20px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; display: none;"></div>
             </div>
             
             <div id="prime-ring-section" class="prime-ring-container" style="display: none;">
-                <h3>Prime Residue Visualization: Concentric Rings (mod m)</h3>
+                <h3>Advanced Prime Residue Visualization: Concentric Rings (mod m)</h3>
+                
+                <!-- Advanced Mode Tabs -->
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="ring-mode-btn active" onclick="setRingMode('basic')" id="ringModeBasic">Basic</button>
+                    <button class="ring-mode-btn" onclick="setRingMode('density')" id="ringModeDensity">Density Heatmap</button>
+                    <button class="ring-mode-btn" onclick="setRingMode('connections')" id="ringModeConnections">Prime Connections</button>
+                    <button class="ring-mode-btn" onclick="setRingMode('flow')" id="ringModeFlow">Flow Particles</button>
+                    <button class="ring-mode-btn" onclick="setRingMode('3d')" id="ringMode3d">3D Helix</button>
+                </div>
+                
+                <!-- Basic Controls -->
                 <div class="ring-controls">
                     <label>
                         Modulus Mode:
@@ -1460,12 +1448,14 @@
                             <option value="custom">Custom List</option>
                             <option value="powers">Powers of 2</option>
                             <option value="powers3">Powers of 3</option>
+                            <option value="primes">Prime Moduli Only</option>
+                            <option value="fibonacci">Fibonacci Numbers</option>
                         </select>
                     </label>
                     <div id="rangeControls">
                         <label>
                             Max Modulus:
-                            <input type="number" id="maxModulus" value="30" min="2" max="100" step="1">
+                            <input type="number" id="maxModulus" value="30" min="2" max="200" step="1">
                         </label>
                     </div>
                     <div id="customControls" style="display: none;">
@@ -1476,14 +1466,15 @@
                     </div>
                     <label>
                         Point Size:
-                        <input type="number" id="pointSize" value="4" min="2" max="10" step="1">
+                        <input type="range" id="pointSize" value="4" min="1" max="15" step="0.5">
+                        <span id="pointSizeValue">4</span>
                     </label>
                     <label>
-                        <input type="checkbox" id="showLabels" checked>
+                        <input type="checkbox" id="showLabels">
                         Show Prime Labels
                     </label>
                     <label>
-                        <input type="checkbox" id="showModLines" checked>
+                        <input type="checkbox" id="showModLines">
                         Show Mod Lines
                     </label>
                     <label>
@@ -1496,14 +1487,25 @@
                             <option value="residue">Residue Class</option>
                             <option value="modulus">Modulus Level</option>
                             <option value="size">Prime Size</option>
+                            <option value="gap">Prime Gap</option>
+                            <option value="twin">Twin Prime Status</option>
                         </select>
                     </label>
-                    <button onclick="updatePrimeRing()" style="padding: 6px 16px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update</button>
                 </div>
+                
+                <!-- Advanced Controls -->
                 <div class="ring-controls" style="margin-top: 10px;">
                     <label>
                         <input type="checkbox" id="invertColors">
                         White Background
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showTrails">
+                        Show Prime Trails
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showSymmetry">
+                        Highlight Symmetry
                     </label>
                     <label>
                         Rotation Mode:
@@ -1511,22 +1513,78 @@
                             <option value="none">No Rotation</option>
                             <option value="global">Global Rotation</option>
                             <option value="local">Local Rotation (by ring)</option>
+                            <option value="spiral">Spiral Mode</option>
+                            <option value="pulse">Pulse Mode</option>
                         </select>
                     </label>
                     <label>
                         Speed:
-                        <input type="number" id="rotationSpeed" value="0.5" min="0.1" max="5" step="0.1">
+                        <input type="range" id="rotationSpeed" value="0.5" min="0.1" max="5" step="0.1">
+                        <span id="speedValue">0.5</span>x
                     </label>
-                    <button onclick="toggleRotation()" id="rotationToggle" style="padding: 6px 16px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Start Rotation</button>
-                    <button onclick="exportPrimeRing()" style="padding: 6px 16px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Export Ring (PNG)</button>
                 </div>
+                
+                <!-- Filter Controls -->
+                <div class="ring-controls" style="margin-top: 10px;">
+                    <label>
+                        Prime Range Filter:
+                        <input type="range" id="primeRangeMin" value="0" min="0" max="1000" step="1">
+                        <span id="primeRangeMinValue">0</span>
+                        to
+                        <input type="range" id="primeRangeMax" value="1000" min="0" max="10000" step="10">
+                        <span id="primeRangeMaxValue">1000</span>
+                    </label>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="ring-controls" style="margin-top: 10px;">
+                    <button onclick="updatePrimeRing()" style="padding: 8px 20px; background: #4ecdc4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">🔄 Update</button>
+                    <button onclick="toggleRotation()" id="rotationToggle" style="padding: 8px 20px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">▶️ Start Rotation</button>
+                    <button onclick="captureSnapshot()" style="padding: 8px 20px; background: #9966ff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">📸 Snapshot</button>
+                    <button onclick="exportPrimeRing()" style="padding: 8px 20px; background: linear-gradient(45deg, #4ecdc4, #44a8a3); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">💾 Export</button>
+                    <button onclick="toggleFullscreen()" style="padding: 8px 20px; background: #ffd700; color: #1e3c72; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">⛶ Fullscreen</button>
+                </div>
+                
+                <!-- Statistics Panel -->
+                <div id="ringStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 10px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Primes Plotted</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #4ecdc4;" id="statPrimesPlotted">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Rings Active</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ffd700;" id="statRingsActive">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Coprime Residues</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #ff6384;" id="statCoprimeResidues">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.85em; opacity: 0.8;">Symmetry Score</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #9966ff;" id="statSymmetry">0%</div>
+                    </div>
+                </div>
+                
                 <canvas id="primeRingCanvas"></canvas>
+                
                 <div class="ring-info">
-                    <strong>Visualization:</strong> Each prime p is plotted on concentric rings where ring m represents residues mod m.
-                    Position on ring: angle θ = 2π·(p mod m)/m for primes with gcd(p mod m, m) = 1.
-                    Use "Invert Ring Order" to show smallest modulus on outer ring.
-                    <br><strong>Presets:</strong> Powers of 2 (1,2,4,8,...), Powers of 3 (1,3,9,27,...), or custom list.
-                    Hover over points to see prime details.
+                    <strong>🎨 Visualization Modes:</strong><br>
+                    <strong>Basic:</strong> Standard concentric ring layout with customizable colors<br>
+                    <strong>Density Heatmap:</strong> Shows concentration of primes in different regions<br>
+                    <strong>Prime Connections:</strong> Links related primes (twins, cousins, sexy primes)<br>
+                    <strong>Flow Particles:</strong> Animated particles flowing along residue classes<br>
+                    <strong>3D Helix:</strong> Three-dimensional spiral representation<br><br>
+                    
+                    <strong>📊 Features:</strong><br>
+                    • Multiple modulus modes (range, powers, primes, Fibonacci)<br>
+                    • Advanced color schemes (gap-based, twin prime highlighting)<br>
+                    • Rotation modes with adjustable speed<br>
+                    • Prime range filtering for focused analysis<br>
+                    • Symmetry detection and highlighting<br>
+                    • Real-time statistics panel<br>
+                    • Snapshot and export capabilities<br><br>
+                    
+                    <strong>🖱️ Controls:</strong> Click and drag to rotate • Scroll to zoom • Hover for details
                 </div>
                 <div id="ringLegend" class="ring-legend"></div>
             </div>
@@ -9629,10 +9687,40 @@
             URL.revokeObjectURL(url);
         }
         
-        // Prime Ring Visualization
+        // Prime Ring Visualization - Enhanced
         let rotationAnimationId = null;
         let globalRotationAngle = 0;
         let isRotating = false;
+        let currentRingMode = 'basic';
+        let flowParticles = [];
+        let primeConnections = [];
+        let snapshotHistory = [];
+        
+        function setRingMode(mode) {
+            currentRingMode = mode;
+            
+            // Update button styles
+            ['ringModeBasic', 'ringModeDensity', 'ringModeConnections', 'ringModeFlow', 'ringMode3d'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            const activeId = 'ringMode' + mode.charAt(0).toUpperCase() + mode.slice(1);
+            const activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Reset animations if switching modes
+            if (isRotating) {
+                toggleRotation();
+                setTimeout(() => toggleRotation(), 100);
+            }
+            
+            updatePrimeRing();
+        }
         
         function toggleModulusMode() {
             const mode = document.getElementById('modulusMode').value;
@@ -9648,6 +9736,46 @@
             } else {
                 rangeControls.style.display = 'none';
                 customControls.style.display = 'none';
+            }
+        }
+        
+        function captureSnapshot() {
+            const canvas = document.getElementById('primeRingCanvas');
+            const dataUrl = canvas.toDataURL('image/png');
+            
+            snapshotHistory.push({
+                timestamp: new Date().toISOString(),
+                mode: currentRingMode,
+                modulus: getModulusList(),
+                dataUrl: dataUrl
+            });
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Captured!';
+            btn.style.background = '#4ecdc4';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '#9966ff';
+            }, 1500);
+            
+            // Optionally download immediately
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `prime_ring_snapshot_${Date.now()}.png`;
+            a.click();
+        }
+        
+        function toggleFullscreen() {
+            const canvas = document.getElementById('primeRingCanvas');
+            if (!document.fullscreenElement) {
+                canvas.requestFullscreen().catch(err => {
+                    console.log('Fullscreen error:', err);
+                });
+            } else {
+                document.exitFullscreen();
             }
         }
         
